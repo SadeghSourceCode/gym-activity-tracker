@@ -1,3 +1,39 @@
-<p>
-  WORKOUT
-</p>
+<div class="w-full">
+  <p>WORKOUT</p>
+
+  <div class="flex flex-col gap-4 mt-4 bg-gray-100 rounded-2xl p-2">
+    @for (workout of workouts(); track workout.id) {
+      <div class="w-full flex flex-col items-center gap-4">
+        <div class="w-full">
+          <p>{{ workout.name }}</p>
+
+          @for (set of workout.sets; track set.id) {
+            <div class="flex items-center gap-4">
+              <label>
+                Repeat
+                <input
+                  type="number"
+                  min="0"
+                  [value]="set.repeat"
+                  (input)="updateSet(workout.id, set.id, { repeat: +$any($event.target).value })"
+                />
+              </label>
+
+              <label>
+                Weight
+                <input
+                  type="number"
+                  min="0"
+                  [value]="set.weight"
+                  (input)="updateSet(workout.id, set.id, { weight: +$any($event.target).value })"
+                />
+              </label>
+            </div>
+          }
+
+          <button type="button" (click)="addSet(workout.id)">+</button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

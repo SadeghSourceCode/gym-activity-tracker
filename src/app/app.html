@@ -1,9 +1,11 @@
 <div class="w-full h-full flex flex-col relative">
 
-  <router-outlet />
+  <div class="flex-1 px-5 pt-5">
+    <router-outlet />
+  </div>
 
-  <div class="absolute py-6 px-3 flex items-center justify-center">
-    <div class="bg-amber-900 text-amber-50 px-2 py-3 rounded-xl">
+  <div class="w-full absolute bottom-0 p-3 px-5">
+    <div class="w-full bg-gray-900 text-gray-50 px-2 py-3 rounded-full">
       bottom navigation
     </div>
   </div>
