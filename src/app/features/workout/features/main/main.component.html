@@ -1,14 +1,14 @@
-<div class="w-full">
+<div class="flex flex-col w-full">
   <p>WORKOUT</p>
 
-  <div class="flex flex-col gap-4 mt-4 bg-gray-100 rounded-2xl p-2">
+  <div class="w-full flex flex-col gap-4 mt-4 bg-gray-100 rounded-2xl p-2">
     @for (workout of workouts(); track workout.id) {
-      <div class="w-full flex flex-col items-center gap-4">
-        <div class="w-full">
+      <div class="w-full flex flex-col gap-4">
+        <div class="w-full flex gap-4">
           <p>{{ workout.name }}</p>
 
           @for (set of workout.sets; track set.id) {
-            <div class="flex items-center gap-4">
+            <div class="flex-1 grid grid-cols-2 items-center gap-4">
               <label>
                 Repeat
                 <input
@@ -30,9 +30,14 @@
               </label>
             </div>
           }
-
-          <button type="button" (click)="addSet(workout.id)">+</button>
         </div>
+        <button
+          class="w-full bg-blue-900 text-white rounded-full"
+          type="button"
+          (click)="addSet(workout.id)"
+        >
+          +
+        </button>
       </div>
     }
   </div>
