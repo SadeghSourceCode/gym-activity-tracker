@@ -86,6 +86,12 @@ export class MainComponent {
     );
   }
 
+  removeWorkout(workoutId: number) {
+    this.workouts.update((workouts) =>
+      workouts.filter((workout) => workout.id !== workoutId),
+    );
+  }
+
   addSet(workoutId: number) {
     this.workouts.update((workouts) =>
       workouts.map((workout) => {

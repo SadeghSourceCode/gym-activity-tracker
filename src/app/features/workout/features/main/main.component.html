@@ -1,8 +1,20 @@
 <div class="flex w-full min-w-0 max-w-full flex-col overflow-hidden">
   <div class="mt-4 flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden rounded-2xl">
     @for (workout of workouts(); track workout.id; let last = $last) {
-      <div class="flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden p-3 bg-gray-100">
-        <label class="block min-w-0">
+      <div
+        class="relative flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden bg-gray-100 p-3"
+      >
+        <button
+          class="absolute right-2 top-2 flex size-8 items-center justify-center rounded-full text-2xl leading-none text-red-700 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-600"
+          type="button"
+          aria-label="Remove workout"
+          title="Remove workout"
+          (click)="removeWorkout(workout.id)"
+        >
+          &times;
+        </button>
+
+        <label class="block min-w-0 pr-10">
           Workout name
           <input
             class="block w-full min-w-0 max-w-full"
