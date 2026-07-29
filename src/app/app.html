@@ -1,13 +1,9 @@
-<div class="w-full h-full flex flex-col relative">
-
-  <div class="flex-1 px-5 pt-5">
+<div class="flex h-dvh w-full min-w-0 max-w-full flex-col overflow-hidden">
+  <main class="scrollbar-none min-h-0 w-full min-w-0 max-w-full flex-1 overflow-y-auto overflow-x-hidden p-5">
     <router-outlet />
-  </div>
+  </main>
 
-  <div class="w-full absolute bottom-0 p-3 px-5">
-    <div class="w-full bg-gray-900 text-gray-50 px-2 py-3 rounded-full">
-      bottom navigation
-    </div>
-  </div>
-
+  <nav class="w-full min-w-0 max-w-full shrink-0 overflow-hidden bg-white px-5 py-3">
+    <div class="w-full max-w-full rounded-full bg-gray-900 px-2 py-3 text-gray-50">bottom navigation</div>
+  </nav>
 </div>
