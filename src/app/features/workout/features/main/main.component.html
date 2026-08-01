@@ -14,23 +14,50 @@
           &times;
         </button>
 
-        <label class="block min-w-0 pr-10">
-          Workout name
-          <input
-            class="block w-full min-w-0 max-w-full"
-            type="text"
-            [value]="workout.name"
-            (input)="updateWorkoutName(workout.id, $any($event.target).value)"
-          />
-        </label>
+        <div class="grid min-w-0 grid-cols-[56px_1fr] items-center gap-3 pr-10">
+          @if (workout.thumbnailUrl) {
+            <button
+              class="size-14 overflow-hidden rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-900"
+              type="button"
+              aria-label="Open exercise details"
+              title="Open exercise details"
+              (click)="openExerciseDetails(workout)"
+            >
+              <img
+                class="size-full object-cover"
+                [src]="workout.thumbnailUrl"
+                [alt]="workout.name"
+                loading="lazy"
+              />
+            </button>
+          } @else {
+            <div class="size-14 rounded-xl bg-white"></div>
+          }
+
+          <p class="min-w-0 truncate font-bold">{{ workout.name }}</p>
+        </div>
 
         <div class="flex w-full min-w-0 max-w-full flex-col gap-2 overflow-hidden">
           @for (set of workout.sets; track set.id) {
             <div
               class="grid w-full min-w-0 max-w-full grid-cols-2 items-center gap-4 overflow-hidden"
             >
-              <label class="block min-w-0">
-                Repeat
+              <label class="block min-w-0" aria-label="Repeat" title="Repeat">
+                <svg
+                  class="mb-1 size-5 text-gray-700"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M17 1l4 4-4 4" />
+                  <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                  <path d="M7 23l-4-4 4-4" />
+                  <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                </svg>
                 <input
                   class="block w-full min-w-0 max-w-full"
                   type="number"
@@ -40,8 +67,26 @@
                 />
               </label>
 
-              <label class="block min-w-0">
-                Weight
+              <label class="block min-w-0" aria-label="Weight" title="Weight">
+                <svg
+                  class="mb-1 size-5 text-gray-700"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M6.5 6.5h11" />
+                  <path d="M6.5 17.5h11" />
+                  <path d="M6.5 6.5v11" />
+                  <path d="M17.5 6.5v11" />
+                  <path d="M2 9v6" />
+                  <path d="M22 9v6" />
+                  <path d="M2 12h4.5" />
+                  <path d="M17.5 12H22" />
+                </svg>
                 <input
                   class="block w-full min-w-0 max-w-full"
                   type="number"
@@ -54,11 +99,25 @@
           }
         </div>
         <button
-          class="w-full rounded-full bg-blue-900 text-white"
+          class="flex w-full items-center justify-center rounded-full bg-blue-900 py-2 text-white"
           type="button"
+          aria-label="Add new set"
+          title="Add new set"
           (click)="addSet(workout.id)"
         >
-          Add new set
+          <svg
+            class="size-5"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 5v14" />
+            <path d="M5 12h14" />
+          </svg>
         </button>
       </div>
 
@@ -68,11 +127,203 @@
     }
 
     <button
-      class="w-full rounded-full bg-green-700 px-4 py-2 text-white"
+      class="flex w-full items-center justify-center rounded-full bg-green-700 px-4 py-2 text-white"
       type="button"
-      (click)="addWorkout()"
+      aria-label="Add new workout"
+      title="Add new workout"
+      (click)="openExerciseSheet()"
     >
-      Add new workout
+      <svg
+        class="size-6"
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M12 5v14" />
+        <path d="M5 12h14" />
+        <path d="M18 8.5a4 4 0 0 0-7.5-2" />
+        <path d="M7 15.5a4 4 0 0 0 7.5 2" />
+      </svg>
     </button>
   </div>
 </div>
+
+@if (exerciseDetailsError()) {
+  <p class="mt-4 rounded-xl bg-red-50 p-3 text-center text-red-700">
+    {{ exerciseDetailsError() }}
+  </p>
+}
+
+@if (isExerciseSheetOpen()) {
+  <div
+    class="fixed inset-0 z-50 flex items-end bg-black/40"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Add workout"
+  >
+    <div class="flex h-dvh w-full flex-col rounded-t-3xl bg-white shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-200 p-4">
+        <div>
+          <h2 class="text-xl font-semibold">Add new workout</h2>
+          <p class="text-sm text-gray-600">Search all exercises and select one to add.</p>
+        </div>
+
+        <button
+          class="flex size-10 items-center justify-center rounded-full text-3xl leading-none hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-900"
+          type="button"
+          aria-label="Close exercise search"
+          (click)="closeExerciseSheet()"
+        >
+          &times;
+        </button>
+      </div>
+
+      <div class="border-b border-gray-200 p-4">
+        <label class="block">
+          Search exercises
+          <input
+            class="mt-1 block w-full rounded-xl border border-gray-300 px-4 py-3"
+            type="search"
+            list="exercise-search-suggestions"
+            placeholder="Search by name, muscle, equipment, level..."
+            [value]="exerciseSearchQuery()"
+            (input)="searchExercises($any($event.target).value)"
+          />
+        </label>
+
+        <datalist id="exercise-search-suggestions">
+          @for (exercise of exerciseSearchResults().slice(0, 10); track exercise.id) {
+            <option [value]="exercise.name"></option>
+          }
+        </datalist>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto p-4" (scroll)="onExerciseListScroll($event)">
+        @if (exerciseSearchError()) {
+          <p class="rounded-xl bg-red-50 p-3 text-red-700">{{ exerciseSearchError() }}</p>
+        }
+
+        <div class="grid gap-3">
+          @for (exercise of exerciseSearchResults(); track exercise.id) {
+            <button
+              class="grid w-full grid-cols-[72px_1fr] gap-3 rounded-2xl border border-gray-200 bg-white p-3 text-left shadow-sm hover:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900"
+              type="button"
+              (click)="addWorkout(exercise)"
+            >
+              @if (getExerciseMediaUrl(exercise); as exerciseMediaUrl) {
+                <img
+                  class="size-18 rounded-xl bg-gray-100 object-cover"
+                  [src]="exerciseMediaUrl"
+                  [alt]="exercise.name"
+                  loading="lazy"
+                />
+              } @else {
+                <div class="size-18 rounded-xl bg-gray-100"></div>
+              }
+
+              <span class="min-w-0">
+                <span class="block font-semibold">{{ exercise.name }}</span>
+                <span class="block text-sm capitalize text-gray-600">
+                  {{ exercise.category }}
+                  @if (exercise.equipment) {
+                    · {{ exercise.equipment }}
+                  }
+                </span>
+                <span class="mt-1 block text-sm capitalize text-gray-500">
+                  {{ exercise.primaryMuscles.join(', ') }}
+                </span>
+              </span>
+            </button>
+          }
+        </div>
+
+        @if (isExerciseSearchLoading()) {
+          <p class="py-4 text-center text-gray-600">Loading exercises...</p>
+        } @else if (exerciseSearchResults().length < exerciseSearchTotal()) {
+          <button
+            class="mt-4 w-full rounded-full bg-blue-900 px-4 py-3 text-white"
+            type="button"
+            (click)="loadMoreExercises()"
+          >
+            Load more
+          </button>
+        } @else if (!exerciseSearchResults().length && !exerciseSearchError()) {
+          <p class="py-8 text-center text-gray-600">No exercises found.</p>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+@if (selectedExercise(); as exercise) {
+  <div
+    class="fixed inset-0 z-50 overflow-y-auto bg-white"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Exercise details"
+  >
+    <div class="flex min-h-dvh flex-col items-center gap-4 p-4">
+      <div class="flex w-full items-center justify-between">
+        <h2 class="min-w-0 truncate text-xl font-semibold">{{ exercise.name }}</h2>
+
+        <button
+          class="flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-900"
+          type="button"
+          aria-label="Close exercise details"
+          (click)="closeExerciseDetails()"
+        >
+          &times;
+        </button>
+      </div>
+
+      @if (getExerciseMediaUrl(exercise); as exerciseMediaUrl) {
+        <img
+          class="w-full rounded-3xl bg-gray-100 object-cover"
+          [src]="exerciseMediaUrl"
+          [alt]="exercise.name"
+        />
+      }
+
+      <div class="flex w-full flex-col items-center gap-2 text-center">
+        <p class="font-semibold capitalize text-gray-700">
+          {{ exercise.category }}
+          @if (exercise.equipment) {
+            · {{ exercise.equipment }}
+          }
+        </p>
+
+        @if (exercise.instructions.length) {
+          <p class="max-w-2xl leading-7 text-gray-700">
+            {{ exercise.instructions.join(' ') }}
+          </p>
+        } @else {
+          <p class="max-w-2xl leading-7 text-gray-700">
+            No description is available for this exercise.
+          </p>
+        }
+      </div>
+
+      @if (similarExercises().length) {
+        <div class="w-full">
+          <p class="mb-2 text-center font-semibold">Similar exercises</p>
+
+          <div class="flex items-center gap-3 overflow-x-auto pb-2">
+            @for (similarExercise of similarExercises(); track similarExercise.id) {
+              <button
+                class="shrink-0 rounded-full border border-blue-900 px-4 py-2 text-sm capitalize text-blue-900"
+                type="button"
+                (click)="showExerciseDetails(similarExercise)"
+              >
+                {{ similarExercise.name }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

@@ -1,5 +1,10 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, effect, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, PLATFORM_ID, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  ExerciseDbApiService,
+  ExerciseDbExercise,
+} from '../../services/exercise-db-api.service';
 
 interface WorkoutSet {
   id: number;
@@ -10,6 +15,8 @@ interface WorkoutSet {
 interface Workout {
   id: number;
   name: string;
+  exerciseId?: string;
+  thumbnailUrl?: string;
   date: Date;
   sets: WorkoutSet[];
 }
@@ -21,8 +28,22 @@ interface Workout {
 export class MainComponent {
   private readonly storageKey = 'gym-activity-tracker.workouts';
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly exerciseDbApi = inject(ExerciseDbApiService);
+  private readonly pageSize = 15;
 
   workouts = signal<Workout[]>(this.loadWorkouts());
+  isExerciseSheetOpen = signal(false);
+  exerciseSearchQuery = signal('');
+  exerciseSearchResults = signal<ExerciseDbExercise[]>([]);
+  exerciseSearchTotal = signal(0);
+  isExerciseSearchLoading = signal(false);
+  exerciseSearchError = signal<string | null>(null);
+  selectedExercise = signal<ExerciseDbExercise | null>(null);
+  similarExercises = signal<ExerciseDbExercise[]>([]);
+  exerciseDetailsError = signal<string | null>(null);
+
+  readonly exerciseImageBaseUrl = this.exerciseDbApi.imageBaseUrl;
 
   private readonly saveWorkouts = effect(() => {
     if (!this.isBrowser) {
@@ -64,7 +85,43 @@ export class MainComponent {
     }
   }
 
-  addWorkout() {
+  openExerciseSheet() {
+    this.isExerciseSheetOpen.set(true);
+    this.searchExercises('');
+  }
+
+  closeExerciseSheet() {
+    this.isExerciseSheetOpen.set(false);
+  }
+
+  searchExercises(query: string) {
+    this.exerciseSearchQuery.set(query);
+    this.exerciseSearchResults.set([]);
+    this.exerciseSearchTotal.set(0);
+    this.loadExercisesPage(0);
+  }
+
+  loadMoreExercises() {
+    if (
+      this.isExerciseSearchLoading() ||
+      this.exerciseSearchResults().length >= this.exerciseSearchTotal()
+    ) {
+      return;
+    }
+
+    this.loadExercisesPage(this.exerciseSearchResults().length);
+  }
+
+  onExerciseListScroll(event: Event) {
+    const target = event.target as HTMLElement;
+    const remainingScroll = target.scrollHeight - target.scrollTop - target.clientHeight;
+
+    if (remainingScroll < 240) {
+      this.loadMoreExercises();
+    }
+  }
+
+  addWorkout(exercise?: ExerciseDbExercise) {
     this.workouts.update((workouts) => {
       const nextWorkoutId = Math.max(...workouts.map((workout) => workout.id), 0) + 1;
 
@@ -72,18 +129,67 @@ export class MainComponent {
         ...workouts,
         {
           id: nextWorkoutId,
-          name: `workout ${nextWorkoutId}`,
+          name: exercise?.name ?? `workout ${nextWorkoutId}`,
+          exerciseId: exercise?.id,
+          thumbnailUrl: exercise ? (this.getExerciseMediaUrl(exercise) ?? undefined) : undefined,
           date: new Date(),
           sets: [{ id: 1, repeat: 0, weight: 0 }],
         },
       ];
     });
+
+    this.closeExerciseSheet();
   }
 
-  updateWorkoutName(workoutId: number, name: string) {
-    this.workouts.update((workouts) =>
-      workouts.map((workout) => (workout.id === workoutId ? { ...workout, name } : workout)),
-    );
+  getExerciseMediaUrl(exercise: ExerciseDbExercise): string | null {
+    const mediaPath = exercise.gifUrl ?? exercise.images[0];
+
+    return mediaPath ? this.exerciseImageBaseUrl + mediaPath : null;
+  }
+
+  openExerciseDetails(workout: Workout) {
+    if (!workout.exerciseId) {
+      this.exerciseDetailsError.set('Exercise details are unavailable for this workout.');
+      return;
+    }
+
+    this.exerciseDetailsError.set(null);
+
+    this.exerciseDbApi
+      .getById(workout.exerciseId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (exercise) => {
+          if (!exercise) {
+            this.exerciseDetailsError.set('Exercise details were not found.');
+            return;
+          }
+
+          this.showExerciseDetails(exercise);
+        },
+        error: () => {
+          this.exerciseDetailsError.set('Could not load exercise details.');
+        },
+      });
+  }
+
+  showExerciseDetails(exercise: ExerciseDbExercise) {
+    this.selectedExercise.set(exercise);
+    this.exerciseDetailsError.set(null);
+
+    this.exerciseDbApi
+      .getSimilar(exercise)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (similarExercises) => this.similarExercises.set(similarExercises),
+        error: () => this.similarExercises.set([]),
+      });
+  }
+
+  closeExerciseDetails() {
+    this.selectedExercise.set(null);
+    this.similarExercises.set([]);
+    this.exerciseDetailsError.set(null);
   }
 
   removeWorkout(workoutId: number) {
@@ -133,5 +239,27 @@ export class MainComponent {
         };
       }),
     );
+  }
+
+  private loadExercisesPage(offset: number) {
+    this.isExerciseSearchLoading.set(true);
+    this.exerciseSearchError.set(null);
+
+    this.exerciseDbApi
+      .search(this.exerciseSearchQuery(), offset, this.pageSize)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ items, total }) => {
+          this.exerciseSearchResults.update((results) =>
+            offset === 0 ? items : [...results, ...items],
+          );
+          this.exerciseSearchTotal.set(total);
+          this.isExerciseSearchLoading.set(false);
+        },
+        error: () => {
+          this.exerciseSearchError.set('Could not load exercises. Check your connection and try again.');
+          this.isExerciseSearchLoading.set(false);
+        },
+      });
   }
 }
