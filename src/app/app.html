@@ -21,7 +21,7 @@
           type="button"
           [attr.aria-label]="item.label"
           [attr.aria-current]="isBottomNavItemSelected(item.id) ? 'page' : null"
-          (click)="selectBottomNavItem(item.id)"
+          (click)="selectBottomNavItem(item.id, item.route)"
         >
           <span
             class="flex h-11 items-center justify-center rounded-[48px] transition-all duration-300 ease-out"

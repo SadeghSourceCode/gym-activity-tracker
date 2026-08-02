@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
 
 type BottomNavItem = 'home' | 'search' | 'progress' | 'profile';
 
@@ -9,21 +10,40 @@ type BottomNavItem = 'home' | 'search' | 'progress' | 'profile';
   templateUrl: './app.html',
 })
 export class App {
-  protected readonly title = signal('gym-activity-tracker');
-  protected readonly selectedBottomNavItem = signal<BottomNavItem>('home');
+  private readonly router = inject(Router);
 
-  protected readonly bottomNavItems: { id: BottomNavItem; label: string }[] = [
-    { id: 'home', label: 'Home' },
-    { id: 'search', label: 'Search' },
-    { id: 'progress', label: 'Progress' },
-    { id: 'profile', label: 'Profile' },
+  protected readonly title = signal('gym-activity-tracker');
+  protected readonly selectedBottomNavItem = signal<BottomNavItem | null>(null);
+
+  protected readonly bottomNavItems: { id: BottomNavItem; label: string; route: string }[] = [
+    { id: 'home', label: 'Home', route: '/' },
+    { id: 'search', label: 'Search', route: '/search' },
+    { id: 'progress', label: 'Progress', route: '/' },
+    { id: 'profile', label: 'Profile', route: '/' },
   ];
 
-  protected selectBottomNavItem(item: BottomNavItem) {
-    this.selectedBottomNavItem.set(item);
+  constructor() {
+    this.syncSelectedBottomNavItemWithRoute(this.router.url);
+
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => this.syncSelectedBottomNavItemWithRoute(event.urlAfterRedirects));
+  }
+
+  protected selectBottomNavItem(item: BottomNavItem, route: string) {
+    void this.router.navigateByUrl(route);
   }
 
   protected isBottomNavItemSelected(item: BottomNavItem): boolean {
     return this.selectedBottomNavItem() === item;
+  }
+
+  private syncSelectedBottomNavItemWithRoute(url: string) {
+    const path = url.split('?')[0].split('#')[0];
+    const matchingItem = this.bottomNavItems.find((item) =>
+      item.route === '/' ? path === '/' : path.startsWith(item.route),
+    );
+
+    this.selectedBottomNavItem.set(matchingItem?.id ?? null);
   }
 }
