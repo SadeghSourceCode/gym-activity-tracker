@@ -2,10 +2,10 @@
   <div class="mt-4 flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden rounded-2xl">
     @for (workout of workouts(); track workout.id; let last = $last) {
       <div
-        class="relative flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden bg-gray-100 p-3"
+        class="relative flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden rounded-3xl border border-[#E3E5E5] bg-white p-3 shadow-sm"
       >
         <button
-          class="absolute right-2 top-2 flex size-8 items-center justify-center rounded-full text-2xl leading-none text-red-700 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-600"
+          class="absolute right-2 top-2 flex size-8 items-center justify-center rounded-full text-2xl leading-none text-[#FF6D6D] hover:bg-[#FFD6D6] focus:outline-none focus:ring-2 focus:ring-[#FF6D6D]"
           type="button"
           aria-label="Remove workout"
           title="Remove workout"
@@ -17,7 +17,7 @@
         <div class="grid min-w-0 grid-cols-[56px_1fr] items-center gap-3 pr-10">
           @if (workout.thumbnailUrl) {
             <button
-              class="size-14 overflow-hidden rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-900"
+              class="size-14 overflow-hidden rounded-xl bg-[#F7F9FA] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
               type="button"
               aria-label="Open exercise details"
               title="Open exercise details"
@@ -31,10 +31,10 @@
               />
             </button>
           } @else {
-            <div class="size-14 rounded-xl bg-white"></div>
+            <div class="size-14 rounded-xl bg-[#F7F9FA]"></div>
           }
 
-          <p class="min-w-0 truncate font-bold">{{ workout.name }}</p>
+          <p class="min-w-0 truncate font-bold text-[#202325]">{{ workout.name }}</p>
         </div>
 
         <div class="flex w-full min-w-0 max-w-full flex-col gap-2 overflow-hidden">
@@ -42,24 +42,10 @@
             <div
               class="grid w-full min-w-0 max-w-full grid-cols-2 items-center gap-4 overflow-hidden"
             >
-              <label class="block min-w-0" aria-label="Repeat" title="Repeat">
-                <svg
-                  class="mb-1 size-5 text-gray-700"
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M17 1l4 4-4 4" />
-                  <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-                  <path d="M7 23l-4-4 4-4" />
-                  <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-                </svg>
+              <label class="block min-w-0 text-[#72777A]">
+                Repeat
                 <input
-                  class="block w-full min-w-0 max-w-full"
+                  class="block w-full min-w-0 max-w-full rounded-xl border border-[#E3E5E5] bg-[#F7F9FA] px-3 py-2 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
                   type="number"
                   min="0"
                   [value]="set.repeat"
@@ -67,28 +53,10 @@
                 />
               </label>
 
-              <label class="block min-w-0" aria-label="Weight" title="Weight">
-                <svg
-                  class="mb-1 size-5 text-gray-700"
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M6.5 6.5h11" />
-                  <path d="M6.5 17.5h11" />
-                  <path d="M6.5 6.5v11" />
-                  <path d="M17.5 6.5v11" />
-                  <path d="M2 9v6" />
-                  <path d="M22 9v6" />
-                  <path d="M2 12h4.5" />
-                  <path d="M17.5 12H22" />
-                </svg>
+              <label class="block min-w-0 text-[#72777A]">
+                Weight
                 <input
-                  class="block w-full min-w-0 max-w-full"
+                  class="block w-full min-w-0 max-w-full rounded-xl border border-[#E3E5E5] bg-[#F7F9FA] px-3 py-2 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
                   type="number"
                   min="0"
                   [value]="set.weight"
@@ -99,81 +67,47 @@
           }
         </div>
         <button
-          class="flex w-full items-center justify-center rounded-full bg-blue-900 py-2 text-white"
+          class="w-full rounded-full bg-[#0070F0] px-4 py-2 font-semibold text-white"
           type="button"
-          aria-label="Add new set"
-          title="Add new set"
           (click)="addSet(workout.id)"
         >
-          <svg
-            class="size-5"
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M12 5v14" />
-            <path d="M5 12h14" />
-          </svg>
+          Add new set
         </button>
       </div>
-
-      @if (!last) {
-        <hr />
-      }
     }
 
     <button
-      class="flex w-full items-center justify-center rounded-full bg-green-700 px-4 py-2 text-white"
+      class="w-full rounded-full bg-[#0070F0] px-4 py-2 font-semibold text-white"
       type="button"
-      aria-label="Add new workout"
-      title="Add new workout"
       (click)="openExerciseSheet()"
     >
-      <svg
-        class="size-6"
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M12 5v14" />
-        <path d="M5 12h14" />
-        <path d="M18 8.5a4 4 0 0 0-7.5-2" />
-        <path d="M7 15.5a4 4 0 0 0 7.5 2" />
-      </svg>
+      Add new workout
     </button>
   </div>
 </div>
 
 @if (exerciseDetailsError()) {
-  <p class="mt-4 rounded-xl bg-red-50 p-3 text-center text-red-700">
+  <p class="mt-4 rounded-xl bg-[#FFD6D6] p-3 text-center text-[#FF6D6D]">
     {{ exerciseDetailsError() }}
   </p>
 }
 
 @if (isExerciseSheetOpen()) {
   <div
-    class="fixed inset-0 z-50 flex items-end bg-black/40"
+    class="fixed inset-0 z-50 flex items-end bg-[#202325]/40"
     role="dialog"
     aria-modal="true"
     aria-label="Add workout"
   >
     <div class="flex h-dvh w-full flex-col rounded-t-3xl bg-white shadow-2xl">
-      <div class="flex items-center justify-between border-b border-gray-200 p-4">
+      <div class="flex items-center justify-between border-b border-[#E3E5E5] p-4">
         <div>
-          <h2 class="text-xl font-semibold">Add new workout</h2>
-          <p class="text-sm text-gray-600">Search all exercises and select one to add.</p>
+          <h2 class="text-xl font-semibold text-[#202325]">Add new workout</h2>
+          <p class="text-sm text-[#72777A]">Search all exercises and select one to add.</p>
         </div>
 
         <button
-          class="flex size-10 items-center justify-center rounded-full text-3xl leading-none hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-900"
+          class="flex size-10 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
           type="button"
           aria-label="Close exercise search"
           (click)="closeExerciseSheet()"
@@ -182,11 +116,11 @@
         </button>
       </div>
 
-      <div class="border-b border-gray-200 p-4">
-        <label class="block">
+      <div class="border-b border-[#E3E5E5] p-4">
+        <label class="block text-[#72777A]">
           Search exercises
           <input
-            class="mt-1 block w-full rounded-xl border border-gray-300 px-4 py-3"
+            class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-[#F7F9FA] px-4 py-3 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
             type="search"
             list="exercise-search-suggestions"
             placeholder="Search by name, muscle, equipment, level..."
@@ -204,36 +138,36 @@
 
       <div class="min-h-0 flex-1 overflow-y-auto p-4" (scroll)="onExerciseListScroll($event)">
         @if (exerciseSearchError()) {
-          <p class="rounded-xl bg-red-50 p-3 text-red-700">{{ exerciseSearchError() }}</p>
+          <p class="rounded-xl bg-[#FFD6D6] p-3 text-[#FF6D6D]">{{ exerciseSearchError() }}</p>
         }
 
         <div class="grid gap-3">
           @for (exercise of exerciseSearchResults(); track exercise.id) {
             <button
-              class="grid w-full grid-cols-[72px_1fr] gap-3 rounded-2xl border border-gray-200 bg-white p-3 text-left shadow-sm hover:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900"
+              class="grid w-full grid-cols-[72px_1fr] gap-3 rounded-2xl border border-[#E3E5E5] bg-white p-3 text-left shadow-sm hover:border-[#0070F0] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
               type="button"
               (click)="addWorkout(exercise)"
             >
               @if (getExerciseMediaUrl(exercise); as exerciseMediaUrl) {
                 <img
-                  class="size-18 rounded-xl bg-gray-100 object-cover"
+                  class="size-18 rounded-xl bg-[#F7F9FA] object-cover"
                   [src]="exerciseMediaUrl"
                   [alt]="exercise.name"
                   loading="lazy"
                 />
               } @else {
-                <div class="size-18 rounded-xl bg-gray-100"></div>
+                <div class="size-18 rounded-xl bg-[#F7F9FA]"></div>
               }
 
               <span class="min-w-0">
-                <span class="block font-semibold">{{ exercise.name }}</span>
-                <span class="block text-sm capitalize text-gray-600">
+                <span class="block font-semibold text-[#202325]">{{ exercise.name }}</span>
+                <span class="block text-sm capitalize text-[#72777A]">
                   {{ exercise.category }}
                   @if (exercise.equipment) {
                     · {{ exercise.equipment }}
                   }
                 </span>
-                <span class="mt-1 block text-sm capitalize text-gray-500">
+                <span class="mt-1 block text-sm capitalize text-[#979C9E]">
                   {{ exercise.primaryMuscles.join(', ') }}
                 </span>
               </span>
@@ -242,17 +176,17 @@
         </div>
 
         @if (isExerciseSearchLoading()) {
-          <p class="py-4 text-center text-gray-600">Loading exercises...</p>
+          <p class="py-4 text-center text-[#72777A]">Loading exercises...</p>
         } @else if (exerciseSearchResults().length < exerciseSearchTotal()) {
           <button
-            class="mt-4 w-full rounded-full bg-blue-900 px-4 py-3 text-white"
+            class="mt-4 w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
             type="button"
             (click)="loadMoreExercises()"
           >
             Load more
           </button>
         } @else if (!exerciseSearchResults().length && !exerciseSearchError()) {
-          <p class="py-8 text-center text-gray-600">No exercises found.</p>
+          <p class="py-8 text-center text-[#72777A]">No exercises found.</p>
         }
       </div>
     </div>
@@ -261,17 +195,17 @@
 
 @if (selectedExercise(); as exercise) {
   <div
-    class="fixed inset-0 z-50 overflow-y-auto bg-white"
+    class="fixed inset-0 z-50 overflow-y-auto bg-[#F7F9FA]"
     role="dialog"
     aria-modal="true"
     aria-label="Exercise details"
   >
     <div class="flex min-h-dvh flex-col items-center gap-4 p-4">
       <div class="flex w-full items-center justify-between">
-        <h2 class="min-w-0 truncate text-xl font-semibold">{{ exercise.name }}</h2>
+        <h2 class="min-w-0 truncate text-xl font-semibold text-[#202325]">{{ exercise.name }}</h2>
 
         <button
-          class="flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-900"
+          class="flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
           type="button"
           aria-label="Close exercise details"
           (click)="closeExerciseDetails()"
@@ -282,14 +216,14 @@
 
       @if (getExerciseMediaUrl(exercise); as exerciseMediaUrl) {
         <img
-          class="w-full rounded-3xl bg-gray-100 object-cover"
+          class="w-full rounded-3xl bg-white object-cover"
           [src]="exerciseMediaUrl"
           [alt]="exercise.name"
         />
       }
 
       <div class="flex w-full flex-col items-center gap-2 text-center">
-        <p class="font-semibold capitalize text-gray-700">
+        <p class="font-semibold capitalize text-[#404446]">
           {{ exercise.category }}
           @if (exercise.equipment) {
             · {{ exercise.equipment }}
@@ -297,11 +231,11 @@
         </p>
 
         @if (exercise.instructions.length) {
-          <p class="max-w-2xl leading-7 text-gray-700">
+          <p class="max-w-2xl leading-7 text-[#72777A]">
             {{ exercise.instructions.join(' ') }}
           </p>
         } @else {
-          <p class="max-w-2xl leading-7 text-gray-700">
+          <p class="max-w-2xl leading-7 text-[#72777A]">
             No description is available for this exercise.
           </p>
         }
@@ -309,12 +243,12 @@
 
       @if (similarExercises().length) {
         <div class="w-full">
-          <p class="mb-2 text-center font-semibold">Similar exercises</p>
+          <p class="mb-2 text-center font-semibold text-[#202325]">Similar exercises</p>
 
           <div class="flex items-center gap-3 overflow-x-auto pb-2">
             @for (similarExercise of similarExercises(); track similarExercise.id) {
               <button
-                class="shrink-0 rounded-full border border-blue-900 px-4 py-2 text-sm capitalize text-blue-900"
+                class="shrink-0 rounded-full border border-[#0070F0] bg-[#EBF4FF] px-4 py-2 text-sm capitalize text-[#0070F0]"
                 type="button"
                 (click)="showExerciseDetails(similarExercise)"
               >
