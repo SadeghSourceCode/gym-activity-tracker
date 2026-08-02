@@ -1,0 +1,53 @@
+<div class="overflow-hidden rounded-3xl border border-[#E3E5E5] bg-white shadow-sm">
+  <div class="grid grid-cols-[56px_repeat(7,minmax(96px,1fr))] overflow-x-auto">
+    <div class="sticky left-0 z-20 border-b border-r border-[#E3E5E5] bg-white"></div>
+
+    @for (day of weekDays(); track day.date.toDateString()) {
+      <div class="border-b border-r border-[#E3E5E5] bg-white p-3 text-center last:border-r-0">
+        <p class="text-xs font-medium uppercase text-[#72777A]">{{ day.label }}</p>
+        <p class="text-lg font-bold text-[#202325]">{{ day.date.getDate() }}</p>
+      </div>
+    }
+
+    <div class="sticky left-0 z-10 bg-white">
+      @for (hour of hours; track hour) {
+        <div class="h-16 border-r border-[#E3E5E5] pr-2 pt-1 text-right text-xs text-[#979C9E]">
+          {{ hour.toString().padStart(2, '0') }}:00
+        </div>
+      }
+    </div>
+
+    @for (day of weekDays(); track day.date.toDateString()) {
+      <div class="relative min-w-24 border-r border-[#E3E5E5] last:border-r-0">
+        @for (hour of hours; track hour) {
+          <div class="h-16 border-b border-[#F2F4F5]"></div>
+        }
+
+        @for (event of day.events; track event.id) {
+          <div
+            class="absolute left-1 right-1 overflow-hidden rounded-2xl border border-[#80BBFF] bg-[#EBF4FF] p-2 shadow-sm"
+            [style]="getEventStyle(event)"
+          >
+            <div class="flex min-w-0 items-center gap-2">
+              @if (event.thumbnailUrl) {
+                <img
+                  class="size-7 shrink-0 rounded-lg bg-white object-cover"
+                  [src]="event.thumbnailUrl"
+                  [alt]="event.title"
+                  loading="lazy"
+                />
+              }
+
+              <div class="min-w-0">
+                <p class="truncate text-xs font-bold text-[#0070F0]">{{ event.title }}</p>
+                <p class="truncate text-[10px] text-[#404446]">
+                  {{ event.startsAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}
+                </p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

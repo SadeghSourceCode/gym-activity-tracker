@@ -5,6 +5,7 @@ import {
   ExerciseDbApiService,
   ExerciseDbExercise,
 } from '../../services/exercise-db-api.service';
+import { WeekSchedulerComponent } from '../week-scheduler/week-scheduler.component';
 
 interface WorkoutSet {
   id: number;
@@ -23,6 +24,7 @@ interface Workout {
 
 @Component({
   selector: 'app-main',
+  imports: [WeekSchedulerComponent],
   templateUrl: './main.component.html',
 })
 export class MainComponent {
