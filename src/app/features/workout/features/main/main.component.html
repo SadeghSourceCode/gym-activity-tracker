@@ -1,6 +1,6 @@
 <div class="flex w-full min-w-0 max-w-full flex-col overflow-hidden">
   <div class="mt-4 flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden rounded-2xl">
-    <app-week-scheduler [workouts]="workouts()" />
+    <app-workout-calendar />
 
     @for (workout of workouts(); track workout.id; let last = $last) {
       <div
