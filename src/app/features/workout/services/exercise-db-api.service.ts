@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map, shareReplay } from 'rxjs';
-import { ProfilePreferencesService } from '../../../core/profile/profile-preferences.service';
+import { ProfilePreferencesService } from '../../profile/data-access/services/profile-preferences.service';
 import { translateExerciseNameToPersian } from '../utils/exercise-persian-name.util';
 
 export interface ExerciseDbExercise {

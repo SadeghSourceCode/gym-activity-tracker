@@ -1,6 +1,6 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Injectable, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
-import { AppLanguage, AppTheme, UserProfile } from './user-profile.models';
+import { AppLanguage, AppTheme, UserProfile } from '../models/user-profile.models';
 
 const defaultProfile: UserProfile = {
   imageBase64: null,

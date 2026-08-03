@@ -1,1 +1,1 @@
-export { MainComponent } from './main/main.component';
+export { WorkoutPage } from './workout-page/workout-page';

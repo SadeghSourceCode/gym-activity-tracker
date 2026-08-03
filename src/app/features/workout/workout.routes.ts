@@ -1,9 +1,9 @@
 import { Routes } from "@angular/router";
-import { MainComponent } from "./features";
+import { WorkoutPage } from "./features";
 
 export const WorkoutRoutes: Routes = [
   {
     path: '',
-    loadComponent: () => MainComponent
+    loadComponent: () => WorkoutPage
   }
 ]

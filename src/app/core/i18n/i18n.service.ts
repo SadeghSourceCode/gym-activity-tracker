@@ -1,5 +1,5 @@
 import { Injectable, computed, inject } from '@angular/core';
-import { ProfilePreferencesService } from '../profile/profile-preferences.service';
+import { ProfilePreferencesService } from '../../features/profile/data-access/services/profile-preferences.service';
 
 type TranslationKey =
   | 'addSet'

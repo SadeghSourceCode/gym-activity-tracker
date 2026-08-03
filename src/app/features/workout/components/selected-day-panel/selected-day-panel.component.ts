@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import {
   SelectedDayViewModel,
   WorkoutDisplayStatus,
@@ -35,18 +35,24 @@ export class SelectedDayPanelComponent {
   readonly markAsRestDay = output<void>();
   readonly removeRestDay = output<void>();
 
-  getStatusLabel(status: WorkoutDisplayStatus): string {
-    switch (status) {
+  statusLabel = computed<string>(() => {
+    let result = this.text().inProgressLabel;
+    switch (this.selectedDayWorkoutStatus()) {
       case 'in-progress':
-        return this.text().inProgressLabel;
+        result= this.text().inProgressLabel;
+        break;
       case 'done':
-        return this.text().doneLabel;
+        result= this.text().doneLabel;
+        break;
       case 'rejected':
-        return this.text().rejectedLabel;
+        result= this.text().rejectedLabel;
+        break;
       case 'upcoming':
-        return this.text().incomingLabel;
+        result= this.text().incomingLabel;
+        break;
     }
-  }
+    return result;
+  })
 
   getExerciseCountLabel(exerciseCount: number): string {
     return this.text().isPersian

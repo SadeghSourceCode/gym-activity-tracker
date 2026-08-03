@@ -7,7 +7,7 @@
     <h2 class="text-xl font-bold text-[#202325]">{{ selectedDateLabel() }}</h2>
 
     @if (selectedDayWorkoutStatus(); as status) {
-      <app-status-badge [status]="status" [label]="getStatusLabel(status)" />
+      <app-status-badge [status]="status" [label]="statusLabel()" />
     }
   </div>
 

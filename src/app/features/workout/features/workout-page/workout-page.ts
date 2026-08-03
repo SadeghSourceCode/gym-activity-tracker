@@ -31,15 +31,15 @@ import {
 } from '../../services/exercise-db-api.service';
 import { getDateKey, getTodayDateKey, parseDateKey } from '../../utils/calendar-date.util';
 import { mapDailyPlanToViewModel } from '../../utils/workout-plan-view-model.mapper';
-import { WorkoutCalendarComponent } from '../workout-calendar/workout-calendar.component';
+import { WorkoutCalendarComponent } from '../../components/workout-calendar/workout-calendar.component';
 import { I18nService } from '../../../../core/i18n/i18n.service';
-import { SelectedDayPanelComponent } from '../selected-day-panel/selected-day-panel.component';
-import { WorkoutEditorSheetComponent } from '../workout-editor-sheet/workout-editor-sheet.component';
-import { WorkoutDetailComponent } from '../workout-detail/workout-detail.component';
-import { ExerciseDetailsDialogComponent } from '../exercise-details-dialog/exercise-details-dialog.component';
+import { SelectedDayPanelComponent } from '../../components/selected-day-panel/selected-day-panel.component';
+import { WorkoutEditorSheetComponent } from '../../components/workout-editor-sheet/workout-editor-sheet.component';
+import { WorkoutDetailComponent } from '../../components/workout-detail/workout-detail.component';
+import { ExerciseDetailsDialogComponent } from '../../components/exercise-details-dialog/exercise-details-dialog.component';
 
 @Component({
-  selector: 'app-main',
+  selector: 'app-workout-page',
   imports: [
     WorkoutCalendarComponent,
     SelectedDayPanelComponent,
@@ -47,9 +47,9 @@ import { ExerciseDetailsDialogComponent } from '../exercise-details-dialog/exerc
     WorkoutDetailComponent,
     ExerciseDetailsDialogComponent,
   ],
-  templateUrl: './main.component.html',
+  templateUrl: './workout-page.html',
 })
-export class MainComponent {
+export class WorkoutPage {
   private readonly storageKey = 'gym-activity-tracker.workouts';
   private readonly restDaysStorageKey = 'gym-activity-tracker.rest-days';
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
