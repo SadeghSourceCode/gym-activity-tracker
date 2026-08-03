@@ -8,7 +8,7 @@
     <section
       class="flex w-full min-w-0 flex-col gap-4 rounded-3xl bg-white p-4 shadow-sm"
       aria-live="polite"
-      aria-label="Selected day workouts"
+      [attr.aria-label]="i18n.t('selectedDayWorkouts')"
     >
       <div class="flex items-center justify-between gap-3">
         <h2 class="text-xl font-bold text-[#202325]">{{ selectedDateLabel() }}</h2>
@@ -38,7 +38,7 @@
             type="button"
             (click)="retrySelectedDay()"
           >
-            Retry
+            {{ i18n.t('retry') }}
           </button>
         </div>
       } @else {
@@ -50,7 +50,7 @@
                   class="flex min-w-0 cursor-pointer items-center justify-between gap-3 rounded-2xl border border-[#E3E5E5] bg-[#F7F9FA] p-4 hover:border-[#0070F0] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
                   role="button"
                   tabindex="0"
-                  [attr.aria-label]="'Open ' + workout.title"
+                  [attr.aria-label]="i18n.t('open') + ' ' + workout.title"
                   (click)="openWorkoutDetails(workout.id)"
                   (keydown.enter)="openWorkoutDetails(workout.id)"
                   (keydown.space)="openWorkoutDetails(workout.id)"
@@ -68,19 +68,19 @@
                     <button
                       class="rounded-full border border-[#C93636] bg-white px-3 py-1 text-xs font-bold text-[#C93636]"
                       type="button"
-                      [attr.aria-label]="'Reject ' + workout.title"
+                      [attr.aria-label]="i18n.t('reject') + ' ' + workout.title"
                       (click)="$event.stopPropagation(); setWorkoutCompletionStatus(+workout.id, 'rejected')"
                     >
-                      Reject
+                      {{ i18n.t('reject') }}
                     </button>
 
                     <button
                       class="rounded-full border border-[#0070F0] bg-white px-3 py-1 text-xs font-bold text-[#0070F0]"
                       type="button"
-                      [attr.aria-label]="'Edit ' + workout.title"
+                      [attr.aria-label]="i18n.t('edit') + ' ' + workout.title"
                       (click)="$event.stopPropagation(); openEditWorkoutSheet(workout.id)"
                     >
-                      Edit
+                      {{ i18n.t('edit') }}
                     </button>
                   </div>
                 </article>
@@ -90,46 +90,46 @@
 
           @case ('rest') {
             <div class="rounded-2xl border border-[#E3E5E5] bg-[#F7F9FA] p-4 text-center">
-              <h3 class="text-lg font-bold text-[#202325]">Rest Day</h3>
+              <h3 class="text-lg font-bold text-[#202325]">{{ i18n.t('restDay') }}</h3>
               <p class="mt-1 text-sm text-[#72777A]">
-                Recovery is part of your training plan.
+                {{ i18n.t('recoveryMessage') }}
               </p>
 
               <button
                 class="mt-4 rounded-full border border-[#0070F0] px-4 py-2 text-sm font-semibold text-[#0070F0]"
                 type="button"
-                aria-label="Remove rest day"
+                [attr.aria-label]="i18n.t('removeRestDay')"
                 (click)="removeSelectedRestDay()"
               >
-                Remove rest day
+                {{ i18n.t('removeRestDay') }}
               </button>
             </div>
           }
 
           @case ('empty') {
             <div class="rounded-2xl border border-dashed border-[#C7CBCC] bg-[#F7F9FA] p-4 text-center">
-              <h3 class="text-lg font-bold text-[#202325]">No workout planned for this day.</h3>
+              <h3 class="text-lg font-bold text-[#202325]">{{ i18n.t('noWorkoutPlanned') }}</h3>
               <p class="mt-1 text-sm text-[#72777A]">
-                Set a workout or mark this day as rest.
+                {{ i18n.t('setWorkoutOrRest') }}
               </p>
 
               <div class="mt-4 grid gap-2 sm:grid-cols-2">
                 <button
                   class="rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
                   type="button"
-                  aria-label="Set a workout for selected day"
+                  [attr.aria-label]="i18n.t('setWorkout')"
                   (click)="openExerciseSheet()"
                 >
-                  Set workout
+                  {{ i18n.t('setWorkout') }}
                 </button>
 
                 <button
                   class="rounded-full border border-[#0070F0] bg-white px-4 py-3 font-semibold text-[#0070F0]"
                   type="button"
-                  aria-label="Mark selected day as rest day"
+                  [attr.aria-label]="i18n.t('markAsRestDay')"
                   (click)="markSelectedDayAsRestDay()"
                 >
-                  Mark as rest day
+                  {{ i18n.t('markAsRestDay') }}
                 </button>
               </div>
             </div>
@@ -151,21 +151,21 @@
     class="fixed inset-0 z-50 flex items-end bg-[#202325]/40"
     role="dialog"
     aria-modal="true"
-    aria-label="Add workout"
+    [attr.aria-label]="i18n.t('addWorkout')"
   >
     <div class="flex h-dvh w-full flex-col rounded-t-3xl bg-white shadow-2xl">
       <div class="flex items-center justify-between border-b border-[#E3E5E5] p-4">
         <div>
           <h2 class="text-xl font-semibold text-[#202325]">{{ getWorkoutSheetTitle() }}</h2>
           <p class="text-sm text-[#72777A]">
-            Select one or more exercises for {{ selectedDateLabel() }}.
+            {{ i18n.t('selectExerciseForDate') }} {{ selectedDateLabel() }}.
           </p>
         </div>
 
         <button
           class="flex size-10 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
           type="button"
-          aria-label="Close exercise search"
+          [attr.aria-label]="i18n.t('closeExerciseSearch')"
           (click)="closeExerciseSheet()"
         >
           &times;
@@ -174,7 +174,7 @@
 
       <div class="border-b border-[#E3E5E5] p-4">
         <label class="mb-4 block text-[#72777A]">
-          Workout title
+          {{ i18n.t('workoutTitle') }}
           <input
             class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-[#F7F9FA] px-4 py-3 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
             type="text"
@@ -183,17 +183,17 @@
             (input)="workoutTitle.set($any($event.target).value)"
           />
           <span class="mt-1 block text-xs text-[#979C9E]">
-            Leave empty to use “{{ getDefaultWorkoutTitle() }}”.
+            {{ i18n.t('leaveEmptyToUse') }} “{{ getDefaultWorkoutTitle() }}”.
           </span>
         </label>
 
         <label class="block text-[#72777A]">
-          Search exercises
+          {{ i18n.t('searchExercises') }}
           <input
             class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-[#F7F9FA] px-4 py-3 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
             type="search"
             list="exercise-search-suggestions"
-            placeholder="Search by name, muscle, equipment, level..."
+            [placeholder]="i18n.t('searchByNameMuscleEquipment')"
             [value]="exerciseSearchQuery()"
             (input)="searchExercises($any($event.target).value)"
           />
@@ -208,7 +208,7 @@
         @if (selectedWorkoutExercises().length) {
           <div class="mt-4 rounded-2xl bg-[#F7F9FA] p-3">
             <p class="text-sm font-semibold text-[#202325]">
-              Selected exercises: {{ selectedWorkoutExercises().length }}
+              {{ i18n.t('selectedExercises') }}: {{ selectedWorkoutExercises().length }}
             </p>
 
             <div class="mt-2 flex gap-2 overflow-x-auto pb-1">
@@ -216,7 +216,7 @@
                 <button
                   class="shrink-0 rounded-full bg-[#EBF4FF] px-3 py-1 text-sm font-medium text-[#0070F0]"
                   type="button"
-                  [attr.aria-label]="'Remove ' + exercise.name + ' from workout'"
+                  [attr.aria-label]="i18n.t('remove') + ' ' + exercise.name"
                   (click)="removeSelectedWorkoutExercise(exercise.id)"
                 >
                   {{ exercise.name }} ×
@@ -256,7 +256,7 @@
               <span class="min-w-0">
                 <span class="block font-semibold text-[#202325]">{{ exercise.name }}</span>
                 @if (isWorkoutExerciseSelected(exercise.id)) {
-                  <span class="block text-sm font-semibold text-[#0070F0]">Selected</span>
+                  <span class="block text-sm font-semibold text-[#0070F0]">{{ i18n.t('selected') }}</span>
                 }
                 <span class="block text-sm capitalize text-[#72777A]">
                   {{ exercise.category }}
@@ -273,17 +273,17 @@
         </div>
 
         @if (isExerciseSearchLoading()) {
-          <p class="py-4 text-center text-[#72777A]">Loading exercises...</p>
+          <p class="py-4 text-center text-[#72777A]">{{ i18n.t('loadingExercises') }}</p>
         } @else if (exerciseSearchResults().length < exerciseSearchTotal()) {
           <button
             class="mt-4 w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
             type="button"
             (click)="loadMoreExercises()"
           >
-            Load more
+            {{ i18n.t('loadMore') }}
           </button>
         } @else if (!exerciseSearchResults().length && !exerciseSearchError()) {
-          <p class="py-8 text-center text-[#72777A]">No exercises found.</p>
+          <p class="py-8 text-center text-[#72777A]">{{ i18n.t('noExercisesFound') }}</p>
         }
       </div>
 
@@ -309,7 +309,7 @@
     class="fixed inset-0 z-50 overflow-y-auto bg-[#F7F9FA]"
     role="dialog"
     aria-modal="true"
-    [attr.aria-label]="workout.name + ' workout details'"
+    [attr.aria-label]="workout.name + ' ' + i18n.t('workoutDetails')"
   >
     <div class="flex min-h-dvh flex-col gap-4 p-4">
       <div class="flex items-center justify-between gap-3">
@@ -323,7 +323,7 @@
         <button
           class="flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
           type="button"
-          aria-label="Close workout details"
+          [attr.aria-label]="i18n.t('closeWorkoutDetails')"
           (click)="closeWorkoutDetails()"
         >
           &times;
@@ -354,7 +354,7 @@
               @for (set of exercise.sets; track set.id) {
                 <div class="grid grid-cols-2 gap-3 rounded-2xl bg-[#F7F9FA] p-3">
                   <label class="block min-w-0 text-sm font-medium text-[#72777A]">
-                    Repeat
+                    {{ i18n.t('repeat') }}
                     <input
                       class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-white px-3 py-2 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
                       type="number"
@@ -365,7 +365,7 @@
                   </label>
 
                   <label class="block min-w-0 text-sm font-medium text-[#72777A]">
-                    Weight
+                    {{ i18n.t('weight') }}
                     <input
                       class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-white px-3 py-2 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
                       type="number"
@@ -383,7 +383,7 @@
               type="button"
               (click)="addSet(workout.id, exercise.id)"
             >
-              Add set
+              {{ i18n.t('addSet') }}
             </button>
           </section>
         }
@@ -395,7 +395,7 @@
           type="button"
           (click)="completeWorkoutFromDetails(workout.id, 'completed')"
         >
-          Mark as Done
+          {{ i18n.t('markAsDone') }}
         </button>
 
         <button
@@ -403,7 +403,7 @@
           type="button"
           (click)="completeWorkoutFromDetails(workout.id, 'rejected')"
         >
-          Reject Workout
+          {{ i18n.t('rejectWorkout') }}
         </button>
       </div>
     </div>
@@ -415,7 +415,7 @@
     class="fixed inset-0 z-50 overflow-y-auto bg-[#F7F9FA]"
     role="dialog"
     aria-modal="true"
-    aria-label="Exercise details"
+    [attr.aria-label]="i18n.t('exerciseDetails')"
   >
     <div class="flex min-h-dvh flex-col items-center gap-4 p-4">
       <div class="flex w-full items-center justify-between">
@@ -424,7 +424,7 @@
         <button
           class="flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
           type="button"
-          aria-label="Close exercise details"
+          [attr.aria-label]="i18n.t('closeExerciseDetails')"
           (click)="closeExerciseDetails()"
         >
           &times;
@@ -453,14 +453,14 @@
           </p>
         } @else {
           <p class="max-w-2xl leading-7 text-[#72777A]">
-            No description is available for this exercise.
+            {{ i18n.t('noDescriptionAvailable') }}
           </p>
         }
       </div>
 
       @if (similarExercises().length) {
         <div class="w-full">
-          <p class="mb-2 text-center font-semibold text-[#202325]">Similar exercises</p>
+          <p class="mb-2 text-center font-semibold text-[#202325]">{{ i18n.t('similarExercises') }}</p>
 
           <div class="flex items-center gap-3 overflow-x-auto pb-2">
             @for (similarExercise of similarExercises(); track similarExercise.id) {

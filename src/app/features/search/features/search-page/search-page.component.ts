@@ -13,6 +13,7 @@ import {
   ExerciseDbApiService,
   ExerciseDbExercise,
 } from '../../../workout/services/exercise-db-api.service';
+import { I18nService } from '../../../../core/i18n/i18n.service';
 
 @Component({
   selector: 'app-search-page',
@@ -38,6 +39,7 @@ export class SearchPageComponent {
   private readonly exerciseDbApi = inject(ExerciseDbApiService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  readonly i18n = inject(I18nService);
   private readonly resultLimit = 15;
   private loadMoreObserver?: IntersectionObserver;
   private searchRequestId = 0;
@@ -88,7 +90,7 @@ export class SearchPageComponent {
 
           this.workouts.set([]);
           this.totalWorkouts.set(0);
-          this.error.set('Could not load workouts. Check your connection and try again.');
+          this.error.set(this.i18n.t('couldNotLoadWorkouts'));
           this.isLoading.set(false);
         },
       });
@@ -128,7 +130,7 @@ export class SearchPageComponent {
             return;
           }
 
-          this.error.set('Could not load more workouts. Check your connection and try again.');
+          this.error.set(this.i18n.t('couldNotLoadMoreWorkouts'));
           this.isLoadingMore.set(false);
         },
       });

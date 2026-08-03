@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
+import { I18nService } from './core/i18n/i18n.service';
 import { TelegramService } from './core/telegram/data-access/services/telegram.service';
 
 type BottomNavItem = 'home' | 'search' | 'progress' | 'profile';
@@ -13,15 +14,16 @@ type BottomNavItem = 'home' | 'search' | 'progress' | 'profile';
 export class App implements OnInit {
   private readonly router = inject(Router);
   readonly telegram = inject(TelegramService);
+  readonly i18n = inject(I18nService);
 
   protected readonly title = signal('gym-activity-tracker');
   protected readonly selectedBottomNavItem = signal<BottomNavItem | null>(null);
 
-  protected readonly bottomNavItems: { id: BottomNavItem; label: string; route: string }[] = [
-    { id: 'home', label: 'Home', route: '/' },
-    { id: 'search', label: 'Search', route: '/search' },
-    { id: 'progress', label: 'Progress', route: '/' },
-    { id: 'profile', label: 'Profile', route: '/' },
+  protected readonly bottomNavItems: { id: BottomNavItem; labelKey: 'home' | 'search' | 'progress' | 'profile'; route: string }[] = [
+    { id: 'home', labelKey: 'home', route: '/' },
+    { id: 'search', labelKey: 'search', route: '/search' },
+    { id: 'progress', labelKey: 'progress', route: '/' },
+    { id: 'profile', labelKey: 'profile', route: '/profile' },
   ];
 
   constructor() {
@@ -43,6 +45,10 @@ export class App implements OnInit {
 
   protected isBottomNavItemSelected(item: BottomNavItem): boolean {
     return this.selectedBottomNavItem() === item;
+  }
+
+  protected getBottomNavLabel(labelKey: 'home' | 'search' | 'progress' | 'profile'): string {
+    return this.i18n.t(labelKey);
   }
 
   private syncSelectedBottomNavItemWithRoute(url: string) {

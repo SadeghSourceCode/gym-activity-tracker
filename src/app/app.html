@@ -19,7 +19,7 @@
           [class.col-span-2]="isBottomNavItemSelected(item.id)"
           [class.col-auto]="!isBottomNavItemSelected(item.id)"
           type="button"
-          [attr.aria-label]="item.label"
+          [attr.aria-label]="getBottomNavLabel(item.labelKey)"
           [attr.aria-current]="isBottomNavItemSelected(item.id) ? 'page' : null"
           (click)="selectBottomNavItem(item.id, item.route)"
         >
@@ -106,7 +106,7 @@
               [class.opacity-0]="!isBottomNavItemSelected(item.id)"
               [class.-translate-x-1]="!isBottomNavItemSelected(item.id)"
             >
-              {{ item.label }}
+              {{ getBottomNavLabel(item.labelKey) }}
             </span>
           </span>
         </button>

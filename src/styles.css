@@ -27,6 +27,21 @@ body {
     sans-serif;
 }
 
+:root[data-theme='dark'] body {
+  background: #151719;
+  color: #f2f4f5;
+}
+
+:root[data-theme='dark'] app-root > div {
+  background: #151719;
+  color: #f2f4f5;
+}
+
+:root[data-theme='dark'] main,
+:root[data-theme='dark'] nav {
+  background: #151719;
+}
+
 app-root {
   display: block;
   width: 100%;

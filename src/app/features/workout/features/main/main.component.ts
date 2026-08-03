@@ -20,8 +20,8 @@ import {
 } from '../../services/exercise-db-api.service';
 import { getDateKey, getTodayDateKey, parseDateKey } from '../../utils/calendar-date.util';
 import { mapDailyPlanToViewModel } from '../../utils/workout-plan-view-model.mapper';
-import { WORKOUT_STATUS_LABELS } from '../../utils/workout-status.util';
 import { WorkoutCalendarComponent } from '../workout-calendar/workout-calendar.component';
+import { I18nService } from '../../../../core/i18n/i18n.service';
 
 interface WorkoutSet {
   id: number;
@@ -58,6 +58,7 @@ export class MainComponent {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly destroyRef = inject(DestroyRef);
   private readonly exerciseDbApi = inject(ExerciseDbApiService);
+  readonly i18n = inject(I18nService);
   private readonly pageSize = 15;
 
   selectedDate = signal(getTodayDateKey());
@@ -116,7 +117,7 @@ export class MainComponent {
     return 'upcoming';
   });
   readonly selectedDateLabel = computed(() =>
-    parseDateKey(this.selectedDate()).toLocaleDateString(undefined, {
+    parseDateKey(this.selectedDate()).toLocaleDateString(this.getDateLocale(), {
       weekday: 'long',
       month: 'long',
       day: 'numeric',
@@ -218,7 +219,7 @@ export class MainComponent {
     const workout = this.workouts().find((candidate) => candidate.id === Number(workoutId));
 
     if (!workout) {
-      this.selectedDayError.set('Could not find this workout to edit.');
+      this.selectedDayError.set(this.i18n.t('couldNotFindWorkoutToEdit'));
       return;
     }
 
@@ -287,7 +288,7 @@ export class MainComponent {
     const workout = this.workouts().find((candidate) => candidate.id === Number(workoutId));
 
     if (!workout) {
-      this.selectedDayError.set('Could not find this workout.');
+      this.selectedDayError.set(this.i18n.t('couldNotFindWorkout'));
       return;
     }
 
@@ -326,7 +327,7 @@ export class MainComponent {
     const selectedExercises = this.selectedWorkoutExercises();
 
     if (!selectedExercises.length) {
-      this.exerciseSearchError.set('Select at least one exercise to create a workout.');
+      this.exerciseSearchError.set(this.i18n.t('selectAtLeastOneExercise'));
       return;
     }
 
@@ -453,7 +454,7 @@ export class MainComponent {
     const selectedDate = this.selectedDate();
 
     if (this.getWorkoutsForDate(selectedDate).length) {
-      this.selectedDayError.set('Remove this day’s workouts before marking it as a rest day.');
+      this.selectedDayError.set(this.i18n.t('removeWorkoutBeforeRest'));
       return;
     }
 
@@ -477,19 +478,30 @@ export class MainComponent {
   }
 
   getStatusLabel(status: WorkoutDisplayStatus): string {
-    return WORKOUT_STATUS_LABELS[status];
+    switch (status) {
+      case 'in-progress':
+        return this.i18n.t('inProgress');
+      case 'done':
+        return this.i18n.t('done');
+      case 'rejected':
+        return this.i18n.t('rejected');
+      case 'upcoming':
+        return this.i18n.t('incoming');
+    }
   }
 
   getExerciseCountLabel(exerciseCount: number): string {
-    return `${exerciseCount} ${exerciseCount === 1 ? 'exercise' : 'exercises'}`;
+    return this.i18n.language() === 'fa'
+      ? `${exerciseCount} حرکت`
+      : `${exerciseCount} ${exerciseCount === 1 ? 'exercise' : 'exercises'}`;
   }
 
   getWorkoutSheetTitle(): string {
-    return this.editingWorkoutId() === null ? 'Add new workout' : 'Edit workout';
+    return this.editingWorkoutId() === null ? this.i18n.t('addWorkout') : this.i18n.t('editWorkout');
   }
 
   getWorkoutSaveButtonLabel(): string {
-    return this.editingWorkoutId() === null ? 'Create workout' : 'Save workout';
+    return this.editingWorkoutId() === null ? this.i18n.t('addWorkout') : this.i18n.t('saveWorkout');
   }
 
   getDefaultWorkoutTitle(): string {
@@ -497,16 +509,16 @@ export class MainComponent {
     const saturdayFirstDayIndexes = [6, 0, 1, 2, 3, 4, 5];
     const dayIndex = saturdayFirstDayIndexes.indexOf(selectedDate.getDay());
     const dayLabels = [
-      'First Day',
-      'Second Day',
-      'Third Day',
-      'Fourth Day',
-      'Fifth Day',
-      'Sixth Day',
-      'Seventh Day',
+      this.i18n.t('firstDay'),
+      this.i18n.t('secondDay'),
+      this.i18n.t('thirdDay'),
+      this.i18n.t('fourthDay'),
+      this.i18n.t('fifthDay'),
+      this.i18n.t('sixthDay'),
+      this.i18n.t('seventhDay'),
     ];
 
-    return dayLabels[dayIndex] ?? 'Workout Day';
+    return dayLabels[dayIndex] ?? this.i18n.t('workoutDay');
   }
 
   addSet(workoutId: number, exerciseId: string) {
@@ -587,7 +599,7 @@ export class MainComponent {
           this.isExerciseSearchLoading.set(false);
         },
         error: () => {
-          this.exerciseSearchError.set('Could not load exercises. Check your connection and try again.');
+          this.exerciseSearchError.set(this.i18n.t('couldNotLoadExercises'));
           this.isExerciseSearchLoading.set(false);
         },
       });
@@ -702,5 +714,9 @@ export class MainComponent {
     }
 
     return this.getDefaultWorkoutTitle();
+  }
+
+  private getDateLocale(): string | undefined {
+    return this.i18n.language() === 'fa' ? 'fa-IR' : undefined;
   }
 }

@@ -15,6 +15,7 @@ import {
   getTodayDateKey,
   parseDateKey,
 } from '../../utils/calendar-date.util';
+import { I18nService } from '../../../../core/i18n/i18n.service';
 
 interface CalendarDay {
   label: string;
@@ -32,6 +33,7 @@ export class WorkoutCalendarComponent implements AfterViewInit {
   private readonly calendarScrollContainer?: ElementRef<HTMLElement>;
 
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  readonly i18n = inject(I18nService);
   private readonly today = getTodayDateKey();
 
   readonly selectedDate = input<string>(this.today);
@@ -39,7 +41,7 @@ export class WorkoutCalendarComponent implements AfterViewInit {
   readonly dateSelected = output<string>();
 
   readonly calendarTitle = computed(() =>
-    parseDateKey(this.selectedDate()).toLocaleDateString(undefined, {
+    parseDateKey(this.selectedDate()).toLocaleDateString(this.getDateLocale(), {
       month: 'long',
       year: 'numeric',
     }),
@@ -55,7 +57,7 @@ export class WorkoutCalendarComponent implements AfterViewInit {
       date.setDate(firstVisibleDay.getDate() + index);
 
       return {
-        label: date.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2),
+        label: date.toLocaleDateString(this.getDateLocale(), { weekday: 'short' }).slice(0, 2),
         date,
         dateKey: getDateKey(date),
       };
@@ -113,10 +115,14 @@ export class WorkoutCalendarComponent implements AfterViewInit {
   }
 
   private formatShortDate(date: Date): string {
-    return date.toLocaleDateString(undefined, {
+    return date.toLocaleDateString(this.getDateLocale(), {
       month: 'short',
       day: 'numeric',
     });
+  }
+
+  private getDateLocale(): string | undefined {
+    return this.i18n.language() === 'fa' ? 'fa-IR' : undefined;
   }
 
   private scrollTodayToCenter(behavior: ScrollBehavior) {
