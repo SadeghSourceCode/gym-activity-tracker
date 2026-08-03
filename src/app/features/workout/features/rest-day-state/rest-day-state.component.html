@@ -1,0 +1,16 @@
+<div class="rounded-2xl border border-[#E3E5E5] bg-[#F7F9FA] p-4 text-center">
+  <h3 class="text-lg font-bold text-[#202325]">{{ title() }}</h3>
+  <p class="mt-1 text-sm text-[#72777A]">
+    {{ message() }}
+  </p>
+
+  <button
+    class="mt-4 rounded-full border border-[#0070F0] px-4 py-2 text-sm font-semibold text-[#0070F0]"
+    type="button"
+    [attr.aria-label]="removeLabel()"
+    (click)="remove.emit()"
+  >
+    {{ removeLabel() }}
+  </button>
+</div>
+

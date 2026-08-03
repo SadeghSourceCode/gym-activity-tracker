@@ -1,0 +1,155 @@
+<div
+  class="fixed inset-0 z-50 flex items-end bg-[#202325]/40"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="text().addWorkoutLabel"
+>
+  <div class="flex h-dvh w-full flex-col rounded-t-3xl bg-white shadow-2xl">
+    <div class="flex items-center justify-between border-b border-[#E3E5E5] p-4">
+      <div>
+        <h2 class="text-xl font-semibold text-[#202325]">{{ title() }}</h2>
+        <p class="text-sm text-[#72777A]">
+          {{ text().selectExerciseForDateLabel }} {{ selectedDateLabel() }}.
+        </p>
+      </div>
+
+      <button
+        class="flex size-10 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+        type="button"
+        [attr.aria-label]="text().closeExerciseSearchLabel"
+        (click)="close.emit()"
+      >
+        &times;
+      </button>
+    </div>
+
+    <div class="border-b border-[#E3E5E5] p-4">
+      <label class="mb-4 block text-[#72777A]">
+        {{ text().workoutTitleLabel }}
+        <input
+          class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-[#F7F9FA] px-4 py-3 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+          type="text"
+          [placeholder]="defaultWorkoutTitle()"
+          [value]="workoutTitle()"
+          (input)="workoutTitleChanged.emit($any($event.target).value)"
+        />
+        <span class="mt-1 block text-xs text-[#979C9E]">
+          {{ text().leaveEmptyToUseLabel }} “{{ defaultWorkoutTitle() }}”.
+        </span>
+      </label>
+
+      <label class="block text-[#72777A]">
+        {{ text().searchExercisesLabel }}
+        <input
+          class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-[#F7F9FA] px-4 py-3 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+          type="search"
+          list="exercise-search-suggestions"
+          [placeholder]="text().searchByNameMuscleEquipmentLabel"
+          [value]="exerciseSearchQuery()"
+          (input)="searchExercises.emit($any($event.target).value)"
+        />
+      </label>
+
+      <datalist id="exercise-search-suggestions">
+        @for (exercise of exerciseSearchResults().slice(0, 10); track exercise.id) {
+          <option [value]="exercise.name"></option>
+        }
+      </datalist>
+
+      @if (selectedExercises().length) {
+        <div class="mt-4 rounded-2xl bg-[#F7F9FA] p-3">
+          <p class="text-sm font-semibold text-[#202325]">
+            {{ text().selectedExercisesLabel }}: {{ selectedExercises().length }}
+          </p>
+
+          <div class="mt-2 flex gap-2 overflow-x-auto pb-1">
+            @for (exercise of selectedExercises(); track exercise.id) {
+              <button
+                class="shrink-0 rounded-full bg-[#EBF4FF] px-3 py-1 text-sm font-medium text-[#0070F0]"
+                type="button"
+                [attr.aria-label]="text().removeLabel + ' ' + getWorkoutExerciseName(exercise)"
+                (click)="removeSelectedExercise.emit(exercise.id)"
+              >
+                {{ getWorkoutExerciseName(exercise) }} ×
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="min-h-0 flex-1 overflow-y-auto p-4" (scroll)="scrolled.emit($event)">
+      @if (exerciseSearchError()) {
+        <p class="rounded-xl bg-[#FFD6D6] p-3 text-[#FF6D6D]">{{ exerciseSearchError() }}</p>
+      }
+
+      <div class="grid gap-3">
+        @for (exercise of exerciseSearchResults(); track exercise.id) {
+          <button
+            class="grid w-full grid-cols-[72px_1fr] gap-3 rounded-2xl border border-[#E3E5E5] bg-white p-3 text-left shadow-sm hover:border-[#0070F0] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+            [class.border-[#0070F0]]="isExerciseSelected(exercise.id)"
+            [class.bg-[#EBF4FF]]="isExerciseSelected(exercise.id)"
+            type="button"
+            [attr.aria-pressed]="isExerciseSelected(exercise.id)"
+            (click)="toggleExercise.emit(exercise)"
+          >
+            @if (getExerciseMediaUrl(exercise); as exerciseMediaUrl) {
+              <img
+                class="size-18 rounded-xl bg-[#F7F9FA] object-cover"
+                [src]="exerciseMediaUrl"
+                [alt]="exercise.name"
+                loading="lazy"
+              />
+            } @else {
+              <div class="size-18 rounded-xl bg-[#F7F9FA]"></div>
+            }
+
+            <span class="min-w-0">
+              <span class="block font-semibold text-[#202325]">{{ exercise.name }}</span>
+              @if (isExerciseSelected(exercise.id)) {
+                <span class="block text-sm font-semibold text-[#0070F0]">{{ text().selectedLabel }}</span>
+              }
+              <span class="block text-sm capitalize text-[#72777A]">
+                {{ exercise.category }}
+                @if (exercise.equipment) {
+                  · {{ exercise.equipment }}
+                }
+              </span>
+              <span class="mt-1 block text-sm capitalize text-[#979C9E]">
+                {{ exercise.primaryMuscles.join(', ') }}
+              </span>
+            </span>
+          </button>
+        }
+      </div>
+
+      @if (isExerciseSearchLoading()) {
+        <p class="py-4 text-center text-[#72777A]">{{ text().loadingExercisesLabel }}</p>
+      } @else if (exerciseSearchResults().length < exerciseSearchTotal()) {
+        <button
+          class="mt-4 w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
+          type="button"
+          (click)="loadMore.emit()"
+        >
+          {{ text().loadMoreLabel }}
+        </button>
+      } @else if (!exerciseSearchResults().length && !exerciseSearchError()) {
+        <p class="py-8 text-center text-[#72777A]">{{ text().noExercisesFoundLabel }}</p>
+      }
+    </div>
+
+    <div class="border-t border-[#E3E5E5] p-4">
+      <button
+        class="w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white disabled:bg-[#C7CBCC]"
+        type="button"
+        [disabled]="!selectedExercises().length"
+        (click)="save.emit()"
+      >
+        {{ saveButtonLabel() }}
+        @if (selectedExercises().length) {
+          · {{ getExerciseCountLabel(selectedExercises().length) }}
+        }
+      </button>
+    </div>
+  </div>
+</div>

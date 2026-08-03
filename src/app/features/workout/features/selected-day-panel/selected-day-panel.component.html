@@ -1,0 +1,65 @@
+<section
+  class="flex w-full min-w-0 flex-col gap-4 rounded-3xl bg-white p-4 shadow-sm"
+  aria-live="polite"
+  [attr.aria-label]="text().selectedDayWorkoutsLabel"
+>
+  <div class="flex items-center justify-between gap-3">
+    <h2 class="text-xl font-bold text-[#202325]">{{ selectedDateLabel() }}</h2>
+
+    @if (selectedDayWorkoutStatus(); as status) {
+      <app-status-badge [status]="status" [label]="getStatusLabel(status)" />
+    }
+  </div>
+
+  @if (selectedDayError()) {
+    <div class="rounded-2xl bg-[#FFD6D6] p-3 text-[#C93636]" role="alert">
+      <p>{{ selectedDayError() }}</p>
+      <button
+        class="mt-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#C93636]"
+        type="button"
+        (click)="retry.emit()"
+      >
+        {{ text().retryLabel }}
+      </button>
+    </div>
+  } @else {
+    @switch (selectedDayViewModel().type) {
+      @case ('workout') {
+        <div class="grid gap-3">
+          @for (workout of selectedDayViewModel().workouts; track workout.id) {
+            <app-workout-summary-card
+              [workout]="workout"
+              [exerciseCountLabel]="getExerciseCountLabel(workout.exerciseCount)"
+              [openLabel]="text().openLabel"
+              [rejectLabel]="text().rejectLabel"
+              [editLabel]="text().editLabel"
+              (open)="openWorkoutDetails.emit($event)"
+              (reject)="rejectWorkout.emit($event)"
+              (edit)="editWorkout.emit($event)"
+            />
+          }
+        </div>
+      }
+
+      @case ('rest') {
+        <app-rest-day-state
+          [title]="text().restDayTitle"
+          [message]="text().recoveryMessage"
+          [removeLabel]="text().removeRestDayLabel"
+          (remove)="removeRestDay.emit()"
+        />
+      }
+
+      @case ('empty') {
+        <app-empty-day-state
+          [title]="text().noWorkoutPlannedTitle"
+          [message]="text().setWorkoutOrRestMessage"
+          [setWorkoutLabel]="text().setWorkoutLabel"
+          [markAsRestDayLabel]="text().markAsRestDayLabel"
+          (setWorkout)="setWorkout.emit()"
+          (markAsRestDay)="markAsRestDay.emit()"
+        />
+      }
+    }
+  }
+</section>

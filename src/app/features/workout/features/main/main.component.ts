@@ -15,6 +15,17 @@ import {
   WorkoutDisplayStatus,
 } from '../../models/workout-planner.models';
 import {
+  Workout,
+  WorkoutExerciseSummary,
+  WorkoutSet,
+} from '../../models/workout-storage.models';
+import {
+  ExerciseDetailsTextConfig,
+  SelectedDayPanelTextConfig,
+  WorkoutDetailTextConfig,
+  WorkoutEditorTextConfig,
+} from '../../models/workout-ui.models';
+import {
   ExerciseDbApiService,
   ExerciseDbExercise,
 } from '../../services/exercise-db-api.service';
@@ -22,36 +33,20 @@ import { getDateKey, getTodayDateKey, parseDateKey } from '../../utils/calendar-
 import { mapDailyPlanToViewModel } from '../../utils/workout-plan-view-model.mapper';
 import { WorkoutCalendarComponent } from '../workout-calendar/workout-calendar.component';
 import { I18nService } from '../../../../core/i18n/i18n.service';
-
-interface WorkoutSet {
-  id: number;
-  repeat: number;
-  weight: number;
-}
-
-interface WorkoutExerciseSummary {
-  id: string;
-  name: string;
-  nameEn: string;
-  nameFa: string;
-  thumbnailUrl?: string;
-  sets: WorkoutSet[];
-}
-
-interface Workout {
-  id: number;
-  name: string;
-  exerciseId?: string;
-  thumbnailUrl?: string;
-  exercises: WorkoutExerciseSummary[];
-  date: Date;
-  sets: WorkoutSet[];
-  completionStatus?: WorkoutCompletionStatus;
-}
+import { SelectedDayPanelComponent } from '../selected-day-panel/selected-day-panel.component';
+import { WorkoutEditorSheetComponent } from '../workout-editor-sheet/workout-editor-sheet.component';
+import { WorkoutDetailComponent } from '../workout-detail/workout-detail.component';
+import { ExerciseDetailsDialogComponent } from '../exercise-details-dialog/exercise-details-dialog.component';
 
 @Component({
   selector: 'app-main',
-  imports: [WorkoutCalendarComponent],
+  imports: [
+    WorkoutCalendarComponent,
+    SelectedDayPanelComponent,
+    WorkoutEditorSheetComponent,
+    WorkoutDetailComponent,
+    ExerciseDetailsDialogComponent,
+  ],
   templateUrl: './main.component.html',
 })
 export class MainComponent {
@@ -125,6 +120,57 @@ export class MainComponent {
       day: 'numeric',
     }),
   );
+  readonly selectedDayPanelText = computed<SelectedDayPanelTextConfig>(() => ({
+    selectedDayWorkoutsLabel: this.i18n.t('selectedDayWorkouts'),
+    retryLabel: this.i18n.t('retry'),
+    openLabel: this.i18n.t('open'),
+    rejectLabel: this.i18n.t('reject'),
+    editLabel: this.i18n.t('edit'),
+    restDayTitle: this.i18n.t('restDay'),
+    recoveryMessage: this.i18n.t('recoveryMessage'),
+    removeRestDayLabel: this.i18n.t('removeRestDay'),
+    noWorkoutPlannedTitle: this.i18n.t('noWorkoutPlanned'),
+    setWorkoutOrRestMessage: this.i18n.t('setWorkoutOrRest'),
+    setWorkoutLabel: this.i18n.t('setWorkout'),
+    markAsRestDayLabel: this.i18n.t('markAsRestDay'),
+    inProgressLabel: this.i18n.t('inProgress'),
+    doneLabel: this.i18n.t('done'),
+    rejectedLabel: this.i18n.t('rejected'),
+    incomingLabel: this.i18n.t('incoming'),
+    isPersian: this.i18n.language() === 'fa',
+  }));
+  readonly workoutEditorText = computed<WorkoutEditorTextConfig>(() => ({
+    addWorkoutLabel: this.i18n.t('addWorkout'),
+    closeExerciseSearchLabel: this.i18n.t('closeExerciseSearch'),
+    selectExerciseForDateLabel: this.i18n.t('selectExerciseForDate'),
+    workoutTitleLabel: this.i18n.t('workoutTitle'),
+    leaveEmptyToUseLabel: this.i18n.t('leaveEmptyToUse'),
+    searchExercisesLabel: this.i18n.t('searchExercises'),
+    searchByNameMuscleEquipmentLabel: this.i18n.t('searchByNameMuscleEquipment'),
+    selectedExercisesLabel: this.i18n.t('selectedExercises'),
+    removeLabel: this.i18n.t('remove'),
+    selectedLabel: this.i18n.t('selected'),
+    loadingExercisesLabel: this.i18n.t('loadingExercises'),
+    loadMoreLabel: this.i18n.t('loadMore'),
+    noExercisesFoundLabel: this.i18n.t('noExercisesFound'),
+    isPersian: this.i18n.language() === 'fa',
+  }));
+  readonly workoutDetailText = computed<WorkoutDetailTextConfig>(() => ({
+    workoutDetailsLabel: this.i18n.t('workoutDetails'),
+    closeWorkoutDetailsLabel: this.i18n.t('closeWorkoutDetails'),
+    repeatLabel: this.i18n.t('repeat'),
+    weightLabel: this.i18n.t('weight'),
+    addSetLabel: this.i18n.t('addSet'),
+    markAsDoneLabel: this.i18n.t('markAsDone'),
+    rejectWorkoutLabel: this.i18n.t('rejectWorkout'),
+    isPersian: this.i18n.language() === 'fa',
+  }));
+  readonly exerciseDetailsText = computed<ExerciseDetailsTextConfig>(() => ({
+    exerciseDetailsLabel: this.i18n.t('exerciseDetails'),
+    closeExerciseDetailsLabel: this.i18n.t('closeExerciseDetails'),
+    noDescriptionAvailableLabel: this.i18n.t('noDescriptionAvailable'),
+    similarExercisesLabel: this.i18n.t('similarExercises'),
+  }));
 
   private readonly saveWorkouts = effect(() => {
     if (!this.isBrowser) {

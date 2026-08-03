@@ -1,0 +1,39 @@
+<article
+  class="flex min-w-0 cursor-pointer items-center justify-between gap-3 rounded-2xl border border-[#E3E5E5] bg-[#F7F9FA] p-4 hover:border-[#0070F0] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+  role="button"
+  tabindex="0"
+  [attr.aria-label]="openLabel() + ' ' + workout().title"
+  (click)="open.emit(workout().id)"
+  (keydown.enter)="open.emit(workout().id)"
+  (keydown.space)="open.emit(workout().id)"
+>
+  <div class="min-w-0">
+    <h3 class="truncate text-base font-bold text-[#202325]">
+      {{ workout().title }}
+    </h3>
+    <p class="text-sm font-medium text-[#72777A]">
+      {{ exerciseCountLabel() }}
+    </p>
+  </div>
+
+  <div class="flex shrink-0 items-center gap-2">
+    <button
+      class="rounded-full border border-[#C93636] bg-white px-3 py-1 text-xs font-bold text-[#C93636]"
+      type="button"
+      [attr.aria-label]="rejectLabel() + ' ' + workout().title"
+      (click)="$event.stopPropagation(); reject.emit(workout().id)"
+    >
+      {{ rejectLabel() }}
+    </button>
+
+    <button
+      class="rounded-full border border-[#0070F0] bg-white px-3 py-1 text-xs font-bold text-[#0070F0]"
+      type="button"
+      [attr.aria-label]="editLabel() + ' ' + workout().title"
+      (click)="$event.stopPropagation(); edit.emit(workout().id)"
+    >
+      {{ editLabel() }}
+    </button>
+  </div>
+</article>
+

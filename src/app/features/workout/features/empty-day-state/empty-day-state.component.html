@@ -1,0 +1,27 @@
+<div class="rounded-2xl border border-dashed border-[#C7CBCC] bg-[#F7F9FA] p-4 text-center">
+  <h3 class="text-lg font-bold text-[#202325]">{{ title() }}</h3>
+  <p class="mt-1 text-sm text-[#72777A]">
+    {{ message() }}
+  </p>
+
+  <div class="mt-4 grid gap-2 sm:grid-cols-2">
+    <button
+      class="rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
+      type="button"
+      [attr.aria-label]="setWorkoutLabel()"
+      (click)="setWorkout.emit()"
+    >
+      {{ setWorkoutLabel() }}
+    </button>
+
+    <button
+      class="rounded-full border border-[#0070F0] bg-white px-4 py-3 font-semibold text-[#0070F0]"
+      type="button"
+      [attr.aria-label]="markAsRestDayLabel()"
+      (click)="markAsRestDay.emit()"
+    >
+      {{ markAsRestDayLabel() }}
+    </button>
+  </div>
+</div>
+
