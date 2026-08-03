@@ -10,9 +10,24 @@
       aria-live="polite"
       aria-label="Selected day workouts"
     >
-      <div>
-        <p class="text-sm font-medium text-[#72777A]">Selected day</p>
+      <div class="flex items-center justify-between gap-3">
         <h2 class="text-xl font-bold text-[#202325]">{{ selectedDateLabel() }}</h2>
+
+        @if (selectedDayWorkoutStatus(); as status) {
+          <span
+            class="shrink-0 rounded-full px-3 py-1 text-xs font-bold"
+            [class.bg-[#EBF4FF]]="status === 'in-progress'"
+            [class.text-[#0070F0]]="status === 'in-progress'"
+            [class.bg-[#E7F8EF]]="status === 'done'"
+            [class.text-[#168A4A]]="status === 'done'"
+            [class.bg-[#FFD6D6]]="status === 'rejected'"
+            [class.text-[#C93636]]="status === 'rejected'"
+            [class.bg-[#F2F4F5]]="status === 'upcoming'"
+            [class.text-[#404446]]="status === 'upcoming'"
+          >
+            {{ getStatusLabel(status) }}
+          </span>
+        }
       </div>
 
       @if (selectedDayError()) {
@@ -32,7 +47,13 @@
             <div class="grid gap-3">
               @for (workout of selectedDayViewModel().workouts; track workout.id) {
                 <article
-                  class="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-[#E3E5E5] bg-[#F7F9FA] p-4"
+                  class="flex min-w-0 cursor-pointer items-center justify-between gap-3 rounded-2xl border border-[#E3E5E5] bg-[#F7F9FA] p-4 hover:border-[#0070F0] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+                  role="button"
+                  tabindex="0"
+                  [attr.aria-label]="'Open ' + workout.title"
+                  (click)="openWorkoutDetails(workout.id)"
+                  (keydown.enter)="openWorkoutDetails(workout.id)"
+                  (keydown.space)="openWorkoutDetails(workout.id)"
                 >
                   <div class="min-w-0">
                     <h3 class="truncate text-base font-bold text-[#202325]">
@@ -43,19 +64,25 @@
                     </p>
                   </div>
 
-                  <span
-                    class="shrink-0 rounded-full px-3 py-1 text-xs font-bold"
-                    [class.bg-[#EBF4FF]]="workout.status === 'in-progress'"
-                    [class.text-[#0070F0]]="workout.status === 'in-progress'"
-                    [class.bg-[#E7F8EF]]="workout.status === 'done'"
-                    [class.text-[#168A4A]]="workout.status === 'done'"
-                    [class.bg-[#FFD6D6]]="workout.status === 'rejected'"
-                    [class.text-[#C93636]]="workout.status === 'rejected'"
-                    [class.bg-[#F2F4F5]]="workout.status === 'upcoming'"
-                    [class.text-[#404446]]="workout.status === 'upcoming'"
-                  >
-                    {{ getStatusLabel(workout.status) }}
-                  </span>
+                  <div class="flex shrink-0 items-center gap-2">
+                    <button
+                      class="rounded-full border border-[#C93636] bg-white px-3 py-1 text-xs font-bold text-[#C93636]"
+                      type="button"
+                      [attr.aria-label]="'Reject ' + workout.title"
+                      (click)="$event.stopPropagation(); setWorkoutCompletionStatus(+workout.id, 'rejected')"
+                    >
+                      Reject
+                    </button>
+
+                    <button
+                      class="rounded-full border border-[#0070F0] bg-white px-3 py-1 text-xs font-bold text-[#0070F0]"
+                      type="button"
+                      [attr.aria-label]="'Edit ' + workout.title"
+                      (click)="$event.stopPropagation(); openEditWorkoutSheet(workout.id)"
+                    >
+                      Edit
+                    </button>
+                  </div>
                 </article>
               }
             </div>
@@ -129,7 +156,7 @@
     <div class="flex h-dvh w-full flex-col rounded-t-3xl bg-white shadow-2xl">
       <div class="flex items-center justify-between border-b border-[#E3E5E5] p-4">
         <div>
-          <h2 class="text-xl font-semibold text-[#202325]">Add new workout</h2>
+          <h2 class="text-xl font-semibold text-[#202325]">{{ getWorkoutSheetTitle() }}</h2>
           <p class="text-sm text-[#72777A]">
             Select one or more exercises for {{ selectedDateLabel() }}.
           </p>
@@ -146,6 +173,20 @@
       </div>
 
       <div class="border-b border-[#E3E5E5] p-4">
+        <label class="mb-4 block text-[#72777A]">
+          Workout title
+          <input
+            class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-[#F7F9FA] px-4 py-3 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+            type="text"
+            [placeholder]="getDefaultWorkoutTitle()"
+            [value]="workoutTitle()"
+            (input)="workoutTitle.set($any($event.target).value)"
+          />
+          <span class="mt-1 block text-xs text-[#979C9E]">
+            Leave empty to use “{{ getDefaultWorkoutTitle() }}”.
+          </span>
+        </label>
+
         <label class="block text-[#72777A]">
           Search exercises
           <input
@@ -251,12 +292,118 @@
           class="w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white disabled:bg-[#C7CBCC]"
           type="button"
           [disabled]="!selectedWorkoutExercises().length"
-          (click)="createWorkoutFromSelectedExercises()"
+          (click)="saveWorkoutFromSelectedExercises()"
         >
-          Create workout
+          {{ getWorkoutSaveButtonLabel() }}
           @if (selectedWorkoutExercises().length) {
             · {{ getExerciseCountLabel(selectedWorkoutExercises().length) }}
           }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (openedWorkout(); as workout) {
+  <div
+    class="fixed inset-0 z-50 overflow-y-auto bg-[#F7F9FA]"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="workout.name + ' workout details'"
+  >
+    <div class="flex min-h-dvh flex-col gap-4 p-4">
+      <div class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <h2 class="truncate text-xl font-bold text-[#202325]">{{ workout.name }}</h2>
+          <p class="text-sm font-medium text-[#72777A]">
+            {{ getExerciseCountLabel(workout.exercises.length) }}
+          </p>
+        </div>
+
+        <button
+          class="flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+          type="button"
+          aria-label="Close workout details"
+          (click)="closeWorkoutDetails()"
+        >
+          &times;
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        @for (exercise of workout.exercises; track exercise.id) {
+          <section class="rounded-3xl border border-[#E3E5E5] bg-white p-4 shadow-sm">
+            <div class="flex items-center gap-3">
+              @if (exercise.thumbnailUrl) {
+                <img
+                  class="size-14 shrink-0 rounded-xl bg-[#F7F9FA] object-cover"
+                  [src]="exercise.thumbnailUrl"
+                  [alt]="exercise.name"
+                  loading="lazy"
+                />
+              } @else {
+                <div class="size-14 shrink-0 rounded-xl bg-[#F7F9FA]"></div>
+              }
+
+              <h3 class="min-w-0 truncate text-lg font-bold text-[#202325]">
+                {{ exercise.name }}
+              </h3>
+            </div>
+
+            <div class="mt-4 grid gap-3">
+              @for (set of exercise.sets; track set.id) {
+                <div class="grid grid-cols-2 gap-3 rounded-2xl bg-[#F7F9FA] p-3">
+                  <label class="block min-w-0 text-sm font-medium text-[#72777A]">
+                    Repeat
+                    <input
+                      class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-white px-3 py-2 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+                      type="number"
+                      min="0"
+                      [value]="set.repeat"
+                      (input)="updateSet(workout.id, exercise.id, set.id, { repeat: +$any($event.target).value })"
+                    />
+                  </label>
+
+                  <label class="block min-w-0 text-sm font-medium text-[#72777A]">
+                    Weight
+                    <input
+                      class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-white px-3 py-2 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+                      type="number"
+                      min="0"
+                      [value]="set.weight"
+                      (input)="updateSet(workout.id, exercise.id, set.id, { weight: +$any($event.target).value })"
+                    />
+                  </label>
+                </div>
+              }
+            </div>
+
+            <button
+              class="mt-4 w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
+              type="button"
+              (click)="addSet(workout.id, exercise.id)"
+            >
+              Add set
+            </button>
+          </section>
+        }
+      </div>
+
+      <div class="grid gap-3 rounded-3xl bg-white p-4 shadow-sm sm:grid-cols-2">
+        <button
+          class="rounded-full bg-[#168A4A] px-4 py-3 font-semibold text-white"
+          type="button"
+          (click)="completeWorkoutFromDetails(workout.id, 'completed')"
+        >
+          Mark as Done
+        </button>
+
+        <button
+          class="rounded-full bg-[#C93636] px-4 py-3 font-semibold text-white"
+          type="button"
+          (click)="completeWorkoutFromDetails(workout.id, 'rejected')"
+        >
+          Reject Workout
         </button>
       </div>
     </div>

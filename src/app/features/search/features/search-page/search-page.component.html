@@ -57,6 +57,18 @@
         <p class="py-8 text-center text-[#72777A]">No workouts found.</p>
       }
     </div>
+
+    @if (isLoadingMore()) {
+      <p class="py-4 text-center text-[#72777A]" aria-live="polite">
+        Loading more workouts...
+      </p>
+    }
+
+    @if (workouts().length < totalWorkouts()) {
+      <div #loadMoreSentinel class="h-8" aria-hidden="true"></div>
+    } @else if (workouts().length) {
+      <p class="py-4 text-center text-sm text-[#979C9E]">All workouts loaded.</p>
+    }
   }
 </section>
 
