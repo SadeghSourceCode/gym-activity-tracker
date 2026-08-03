@@ -1,10 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map, shareReplay } from 'rxjs';
+import { ProfilePreferencesService } from '../../../core/profile/profile-preferences.service';
+import { translateExerciseNameToPersian } from '../utils/exercise-persian-name.util';
 
 export interface ExerciseDbExercise {
   id: string;
   name: string;
+  nameEn: string;
+  nameFa: string;
   equipment: string | null;
   primaryMuscles: string[];
   secondaryMuscles: string[];
@@ -40,6 +44,7 @@ export interface ExerciseSearchResult {
 @Injectable({ providedIn: 'root' })
 export class ExerciseDbApiService {
   private readonly http = inject(HttpClient);
+  private readonly profilePreferences = inject(ProfilePreferencesService);
   private readonly exerciseDbUrl =
     'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/data/exercises.json';
 
@@ -50,7 +55,7 @@ export class ExerciseDbApiService {
     map((exercises) =>
       exercises
         .map((exercise) => this.toExerciseDbExercise(exercise))
-        .sort((a, b) => a.name.localeCompare(b.name)),
+        .sort((a, b) => a.nameEn.localeCompare(b.nameEn)),
     ),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
@@ -60,9 +65,10 @@ export class ExerciseDbApiService {
 
     return this.exercises$.pipe(
       map((exercises) => {
+        const localizedExercises = exercises.map((exercise) => this.localizeExercise(exercise));
         const filteredExercises = normalizedQuery
-          ? exercises.filter((exercise) => this.matchesExercise(exercise, normalizedQuery))
-          : exercises;
+          ? localizedExercises.filter((exercise) => this.matchesExercise(exercise, normalizedQuery))
+          : localizedExercises;
 
         return {
           items: filteredExercises.slice(offset, offset + limit),
@@ -74,7 +80,11 @@ export class ExerciseDbApiService {
 
   getById(id: string): Observable<ExerciseDbExercise | null> {
     return this.exercises$.pipe(
-      map((exercises) => exercises.find((exercise) => exercise.id === id) ?? null),
+      map((exercises) => {
+        const exercise = exercises.find((candidate) => candidate.id === id);
+
+        return exercise ? this.localizeExercise(exercise) : null;
+      }),
     );
   }
 
@@ -87,6 +97,7 @@ export class ExerciseDbApiService {
     return this.exercises$.pipe(
       map((exercises) =>
         exercises
+          .map((exercise) => this.localizeExercise(exercise))
           .filter((candidate) => candidate.id !== exercise.id)
           .map((candidate) => ({
             exercise: candidate,
@@ -103,6 +114,8 @@ export class ExerciseDbApiService {
   private matchesExercise(exercise: ExerciseDbExercise, query: string): boolean {
     return [
       exercise.name,
+      exercise.nameEn,
+      exercise.nameFa,
       exercise.category,
       exercise.equipment,
       ...exercise.primaryMuscles,
@@ -138,6 +151,8 @@ export class ExerciseDbApiService {
     return {
       id: exercise.id,
       name: exercise.name,
+      nameEn: exercise.name,
+      nameFa: translateExerciseNameToPersian(exercise.name),
       equipment: exercise.equipment,
       primaryMuscles: [exercise.target, exercise.muscle_group].filter(Boolean),
       secondaryMuscles: exercise.secondary_muscles ?? [],
@@ -150,6 +165,13 @@ export class ExerciseDbApiService {
       category: exercise.category || exercise.body_part,
       images: exercise.image ? [exercise.image] : [],
       gifUrl: exercise.gif_url || null,
+    };
+  }
+
+  private localizeExercise(exercise: ExerciseDbExercise): ExerciseDbExercise {
+    return {
+      ...exercise,
+      name: this.profilePreferences.language() === 'fa' ? exercise.nameFa : exercise.nameEn,
     };
   }
 }

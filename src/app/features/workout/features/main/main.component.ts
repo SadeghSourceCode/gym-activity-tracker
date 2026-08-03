@@ -32,6 +32,8 @@ interface WorkoutSet {
 interface WorkoutExerciseSummary {
   id: string;
   name: string;
+  nameEn: string;
+  nameFa: string;
   thumbnailUrl?: string;
   sets: WorkoutSet[];
 }
@@ -496,6 +498,10 @@ export class MainComponent {
       : `${exerciseCount} ${exerciseCount === 1 ? 'exercise' : 'exercises'}`;
   }
 
+  getWorkoutExerciseName(exercise: WorkoutExerciseSummary): string {
+    return this.i18n.language() === 'fa' ? exercise.nameFa : exercise.nameEn;
+  }
+
   getWorkoutSheetTitle(): string {
     return this.editingWorkoutId() === null ? this.i18n.t('addWorkout') : this.i18n.t('editWorkout');
   }
@@ -664,6 +670,11 @@ export class MainComponent {
         )
         .map((exercise) => ({
           ...exercise,
+          nameEn: exercise.nameEn ?? exercise.name,
+          nameFa: exercise.nameFa ?? exercise.name,
+          name: this.i18n.language() === 'fa'
+            ? (exercise.nameFa ?? exercise.name)
+            : (exercise.nameEn ?? exercise.name),
           sets: this.normalizeWorkoutSets(exercise.sets),
         }));
     }
@@ -673,6 +684,8 @@ export class MainComponent {
         {
           id: workout.exerciseId,
           name: workout.name,
+          nameEn: workout.name,
+          nameFa: workout.name,
           thumbnailUrl: workout.thumbnailUrl,
           sets: this.normalizeWorkoutSets(workout.sets),
         },
@@ -686,6 +699,8 @@ export class MainComponent {
     return {
       id: exercise.id,
       name: exercise.name,
+      nameEn: exercise.nameEn,
+      nameFa: exercise.nameFa,
       thumbnailUrl: this.getExerciseMediaUrl(exercise) ?? undefined,
       sets: [{ id: 1, repeat: 0, weight: 0 }],
     };

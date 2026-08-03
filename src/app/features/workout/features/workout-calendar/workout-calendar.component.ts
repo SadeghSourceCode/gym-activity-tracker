@@ -57,7 +57,7 @@ export class WorkoutCalendarComponent implements AfterViewInit {
       date.setDate(firstVisibleDay.getDate() + index);
 
       return {
-        label: date.toLocaleDateString(this.getDateLocale(), { weekday: 'short' }).slice(0, 2),
+        label: this.formatWeekdayLabel(date),
         date,
         dateKey: getDateKey(date),
       };
@@ -121,6 +121,16 @@ export class WorkoutCalendarComponent implements AfterViewInit {
     });
   }
 
+  private formatWeekdayLabel(date: Date): string {
+    if (this.i18n.language() === 'fa') {
+      const persianWeekdayLabels = ['یک', 'دو', 'سه', 'چها', 'پنج', 'جمعه', 'شنبه'];
+
+      return persianWeekdayLabels[date.getDay()] ?? '';
+    }
+
+    return date.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2);
+  }
+
   private getDateLocale(): string | undefined {
     return this.i18n.language() === 'fa' ? 'fa-IR' : undefined;
   }
@@ -138,14 +148,18 @@ export class WorkoutCalendarComponent implements AfterViewInit {
       return;
     }
 
-    const dayWidth = 32;
-    const dayGap = 16;
-    const dayStep = dayWidth + dayGap;
-    const todayCenter = todayIndex * dayStep + dayWidth / 2;
+    const todayElement = scrollContainer.querySelector<HTMLElement>(
+      `[data-date-key="${this.today}"]`,
+    );
 
-    scrollContainer.scrollTo({
-      left: Math.max(0, todayCenter - scrollContainer.clientWidth / 2),
+    if (!todayElement) {
+      return;
+    }
+
+    todayElement.scrollIntoView({
       behavior,
+      block: 'nearest',
+      inline: 'center',
     });
   }
 }

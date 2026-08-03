@@ -216,10 +216,10 @@
                 <button
                   class="shrink-0 rounded-full bg-[#EBF4FF] px-3 py-1 text-sm font-medium text-[#0070F0]"
                   type="button"
-                  [attr.aria-label]="i18n.t('remove') + ' ' + exercise.name"
+                  [attr.aria-label]="i18n.t('remove') + ' ' + getWorkoutExerciseName(exercise)"
                   (click)="removeSelectedWorkoutExercise(exercise.id)"
                 >
-                  {{ exercise.name }} ×
+                  {{ getWorkoutExerciseName(exercise) }} ×
                 </button>
               }
             </div>
@@ -338,7 +338,7 @@
                 <img
                   class="size-14 shrink-0 rounded-xl bg-[#F7F9FA] object-cover"
                   [src]="exercise.thumbnailUrl"
-                  [alt]="exercise.name"
+                  [alt]="getWorkoutExerciseName(exercise)"
                   loading="lazy"
                 />
               } @else {
@@ -346,7 +346,7 @@
               }
 
               <h3 class="min-w-0 truncate text-lg font-bold text-[#202325]">
-                {{ exercise.name }}
+                {{ getWorkoutExerciseName(exercise) }}
               </h3>
             </div>
 

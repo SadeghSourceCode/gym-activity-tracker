@@ -15,12 +15,17 @@
       </button>
     </div>
 
-    <div #calendarScrollContainer class="scrollbar-none overflow-x-auto py-2">
+    <div
+      #calendarScrollContainer
+      class="scrollbar-none overflow-x-auto py-2"
+      [attr.dir]="i18n.language() === 'fa' ? 'rtl' : 'ltr'"
+    >
       <div class="flex items-start gap-4 text-center">
         @for (day of calendarDays(); track day.date.toDateString()) {
           <button
             class="flex w-8 shrink-0 flex-col items-center gap-3 text-sm font-medium"
             type="button"
+            [attr.data-date-key]="day.dateKey"
             [attr.aria-label]="i18n.t('select') + ' ' + day.date.toLocaleDateString(i18n.language() === 'fa' ? 'fa-IR' : undefined)"
             [attr.aria-selected]="isSelected(day.dateKey)"
             (click)="selectDate(day.dateKey)"
