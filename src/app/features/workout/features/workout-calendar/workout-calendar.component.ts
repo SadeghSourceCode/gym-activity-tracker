@@ -6,13 +6,20 @@ import {
   ViewChild,
   computed,
   inject,
-  signal,
+  input,
+  output,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import {
+  getDateKey,
+  getTodayDateKey,
+  parseDateKey,
+} from '../../utils/calendar-date.util';
 
 interface CalendarDay {
   label: string;
   date: Date;
+  dateKey: string;
 }
 
 @Component({
@@ -25,19 +32,21 @@ export class WorkoutCalendarComponent implements AfterViewInit {
   private readonly calendarScrollContainer?: ElementRef<HTMLElement>;
 
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
-  private readonly today = this.startOfDay(new Date());
+  private readonly today = getTodayDateKey();
 
-  readonly selectedDate = signal(this.startOfDay(new Date()));
+  readonly selectedDate = input<string>(this.today);
+
+  readonly dateSelected = output<string>();
 
   readonly calendarTitle = computed(() =>
-    this.selectedDate().toLocaleDateString(undefined, {
+    parseDateKey(this.selectedDate()).toLocaleDateString(undefined, {
       month: 'long',
       year: 'numeric',
     }),
   );
 
   readonly calendarDays = computed<CalendarDay[]>(() => {
-    const currentWeekStart = this.getWeekStart(this.today);
+    const currentWeekStart = this.getWeekStart(parseDateKey(this.today));
     const firstVisibleDay = new Date(currentWeekStart);
     firstVisibleDay.setDate(currentWeekStart.getDate() - 14);
 
@@ -48,24 +57,25 @@ export class WorkoutCalendarComponent implements AfterViewInit {
       return {
         label: date.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2),
         date,
+        dateKey: getDateKey(date),
       };
     });
   });
 
   readonly weekRangeLabel = computed(() => {
-    const selectedWeekStart = this.getWeekStart(this.selectedDate());
+    const selectedWeekStart = this.getWeekStart(parseDateKey(this.selectedDate()));
     const selectedWeekEnd = new Date(selectedWeekStart);
     selectedWeekEnd.setDate(selectedWeekStart.getDate() + 6);
 
     return `${this.formatShortDate(selectedWeekStart)} - ${this.formatShortDate(selectedWeekEnd)}`;
   });
 
-  selectDate(date: Date) {
-    this.selectedDate.set(this.startOfDay(date));
+  selectDate(dateKey: string) {
+    this.dateSelected.emit(dateKey);
   }
 
   selectToday() {
-    this.selectedDate.set(this.today);
+    this.dateSelected.emit(this.today);
     this.scrollTodayToCenter('smooth');
   }
 
@@ -77,12 +87,12 @@ export class WorkoutCalendarComponent implements AfterViewInit {
     requestAnimationFrame(() => this.scrollTodayToCenter('auto'));
   }
 
-  isSelected(date: Date): boolean {
-    return this.selectedDate().getTime() === this.startOfDay(date).getTime();
+  isSelected(dateKey: string): boolean {
+    return this.selectedDate() === dateKey;
   }
 
-  isToday(date: Date): boolean {
-    return this.today.getTime() === this.startOfDay(date).getTime();
+  isToday(dateKey: string): boolean {
+    return this.today === dateKey;
   }
 
   private getWeekStart(date: Date): Date {
@@ -116,7 +126,12 @@ export class WorkoutCalendarComponent implements AfterViewInit {
       return;
     }
 
-    const todayIndex = this.calendarDays().findIndex((day) => this.isToday(day.date));
+    const todayIndex = this.calendarDays().findIndex((day) => this.isToday(day.dateKey));
+
+    if (todayIndex < 0) {
+      return;
+    }
+
     const dayWidth = 32;
     const dayGap = 16;
     const dayStep = dayWidth + dayGap;

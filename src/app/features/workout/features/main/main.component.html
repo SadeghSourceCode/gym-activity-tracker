@@ -1,90 +1,115 @@
 <div class="flex w-full min-w-0 max-w-full flex-col overflow-hidden">
   <div class="flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden rounded-2xl">
-    <app-workout-calendar />
+    <app-workout-calendar
+      [selectedDate]="selectedDate()"
+      (dateSelected)="selectDate($event)"
+    />
 
-    @for (workout of workouts(); track workout.id; let last = $last) {
-      <div
-        class="relative flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden rounded-3xl border border-[#E3E5E5] bg-white p-3 shadow-sm"
-      >
-        <button
-          class="absolute right-2 top-2 flex size-8 items-center justify-center rounded-full text-2xl leading-none text-[#FF6D6D] hover:bg-[#FFD6D6] focus:outline-none focus:ring-2 focus:ring-[#FF6D6D]"
-          type="button"
-          aria-label="Remove workout"
-          title="Remove workout"
-          (click)="removeWorkout(workout.id)"
-        >
-          &times;
-        </button>
+    <section
+      class="flex w-full min-w-0 flex-col gap-4 rounded-3xl bg-white p-4 shadow-sm"
+      aria-live="polite"
+      aria-label="Selected day workouts"
+    >
+      <div>
+        <p class="text-sm font-medium text-[#72777A]">Selected day</p>
+        <h2 class="text-xl font-bold text-[#202325]">{{ selectedDateLabel() }}</h2>
+      </div>
 
-        <div class="grid min-w-0 grid-cols-[56px_1fr] items-center gap-3 pr-10">
-          @if (workout.thumbnailUrl) {
-            <button
-              class="size-14 overflow-hidden rounded-xl bg-[#F7F9FA] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
-              type="button"
-              aria-label="Open exercise details"
-              title="Open exercise details"
-              (click)="openExerciseDetails(workout)"
-            >
-              <img
-                class="size-full object-cover"
-                [src]="workout.thumbnailUrl"
-                [alt]="workout.name"
-                loading="lazy"
-              />
-            </button>
-          } @else {
-            <div class="size-14 rounded-xl bg-[#F7F9FA]"></div>
-          }
-
-          <p class="min-w-0 truncate font-bold text-[#202325]">{{ workout.name }}</p>
+      @if (selectedDayError()) {
+        <div class="rounded-2xl bg-[#FFD6D6] p-3 text-[#C93636]" role="alert">
+          <p>{{ selectedDayError() }}</p>
+          <button
+            class="mt-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#C93636]"
+            type="button"
+            (click)="retrySelectedDay()"
+          >
+            Retry
+          </button>
         </div>
+      } @else {
+        @switch (selectedDayViewModel().type) {
+          @case ('workout') {
+            <div class="grid gap-3">
+              @for (workout of selectedDayViewModel().workouts; track workout.id) {
+                <article
+                  class="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-[#E3E5E5] bg-[#F7F9FA] p-4"
+                >
+                  <div class="min-w-0">
+                    <h3 class="truncate text-base font-bold text-[#202325]">
+                      {{ workout.title }}
+                    </h3>
+                    <p class="text-sm font-medium text-[#72777A]">
+                      {{ getExerciseCountLabel(workout.exerciseCount) }}
+                    </p>
+                  </div>
 
-        <div class="flex w-full min-w-0 max-w-full flex-col gap-2 overflow-hidden">
-          @for (set of workout.sets; track set.id) {
-            <div
-              class="grid w-full min-w-0 max-w-full grid-cols-2 items-center gap-4 overflow-hidden"
-            >
-              <label class="block min-w-0 text-[#72777A]">
-                Repeat
-                <input
-                  class="block w-full min-w-0 max-w-full rounded-xl border border-[#E3E5E5] bg-[#F7F9FA] px-3 py-2 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
-                  type="number"
-                  min="0"
-                  [value]="set.repeat"
-                  (input)="updateSet(workout.id, set.id, { repeat: +$any($event.target).value })"
-                />
-              </label>
-
-              <label class="block min-w-0 text-[#72777A]">
-                Weight
-                <input
-                  class="block w-full min-w-0 max-w-full rounded-xl border border-[#E3E5E5] bg-[#F7F9FA] px-3 py-2 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
-                  type="number"
-                  min="0"
-                  [value]="set.weight"
-                  (input)="updateSet(workout.id, set.id, { weight: +$any($event.target).value })"
-                />
-              </label>
+                  <span
+                    class="shrink-0 rounded-full px-3 py-1 text-xs font-bold"
+                    [class.bg-[#EBF4FF]]="workout.status === 'in-progress'"
+                    [class.text-[#0070F0]]="workout.status === 'in-progress'"
+                    [class.bg-[#E7F8EF]]="workout.status === 'done'"
+                    [class.text-[#168A4A]]="workout.status === 'done'"
+                    [class.bg-[#FFD6D6]]="workout.status === 'rejected'"
+                    [class.text-[#C93636]]="workout.status === 'rejected'"
+                    [class.bg-[#F2F4F5]]="workout.status === 'upcoming'"
+                    [class.text-[#404446]]="workout.status === 'upcoming'"
+                  >
+                    {{ getStatusLabel(workout.status) }}
+                  </span>
+                </article>
+              }
             </div>
           }
-        </div>
-        <button
-          class="w-full rounded-full bg-[#0070F0] px-4 py-2 font-semibold text-white"
-          type="button"
-          (click)="addSet(workout.id)"
-        >
-          Add new set
-        </button>
-      </div>
-    }
 
-    <button
-      class="w-full rounded-full bg-[#0070F0] px-4 py-2 font-semibold text-white"
-      type="button"
-      (click)="openExerciseSheet()"
-    >
-      Add new workout
-    </button>
+          @case ('rest') {
+            <div class="rounded-2xl border border-[#E3E5E5] bg-[#F7F9FA] p-4 text-center">
+              <h3 class="text-lg font-bold text-[#202325]">Rest Day</h3>
+              <p class="mt-1 text-sm text-[#72777A]">
+                Recovery is part of your training plan.
+              </p>
+
+              <button
+                class="mt-4 rounded-full border border-[#0070F0] px-4 py-2 text-sm font-semibold text-[#0070F0]"
+                type="button"
+                aria-label="Remove rest day"
+                (click)="removeSelectedRestDay()"
+              >
+                Remove rest day
+              </button>
+            </div>
+          }
+
+          @case ('empty') {
+            <div class="rounded-2xl border border-dashed border-[#C7CBCC] bg-[#F7F9FA] p-4 text-center">
+              <h3 class="text-lg font-bold text-[#202325]">No workout planned for this day.</h3>
+              <p class="mt-1 text-sm text-[#72777A]">
+                Set a workout or mark this day as rest.
+              </p>
+
+              <div class="mt-4 grid gap-2 sm:grid-cols-2">
+                <button
+                  class="rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
+                  type="button"
+                  aria-label="Set a workout for selected day"
+                  (click)="openExerciseSheet()"
+                >
+                  Set workout
+                </button>
+
+                <button
+                  class="rounded-full border border-[#0070F0] bg-white px-4 py-3 font-semibold text-[#0070F0]"
+                  type="button"
+                  aria-label="Mark selected day as rest day"
+                  (click)="markSelectedDayAsRestDay()"
+                >
+                  Mark as rest day
+                </button>
+              </div>
+            </div>
+          }
+        }
+      }
+    </section>
   </div>
 </div>
 
@@ -105,7 +130,9 @@
       <div class="flex items-center justify-between border-b border-[#E3E5E5] p-4">
         <div>
           <h2 class="text-xl font-semibold text-[#202325]">Add new workout</h2>
-          <p class="text-sm text-[#72777A]">Search all exercises and select one to add.</p>
+          <p class="text-sm text-[#72777A]">
+            Select one or more exercises for {{ selectedDateLabel() }}.
+          </p>
         </div>
 
         <button
@@ -136,6 +163,27 @@
             <option [value]="exercise.name"></option>
           }
         </datalist>
+
+        @if (selectedWorkoutExercises().length) {
+          <div class="mt-4 rounded-2xl bg-[#F7F9FA] p-3">
+            <p class="text-sm font-semibold text-[#202325]">
+              Selected exercises: {{ selectedWorkoutExercises().length }}
+            </p>
+
+            <div class="mt-2 flex gap-2 overflow-x-auto pb-1">
+              @for (exercise of selectedWorkoutExercises(); track exercise.id) {
+                <button
+                  class="shrink-0 rounded-full bg-[#EBF4FF] px-3 py-1 text-sm font-medium text-[#0070F0]"
+                  type="button"
+                  [attr.aria-label]="'Remove ' + exercise.name + ' from workout'"
+                  (click)="removeSelectedWorkoutExercise(exercise.id)"
+                >
+                  {{ exercise.name }} ×
+                </button>
+              }
+            </div>
+          </div>
+        }
       </div>
 
       <div class="min-h-0 flex-1 overflow-y-auto p-4" (scroll)="onExerciseListScroll($event)">
@@ -147,8 +195,11 @@
           @for (exercise of exerciseSearchResults(); track exercise.id) {
             <button
               class="grid w-full grid-cols-[72px_1fr] gap-3 rounded-2xl border border-[#E3E5E5] bg-white p-3 text-left shadow-sm hover:border-[#0070F0] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+              [class.border-[#0070F0]]="isWorkoutExerciseSelected(exercise.id)"
+              [class.bg-[#EBF4FF]]="isWorkoutExerciseSelected(exercise.id)"
               type="button"
-              (click)="addWorkout(exercise)"
+              [attr.aria-pressed]="isWorkoutExerciseSelected(exercise.id)"
+              (click)="toggleWorkoutExercise(exercise)"
             >
               @if (getExerciseMediaUrl(exercise); as exerciseMediaUrl) {
                 <img
@@ -163,6 +214,9 @@
 
               <span class="min-w-0">
                 <span class="block font-semibold text-[#202325]">{{ exercise.name }}</span>
+                @if (isWorkoutExerciseSelected(exercise.id)) {
+                  <span class="block text-sm font-semibold text-[#0070F0]">Selected</span>
+                }
                 <span class="block text-sm capitalize text-[#72777A]">
                   {{ exercise.category }}
                   @if (exercise.equipment) {
@@ -190,6 +244,20 @@
         } @else if (!exerciseSearchResults().length && !exerciseSearchError()) {
           <p class="py-8 text-center text-[#72777A]">No exercises found.</p>
         }
+      </div>
+
+      <div class="border-t border-[#E3E5E5] p-4">
+        <button
+          class="w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white disabled:bg-[#C7CBCC]"
+          type="button"
+          [disabled]="!selectedWorkoutExercises().length"
+          (click)="createWorkoutFromSelectedExercises()"
+        >
+          Create workout
+          @if (selectedWorkoutExercises().length) {
+            · {{ getExerciseCountLabel(selectedWorkoutExercises().length) }}
+          }
+        </button>
       </div>
     </div>
   </div>
