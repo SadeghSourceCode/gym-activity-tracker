@@ -15,6 +15,8 @@ export function mapDailyPlanToViewModel(
       id: workout.id,
       title: workout.title,
       exerciseCount: workout.exerciseCount,
+      estimatedMinutes: workout.estimatedMinutes,
+      exercises: workout.exercises,
       status: resolveWorkoutStatus(
         workout.scheduledDate,
         workout.completionStatus,
@@ -25,4 +27,3 @@ export function mapDailyPlanToViewModel(
     canMarkAsRestDay: plan.type === 'empty',
   };
 }
-

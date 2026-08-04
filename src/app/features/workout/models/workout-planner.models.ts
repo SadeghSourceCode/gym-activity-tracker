@@ -10,6 +10,15 @@ export interface WorkoutSummary {
   scheduledDate: string;
   exerciseCount: number;
   completionStatus: WorkoutCompletionStatus;
+  estimatedMinutes: number;
+  exercises: WorkoutExercisePreview[];
+}
+
+export interface WorkoutExercisePreview {
+  id: string;
+  name: string;
+  setCount: number;
+  weight: number;
 }
 
 export interface DailyWorkoutPlan {
@@ -22,6 +31,8 @@ export interface WorkoutCardViewModel {
   id: string;
   title: string;
   exerciseCount: number;
+  estimatedMinutes: number;
+  exercises: WorkoutExercisePreview[];
   status: WorkoutDisplayStatus;
 }
 
@@ -32,4 +43,3 @@ export interface SelectedDayViewModel {
   canAddWorkout: boolean;
   canMarkAsRestDay: boolean;
 }
-

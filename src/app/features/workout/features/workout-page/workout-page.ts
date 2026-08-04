@@ -719,6 +719,17 @@ export class WorkoutPage {
       title: workout.name,
       scheduledDate: getDateKey(workout.date),
       exerciseCount: workout.exercises.length,
+      estimatedMinutes: Math.max(workout.exercises.length * 12, 15),
+      exercises: workout.exercises.map((exercise) => {
+        const firstSet = exercise.sets[0];
+
+        return {
+          id: exercise.id,
+          name: this.getWorkoutExerciseName(exercise),
+          setCount: exercise.sets.length,
+          weight: firstSet?.weight ?? 0,
+        };
+      }),
       completionStatus: this.normalizeCompletionStatus(workout.completionStatus),
     }));
 

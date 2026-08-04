@@ -18,4 +18,18 @@ export class WorkoutSummaryCardComponent {
   readonly open = output<string>();
   readonly reject = output<string>();
   readonly edit = output<string>();
+
+  readonly visibleExerciseLimit = 3;
+
+  visibleExercises() {
+    return this.workout().exercises.slice(0, this.visibleExerciseLimit);
+  }
+
+  hiddenExerciseCount(): number {
+    return Math.max(this.workout().exerciseCount - this.visibleExerciseLimit, 0);
+  }
+
+  getEstimatedDurationLabel(): string {
+    return `est. ${this.workout().estimatedMinutes} min`;
+  }
 }
