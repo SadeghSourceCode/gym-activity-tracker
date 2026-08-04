@@ -1,0 +1,103 @@
+<div
+  class="fixed inset-0 z-50 overflow-y-auto bg-[#F7F9FA]"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="workout().name + ' ' + text().workoutDetailsLabel"
+>
+  <div class="flex min-h-dvh flex-col gap-4 p-4">
+    <div class="flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <h2 class="truncate text-xl font-bold text-[#202325]">{{ workout().name }}</h2>
+        <p class="text-sm font-medium text-[#72777A]">
+          {{ getExerciseCountLabel(workout().exercises.length) }}
+        </p>
+      </div>
+
+      <button
+        class="flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+        type="button"
+        [attr.aria-label]="text().closeWorkoutDetailsLabel"
+        (click)="close.emit()"
+      >
+        &times;
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-4">
+      @for (exercise of workout().exercises; track exercise.id) {
+        <section class="rounded-3xl border border-[#E3E5E5] bg-white p-4 shadow-sm">
+          <div class="flex items-center gap-3">
+            @if (exercise.thumbnailUrl) {
+              <img
+                class="size-14 shrink-0 rounded-xl bg-[#F7F9FA] object-cover"
+                [src]="exercise.thumbnailUrl"
+                [alt]="getWorkoutExerciseName(exercise)"
+                loading="lazy"
+              />
+            } @else {
+              <div class="size-14 shrink-0 rounded-xl bg-[#F7F9FA]"></div>
+            }
+
+            <h3 class="min-w-0 truncate text-lg font-bold text-[#202325]">
+              {{ getWorkoutExerciseName(exercise) }}
+            </h3>
+          </div>
+
+          <div class="mt-4 grid gap-3">
+            @for (set of exercise.sets; track set.id) {
+              <div class="grid grid-cols-2 gap-3 rounded-2xl bg-[#F7F9FA] p-3">
+                <label class="block min-w-0 text-sm font-medium text-[#72777A]">
+                  {{ text().repeatLabel }}
+                  <input
+                    class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-white px-3 py-2 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+                    type="number"
+                    min="0"
+                    [value]="set.repeat"
+                    (input)="updateSet.emit({ workoutId: workout().id, exerciseId: exercise.id, setId: set.id, changes: { repeat: +$any($event.target).value } })"
+                  />
+                </label>
+
+                <label class="block min-w-0 text-sm font-medium text-[#72777A]">
+                  {{ text().weightLabel }}
+                  <input
+                    class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-white px-3 py-2 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+                    type="number"
+                    min="0"
+                    [value]="set.weight"
+                    (input)="updateSet.emit({ workoutId: workout().id, exerciseId: exercise.id, setId: set.id, changes: { weight: +$any($event.target).value } })"
+                  />
+                </label>
+              </div>
+            }
+          </div>
+
+          <button
+            class="mt-4 w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
+            type="button"
+            (click)="addSet.emit({ workoutId: workout().id, exerciseId: exercise.id })"
+          >
+          {{ text().addSetLabel }}
+          </button>
+        </section>
+      }
+    </div>
+
+    <div class="grid gap-3 rounded-3xl bg-white p-4 shadow-sm sm:grid-cols-2">
+      <button
+        class="rounded-full bg-[#168A4A] px-4 py-3 font-semibold text-white"
+        type="button"
+        (click)="complete.emit({ workoutId: workout().id, completionStatus: 'completed' })"
+      >
+        {{ text().markAsDoneLabel }}
+      </button>
+
+      <button
+        class="rounded-full bg-[#C93636] px-4 py-3 font-semibold text-white"
+        type="button"
+        (click)="complete.emit({ workoutId: workout().id, completionStatus: 'rejected' })"
+      >
+        {{ text().rejectWorkoutLabel }}
+      </button>
+    </div>
+  </div>
+</div>

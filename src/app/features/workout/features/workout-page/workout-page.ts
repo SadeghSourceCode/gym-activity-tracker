@@ -15,46 +15,45 @@ import {
   WorkoutDisplayStatus,
 } from '../../models/workout-planner.models';
 import {
+  Workout,
+  WorkoutExerciseSummary,
+  WorkoutSet,
+} from '../../models/workout-storage.models';
+import {
+  ExerciseDetailsTextConfig,
+  SelectedDayPanelTextConfig,
+  WorkoutDetailTextConfig,
+  WorkoutEditorTextConfig,
+} from '../../models/workout-ui.models';
+import {
   ExerciseDbApiService,
   ExerciseDbExercise,
+  TargetMuscleOption,
 } from '../../services/exercise-db-api.service';
 import { getDateKey, getTodayDateKey, parseDateKey } from '../../utils/calendar-date.util';
 import { mapDailyPlanToViewModel } from '../../utils/workout-plan-view-model.mapper';
-import { WorkoutCalendarComponent } from '../workout-calendar/workout-calendar.component';
+import { WorkoutCalendarComponent } from '../../components/workout-calendar/workout-calendar.component';
 import { I18nService } from '../../../../core/i18n/i18n.service';
-
-interface WorkoutSet {
-  id: number;
-  repeat: number;
-  weight: number;
-}
-
-interface WorkoutExerciseSummary {
-  id: string;
-  name: string;
-  nameEn: string;
-  nameFa: string;
-  thumbnailUrl?: string;
-  sets: WorkoutSet[];
-}
-
-interface Workout {
-  id: number;
-  name: string;
-  exerciseId?: string;
-  thumbnailUrl?: string;
-  exercises: WorkoutExerciseSummary[];
-  date: Date;
-  sets: WorkoutSet[];
-  completionStatus?: WorkoutCompletionStatus;
-}
+import { SelectedDayPanelComponent } from '../../components/selected-day-panel/selected-day-panel.component';
+import {
+  WorkoutEditorSheetComponent,
+  WorkoutEditorStep,
+} from '../../components/workout-editor-sheet/workout-editor-sheet.component';
+import { WorkoutDetailComponent } from '../../components/workout-detail/workout-detail.component';
+import { ExerciseDetailsDialogComponent } from '../../components/exercise-details-dialog/exercise-details-dialog.component';
 
 @Component({
-  selector: 'app-main',
-  imports: [WorkoutCalendarComponent],
-  templateUrl: './main.component.html',
+  selector: 'app-workout-page',
+  imports: [
+    WorkoutCalendarComponent,
+    SelectedDayPanelComponent,
+    WorkoutEditorSheetComponent,
+    WorkoutDetailComponent,
+    ExerciseDetailsDialogComponent,
+  ],
+  templateUrl: './workout-page.html',
 })
-export class MainComponent {
+export class WorkoutPage {
   private readonly storageKey = 'gym-activity-tracker.workouts';
   private readonly restDaysStorageKey = 'gym-activity-tracker.rest-days';
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
@@ -73,6 +72,10 @@ export class MainComponent {
   exerciseSearchTotal = signal(0);
   isExerciseSearchLoading = signal(false);
   exerciseSearchError = signal<string | null>(null);
+  targetMuscles = signal<TargetMuscleOption[]>([]);
+  selectedTargetMuscle = signal<string | null>(null);
+  workoutEditorStep = signal<WorkoutEditorStep>('muscle');
+  isWeeklyPlan = signal(false);
   editingWorkoutId = signal<number | null>(null);
   workoutTitle = signal('');
   selectedWorkoutExercises = signal<WorkoutExerciseSummary[]>([]);
@@ -125,6 +128,67 @@ export class MainComponent {
       day: 'numeric',
     }),
   );
+  readonly selectedDayPanelText = computed<SelectedDayPanelTextConfig>(() => ({
+    selectedDayWorkoutsLabel: this.i18n.t('selectedDayWorkouts'),
+    retryLabel: this.i18n.t('retry'),
+    openLabel: this.i18n.t('open'),
+    rejectLabel: this.i18n.t('reject'),
+    editLabel: this.i18n.t('edit'),
+    restDayTitle: this.i18n.t('restDay'),
+    recoveryMessage: this.i18n.t('recoveryMessage'),
+    removeRestDayLabel: this.i18n.t('removeRestDay'),
+    noWorkoutPlannedTitle: this.i18n.t('noWorkoutPlanned'),
+    setWorkoutOrRestMessage: this.i18n.t('setWorkoutOrRest'),
+    setWorkoutLabel: this.i18n.t('setWorkout'),
+    markAsRestDayLabel: this.i18n.t('markAsRestDay'),
+    inProgressLabel: this.i18n.t('inProgress'),
+    doneLabel: this.i18n.t('done'),
+    rejectedLabel: this.i18n.t('rejected'),
+    incomingLabel: this.i18n.t('incoming'),
+    isPersian: this.i18n.language() === 'fa',
+  }));
+  readonly workoutEditorText = computed<WorkoutEditorTextConfig>(() => ({
+    addWorkoutLabel: this.i18n.t('addWorkout'),
+    closeExerciseSearchLabel: this.i18n.t('closeExerciseSearch'),
+    selectExerciseForDateLabel: this.i18n.t('selectExerciseForDate'),
+    workoutTitleLabel: this.i18n.t('workoutTitle'),
+    leaveEmptyToUseLabel: this.i18n.t('leaveEmptyToUse'),
+    searchExercisesLabel: this.i18n.t('searchExercises'),
+    searchByNameMuscleEquipmentLabel: this.i18n.t('searchByNameMuscleEquipment'),
+    selectedExercisesLabel: this.i18n.t('selectedExercises'),
+    removeLabel: this.i18n.t('remove'),
+    selectedLabel: this.i18n.t('selected'),
+    loadingExercisesLabel: this.i18n.t('loadingExercises'),
+    loadMoreLabel: this.i18n.t('loadMore'),
+    noExercisesFoundLabel: this.i18n.t('noExercisesFound'),
+    backLabel: this.i18n.t('back'),
+    continueLabel: this.i18n.t('continue'),
+    targetMuscleLabel: this.i18n.t('targetMuscleLabel'),
+    chooseTargetMuscleLabel: this.i18n.t('chooseTargetMuscleLabel'),
+    chooseTargetMuscleMessage: this.i18n.t('chooseTargetMuscleMessage'),
+    chooseExercisesMessage: this.i18n.t('chooseExercisesMessage'),
+    workoutPlanningLabel: this.i18n.t('workoutPlanningLabel'),
+    workingDayLabel: this.i18n.t('workingDayLabel'),
+    weeklyPlanLabel: this.i18n.t('weeklyPlanLabel'),
+    weeklyPlanHelpLabel: this.i18n.t('weeklyPlanHelpLabel'),
+    isPersian: this.i18n.language() === 'fa',
+  }));
+  readonly workoutDetailText = computed<WorkoutDetailTextConfig>(() => ({
+    workoutDetailsLabel: this.i18n.t('workoutDetails'),
+    closeWorkoutDetailsLabel: this.i18n.t('closeWorkoutDetails'),
+    repeatLabel: this.i18n.t('repeat'),
+    weightLabel: this.i18n.t('weight'),
+    addSetLabel: this.i18n.t('addSet'),
+    markAsDoneLabel: this.i18n.t('markAsDone'),
+    rejectWorkoutLabel: this.i18n.t('rejectWorkout'),
+    isPersian: this.i18n.language() === 'fa',
+  }));
+  readonly exerciseDetailsText = computed<ExerciseDetailsTextConfig>(() => ({
+    exerciseDetailsLabel: this.i18n.t('exerciseDetails'),
+    closeExerciseDetailsLabel: this.i18n.t('closeExerciseDetails'),
+    noDescriptionAvailableLabel: this.i18n.t('noDescriptionAvailable'),
+    similarExercisesLabel: this.i18n.t('similarExercises'),
+  }));
 
   private readonly saveWorkouts = effect(() => {
     if (!this.isBrowser) {
@@ -213,8 +277,11 @@ export class MainComponent {
     this.editingWorkoutId.set(null);
     this.workoutTitle.set('');
     this.selectedWorkoutExercises.set([]);
+    this.selectedTargetMuscle.set(null);
+    this.workoutEditorStep.set('muscle');
+    this.isWeeklyPlan.set(false);
     this.isExerciseSheetOpen.set(true);
-    this.searchExercises('');
+    this.loadTargetMuscles();
   }
 
   openEditWorkoutSheet(workoutId: string) {
@@ -228,7 +295,15 @@ export class MainComponent {
     this.editingWorkoutId.set(workout.id);
     this.workoutTitle.set(workout.name);
     this.selectedWorkoutExercises.set([...workout.exercises]);
+    this.selectedTargetMuscle.set(
+      workout.targetMuscle ??
+        workout.exercises.find((exercise) => exercise.targetMuscle)?.targetMuscle ??
+        null,
+    );
+    this.workoutEditorStep.set(this.selectedTargetMuscle() ? 'exercises' : 'muscle');
+    this.isWeeklyPlan.set(Boolean(workout.isWeeklyPlan));
     this.isExerciseSheetOpen.set(true);
+    this.loadTargetMuscles();
     this.searchExercises('');
   }
 
@@ -237,6 +312,15 @@ export class MainComponent {
     this.editingWorkoutId.set(null);
     this.workoutTitle.set('');
     this.selectedWorkoutExercises.set([]);
+    this.selectedTargetMuscle.set(null);
+    this.workoutEditorStep.set('muscle');
+    this.isWeeklyPlan.set(false);
+  }
+
+  selectTargetMuscle(targetMuscle: string) {
+    this.selectedTargetMuscle.set(targetMuscle);
+    this.selectedWorkoutExercises.set([]);
+    this.searchExercises('');
   }
 
   searchExercises(query: string) {
@@ -352,6 +436,8 @@ export class MainComponent {
           thumbnailUrl: firstExercise.thumbnailUrl,
           exercises: selectedExercises,
           date: parseDateKey(this.selectedDate()),
+          targetMuscle: this.selectedTargetMuscle() ?? firstExercise.targetMuscle,
+          isWeeklyPlan: this.isWeeklyPlan(),
           completionStatus: 'pending',
           sets: [{ id: 1, repeat: 0, weight: 0 }],
         },
@@ -383,6 +469,8 @@ export class MainComponent {
               exerciseId: firstExercise.id,
               thumbnailUrl: firstExercise.thumbnailUrl,
               exercises: selectedExercises,
+              targetMuscle: this.selectedTargetMuscle() ?? firstExercise.targetMuscle,
+              isWeeklyPlan: this.isWeeklyPlan(),
             }
           : workout,
       ),
@@ -594,7 +682,7 @@ export class MainComponent {
     this.exerciseSearchError.set(null);
 
     this.exerciseDbApi
-      .search(this.exerciseSearchQuery(), offset, this.pageSize)
+      .search(this.exerciseSearchQuery(), offset, this.pageSize, this.selectedTargetMuscle())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ items, total }) => {
@@ -608,6 +696,20 @@ export class MainComponent {
           this.exerciseSearchError.set(this.i18n.t('couldNotLoadExercises'));
           this.isExerciseSearchLoading.set(false);
         },
+      });
+  }
+
+  private loadTargetMuscles() {
+    if (this.targetMuscles().length) {
+      return;
+    }
+
+    this.exerciseDbApi
+      .getTargetMuscles()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (targetMuscles) => this.targetMuscles.set(targetMuscles),
+        error: () => this.exerciseSearchError.set(this.i18n.t('couldNotLoadExercises')),
       });
   }
 
@@ -672,6 +774,7 @@ export class MainComponent {
           ...exercise,
           nameEn: exercise.nameEn ?? exercise.name,
           nameFa: exercise.nameFa ?? exercise.name,
+          targetMuscle: exercise.targetMuscle ?? workout.targetMuscle,
           name: this.i18n.language() === 'fa'
             ? (exercise.nameFa ?? exercise.name)
             : (exercise.nameEn ?? exercise.name),
@@ -686,6 +789,7 @@ export class MainComponent {
           name: workout.name,
           nameEn: workout.name,
           nameFa: workout.name,
+          targetMuscle: workout.targetMuscle,
           thumbnailUrl: workout.thumbnailUrl,
           sets: this.normalizeWorkoutSets(workout.sets),
         },
@@ -701,6 +805,7 @@ export class MainComponent {
       name: exercise.name,
       nameEn: exercise.nameEn,
       nameFa: exercise.nameFa,
+      targetMuscle: exercise.targetMuscle,
       thumbnailUrl: this.getExerciseMediaUrl(exercise) ?? undefined,
       sets: [{ id: 1, repeat: 0, weight: 0 }],
     };

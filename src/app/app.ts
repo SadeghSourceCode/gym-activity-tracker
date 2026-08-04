@@ -1,8 +1,7 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { I18nService } from './core/i18n/i18n.service';
-import { TelegramService } from './core/telegram/data-access/services/telegram.service';
 
 type BottomNavItem = 'home' | 'search' | 'progress' | 'profile';
 
@@ -11,9 +10,8 @@ type BottomNavItem = 'home' | 'search' | 'progress' | 'profile';
   imports: [RouterOutlet],
   templateUrl: './app.html',
 })
-export class App implements OnInit {
+export class App {
   private readonly router = inject(Router);
-  readonly telegram = inject(TelegramService);
   readonly i18n = inject(I18nService);
 
   protected readonly title = signal('gym-activity-tracker');
@@ -33,10 +31,6 @@ export class App implements OnInit {
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe((event) => this.syncSelectedBottomNavItemWithRoute(event.urlAfterRedirects));
 
-  }
-
-  ngOnInit(): void {
-    this.telegram.initialize();
   }
 
   protected selectBottomNavItem(item: BottomNavItem, route: string) {

@@ -18,7 +18,7 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('main')).toBeTruthy();
+    expect(compiled.querySelector('workout-page')).toBeTruthy();
     expect(compiled.querySelector('nav')?.textContent).toContain('Home');
   });
 });

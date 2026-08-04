@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { I18nService } from '../../../../core/i18n/i18n.service';
-import { ProfilePreferencesService } from '../../../../core/profile/profile-preferences.service';
-import { AppLanguage, AppTheme } from '../../../../core/profile/user-profile.models';
+import { ProfilePreferencesService } from '../../data-access/services/profile-preferences.service';
+import { AppLanguage, AppTheme } from '../../data-access/models/user-profile.models';
 
 @Component({
   selector: 'app-profile-page',
