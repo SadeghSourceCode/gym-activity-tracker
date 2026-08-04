@@ -11,6 +11,11 @@ export type WorkoutEditorStep = 'muscle' | 'exercises' | 'planning';
   standalone: true,
   imports: [AppButton],
   templateUrl: './workout-editor-sheet.component.html',
+  styles: `
+    .selected {
+      @apply border border-[#0070F0];
+    }
+  `,
 })
 export class WorkoutEditorSheetComponent {
   readonly text = input.required<WorkoutEditorTextConfig>();
