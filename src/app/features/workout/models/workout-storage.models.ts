@@ -11,6 +11,7 @@ export interface WorkoutExerciseSummary {
   name: string;
   nameEn: string;
   nameFa: string;
+  targetMuscle?: string;
   thumbnailUrl?: string;
   sets: WorkoutSet[];
 }
@@ -22,7 +23,8 @@ export interface Workout {
   thumbnailUrl?: string;
   exercises: WorkoutExerciseSummary[];
   date: Date;
+  targetMuscle?: string;
+  isWeeklyPlan?: boolean;
   sets: WorkoutSet[];
   completionStatus?: WorkoutCompletionStatus;
 }
-

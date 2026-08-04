@@ -6,11 +6,16 @@ type TranslationKey =
   | 'addWorkout'
   | 'allWorkoutsLoaded'
   | 'ageBirthday'
+  | 'back'
   | 'birthday'
+  | 'chooseExercisesMessage'
+  | 'chooseTargetMuscleLabel'
+  | 'chooseTargetMuscleMessage'
   | 'close'
   | 'closeExerciseDetails'
   | 'closeExerciseSearch'
   | 'closeWorkoutDetails'
+  | 'continue'
   | 'couldNotFindWorkout'
   | 'couldNotFindWorkoutToEdit'
   | 'couldNotLoadExercises'
@@ -73,6 +78,7 @@ type TranslationKey =
   | 'sixthDay'
   | 'systemTheme'
   | 'tall'
+  | 'targetMuscleLabel'
   | 'themeDark'
   | 'themeLight'
   | 'themeSystem'
@@ -80,9 +86,13 @@ type TranslationKey =
   | 'today'
   | 'uploadImage'
   | 'userName'
+  | 'weeklyPlanHelpLabel'
+  | 'weeklyPlanLabel'
   | 'weight'
+  | 'workingDayLabel'
   | 'workoutDay'
   | 'workoutDetails'
+  | 'workoutPlanningLabel'
   | 'workoutTitle';
 
 const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
@@ -91,11 +101,16 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     addWorkout: 'Add new workout',
     allWorkoutsLoaded: 'All workouts loaded.',
     ageBirthday: 'Age / birthday',
+    back: 'Back',
     birthday: 'Birthday',
+    chooseExercisesMessage: 'Search and select exercises for the selected muscle.',
+    chooseTargetMuscleLabel: 'Choose target muscle',
+    chooseTargetMuscleMessage: 'Start with the body area you want to train.',
     close: 'Close',
     closeExerciseDetails: 'Close exercise details',
     closeExerciseSearch: 'Close exercise search',
     closeWorkoutDetails: 'Close workout details',
+    continue: 'Continue',
     couldNotFindWorkout: 'Could not find this workout.',
     couldNotFindWorkoutToEdit: 'Could not find this workout to edit.',
     couldNotLoadExercises: 'Could not load exercises. Check your connection and try again.',
@@ -158,6 +173,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     sixthDay: 'Sixth Day',
     systemTheme: 'System theme',
     tall: 'Tall',
+    targetMuscleLabel: 'Target muscle',
     themeDark: 'Dark',
     themeLight: 'Light',
     themeSystem: 'System',
@@ -165,9 +181,13 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     today: 'Today',
     uploadImage: 'Upload image',
     userName: 'User name',
+    weeklyPlanHelpLabel: 'Add this workout as part of your weekly plan.',
+    weeklyPlanLabel: 'Repeat every week',
     weight: 'Weight',
+    workingDayLabel: 'Working day',
     workoutDay: 'Workout Day',
     workoutDetails: 'Workout details',
+    workoutPlanningLabel: 'Plan workout',
     workoutTitle: 'Workout title',
   },
   fa: {
@@ -175,11 +195,16 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     addWorkout: 'افزودن تمرین جدید',
     allWorkoutsLoaded: 'همه تمرین‌ها بارگذاری شدند.',
     ageBirthday: 'سن / تاریخ تولد',
+    back: 'بازگشت',
     birthday: 'تاریخ تولد',
+    chooseExercisesMessage: 'حرکت‌های مناسب عضله انتخاب‌شده را جستجو و انتخاب کنید.',
+    chooseTargetMuscleLabel: 'انتخاب عضله هدف',
+    chooseTargetMuscleMessage: 'ابتدا بخشی از بدن را که می‌خواهید تمرین دهید انتخاب کنید.',
     close: 'بستن',
     closeExerciseDetails: 'بستن جزئیات حرکت',
     closeExerciseSearch: 'بستن جستجوی حرکت',
     closeWorkoutDetails: 'بستن جزئیات تمرین',
+    continue: 'ادامه',
     couldNotFindWorkout: 'این تمرین پیدا نشد.',
     couldNotFindWorkoutToEdit: 'این تمرین برای ویرایش پیدا نشد.',
     couldNotLoadExercises: 'حرکت‌ها بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
@@ -242,6 +267,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     sixthDay: 'روز ششم',
     systemTheme: 'تم سیستم',
     tall: 'قد',
+    targetMuscleLabel: 'عضله هدف',
     themeDark: 'تیره',
     themeLight: 'روشن',
     themeSystem: 'سیستم',
@@ -249,9 +275,13 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     today: 'امروز',
     uploadImage: 'بارگذاری تصویر',
     userName: 'نام کاربر',
+    weeklyPlanHelpLabel: 'این تمرین را به‌عنوان بخشی از برنامه هفتگی ثبت کنید.',
+    weeklyPlanLabel: 'تکرار هر هفته',
     weight: 'وزن',
+    workingDayLabel: 'روز تمرین',
     workoutDay: 'روز تمرین',
     workoutDetails: 'جزئیات تمرین',
+    workoutPlanningLabel: 'برنامه‌ریزی تمرین',
     workoutTitle: 'عنوان تمرین',
   },
 };

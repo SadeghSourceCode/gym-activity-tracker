@@ -9,6 +9,7 @@ export interface ExerciseDbExercise {
   name: string;
   nameEn: string;
   nameFa: string;
+  targetMuscle: string;
   equipment: string | null;
   primaryMuscles: string[];
   secondaryMuscles: string[];
@@ -41,6 +42,12 @@ export interface ExerciseSearchResult {
   total: number;
 }
 
+export interface TargetMuscleOption {
+  id: string;
+  label: string;
+  exerciseCount: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ExerciseDbApiService {
   private readonly http = inject(HttpClient);
@@ -60,20 +67,47 @@ export class ExerciseDbApiService {
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
-  search(query: string, offset = 0, limit = 15): Observable<ExerciseSearchResult> {
+  search(
+    query: string,
+    offset = 0,
+    limit = 15,
+    targetMuscle: string | null = null,
+  ): Observable<ExerciseSearchResult> {
     const normalizedQuery = query.trim().toLowerCase();
+    const normalizedTargetMuscle = targetMuscle?.trim().toLowerCase() ?? '';
 
     return this.exercises$.pipe(
       map((exercises) => {
         const localizedExercises = exercises.map((exercise) => this.localizeExercise(exercise));
-        const filteredExercises = normalizedQuery
-          ? localizedExercises.filter((exercise) => this.matchesExercise(exercise, normalizedQuery))
+        const muscleFilteredExercises = normalizedTargetMuscle
+          ? localizedExercises.filter(
+              (exercise) => exercise.targetMuscle.toLowerCase() === normalizedTargetMuscle,
+            )
           : localizedExercises;
+        const filteredExercises = normalizedQuery
+          ? muscleFilteredExercises.filter((exercise) => this.matchesExercise(exercise, normalizedQuery))
+          : muscleFilteredExercises;
 
         return {
           items: filteredExercises.slice(offset, offset + limit),
           total: filteredExercises.length,
         };
+      }),
+    );
+  }
+
+  getTargetMuscles(): Observable<TargetMuscleOption[]> {
+    return this.exercises$.pipe(
+      map((exercises) => {
+        const counts = new Map<string, number>();
+
+        for (const exercise of exercises) {
+          counts.set(exercise.targetMuscle, (counts.get(exercise.targetMuscle) ?? 0) + 1);
+        }
+
+        return [...counts.entries()]
+          .map(([label, exerciseCount]) => ({ id: label, label, exerciseCount }))
+          .sort((a, b) => a.label.localeCompare(b.label));
       }),
     );
   }
@@ -153,6 +187,7 @@ export class ExerciseDbApiService {
       name: exercise.name,
       nameEn: exercise.name,
       nameFa: translateExerciseNameToPersian(exercise.name),
+      targetMuscle: exercise.target || exercise.muscle_group || exercise.body_part || exercise.category,
       equipment: exercise.equipment,
       primaryMuscles: [exercise.target, exercise.muscle_group].filter(Boolean),
       secondaryMuscles: exercise.secondary_muscles ?? [],

@@ -32,6 +32,16 @@ export interface WorkoutEditorTextConfig {
   loadingExercisesLabel: string;
   loadMoreLabel: string;
   noExercisesFoundLabel: string;
+  backLabel: string;
+  continueLabel: string;
+  targetMuscleLabel: string;
+  chooseTargetMuscleLabel: string;
+  chooseTargetMuscleMessage: string;
+  chooseExercisesMessage: string;
+  workoutPlanningLabel: string;
+  workingDayLabel: string;
+  weeklyPlanLabel: string;
+  weeklyPlanHelpLabel: string;
   isPersian: boolean;
 }
 

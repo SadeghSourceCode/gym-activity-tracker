@@ -1,57 +1,66 @@
 <div class="flex w-full min-w-0 max-w-full flex-col overflow-hidden">
-  <div class="flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden rounded-2xl">
-    <app-workout-calendar
-      [selectedDate]="selectedDate()"
-      (dateSelected)="selectDate($event)"
-    />
-
-    <app-selected-day-panel
-      [text]="selectedDayPanelText()"
+  @if (isExerciseSheetOpen()) {
+    <app-workout-editor-sheet
+      [text]="workoutEditorText()"
+      [title]="getWorkoutSheetTitle()"
       [selectedDateLabel]="selectedDateLabel()"
-      [selectedDayViewModel]="selectedDayViewModel()"
-      [selectedDayWorkoutStatus]="selectedDayWorkoutStatus()"
-      [selectedDayError]="selectedDayError()"
-      (retry)="retrySelectedDay()"
-      (openWorkoutDetails)="openWorkoutDetails($event)"
-      (rejectWorkout)="setWorkoutCompletionStatus(+$event, 'rejected')"
-      (editWorkout)="openEditWorkoutSheet($event)"
-      (setWorkout)="openExerciseSheet()"
-      (markAsRestDay)="markSelectedDayAsRestDay()"
-      (removeRestDay)="removeSelectedRestDay()"
+      [workingDate]="selectedDate()"
+      [workoutTitle]="workoutTitle()"
+      [defaultWorkoutTitle]="getDefaultWorkoutTitle()"
+      [saveButtonLabel]="getWorkoutSaveButtonLabel()"
+      [selectedExercises]="selectedWorkoutExercises()"
+      [imageBaseUrl]="exerciseImageBaseUrl"
+      [exerciseSearchQuery]="exerciseSearchQuery()"
+      [exerciseSearchResults]="exerciseSearchResults()"
+      [exerciseSearchTotal]="exerciseSearchTotal()"
+      [isExerciseSearchLoading]="isExerciseSearchLoading()"
+      [exerciseSearchError]="exerciseSearchError()"
+      [targetMuscles]="targetMuscles()"
+      [selectedTargetMuscle]="selectedTargetMuscle()"
+      [step]="workoutEditorStep()"
+      [isWeeklyPlan]="isWeeklyPlan()"
+      (close)="closeExerciseSheet()"
+      (stepChanged)="workoutEditorStep.set($event)"
+      (targetMuscleChanged)="selectTargetMuscle($event)"
+      (workoutTitleChanged)="workoutTitle.set($event)"
+      (workingDateChanged)="selectDate($event)"
+      (weeklyPlanChanged)="isWeeklyPlan.set($event)"
+      (searchExercises)="searchExercises($event)"
+      (removeSelectedExercise)="removeSelectedWorkoutExercise($event)"
+      (toggleExercise)="toggleWorkoutExercise($event)"
+      (scrolled)="onExerciseListScroll($event)"
+      (loadMore)="loadMoreExercises()"
+      (save)="saveWorkoutFromSelectedExercises()"
     />
-  </div>
+  } @else {
+    <div class="flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden rounded-2xl">
+      <app-workout-calendar
+        [selectedDate]="selectedDate()"
+        (dateSelected)="selectDate($event)"
+      />
+
+      <app-selected-day-panel
+        [text]="selectedDayPanelText()"
+        [selectedDateLabel]="selectedDateLabel()"
+        [selectedDayViewModel]="selectedDayViewModel()"
+        [selectedDayWorkoutStatus]="selectedDayWorkoutStatus()"
+        [selectedDayError]="selectedDayError()"
+        (retry)="retrySelectedDay()"
+        (openWorkoutDetails)="openWorkoutDetails($event)"
+        (rejectWorkout)="setWorkoutCompletionStatus(+$event, 'rejected')"
+        (editWorkout)="openEditWorkoutSheet($event)"
+        (setWorkout)="openExerciseSheet()"
+        (markAsRestDay)="markSelectedDayAsRestDay()"
+        (removeRestDay)="removeSelectedRestDay()"
+      />
+    </div>
+  }
 </div>
 
 @if (exerciseDetailsError()) {
   <p class="mt-4 rounded-xl bg-[#FFD6D6] p-3 text-center text-[#FF6D6D]">
     {{ exerciseDetailsError() }}
   </p>
-}
-
-@if (isExerciseSheetOpen()) {
-  <app-workout-editor-sheet
-    [text]="workoutEditorText()"
-    [title]="getWorkoutSheetTitle()"
-    [selectedDateLabel]="selectedDateLabel()"
-    [workoutTitle]="workoutTitle()"
-    [defaultWorkoutTitle]="getDefaultWorkoutTitle()"
-    [saveButtonLabel]="getWorkoutSaveButtonLabel()"
-    [selectedExercises]="selectedWorkoutExercises()"
-    [imageBaseUrl]="exerciseImageBaseUrl"
-    [exerciseSearchQuery]="exerciseSearchQuery()"
-    [exerciseSearchResults]="exerciseSearchResults()"
-    [exerciseSearchTotal]="exerciseSearchTotal()"
-    [isExerciseSearchLoading]="isExerciseSearchLoading()"
-    [exerciseSearchError]="exerciseSearchError()"
-    (close)="closeExerciseSheet()"
-    (workoutTitleChanged)="workoutTitle.set($event)"
-    (searchExercises)="searchExercises($event)"
-    (removeSelectedExercise)="removeSelectedWorkoutExercise($event)"
-    (toggleExercise)="toggleWorkoutExercise($event)"
-    (scrolled)="onExerciseListScroll($event)"
-    (loadMore)="loadMoreExercises()"
-    (save)="saveWorkoutFromSelectedExercises()"
-  />
 }
 
 @if (openedWorkout(); as workout) {
