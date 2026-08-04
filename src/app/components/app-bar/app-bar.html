@@ -1,0 +1,19 @@
+<div class="grid grid-cols-5 items-center">
+  @if (config().rightIcon) {
+    <div class="col-span-1">
+      <app-button variant="link" mode="iconOnly" customClass="size-10">
+
+      </app-button>
+    </div>
+  }
+
+  <p class="col-span-3 flex items-center justify-center">
+    {{ config().title }}
+  </p>
+
+  @if (config().leftIcon) {
+    <div class="col-span-1">
+
+    </div>
+  }
+</div>

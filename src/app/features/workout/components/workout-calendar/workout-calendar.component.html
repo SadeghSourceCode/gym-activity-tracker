@@ -6,13 +6,16 @@
         <p class="text-xs font-medium text-[#72777A]">{{ weekRangeLabel() }}</p>
       </div>
 
-      <button
-        class="rounded-full bg-[#EBF4FF] px-3 py-1 text-xs font-medium text-[#0070F0]"
+      <app-button
+        variant="outline"
+        mode="section"
+        size="small"
+        customClass="rounded-full bg-[#EBF4FF] px-3 py-1 text-xs font-medium text-[#0070F0]"
         type="button"
-        (click)="selectToday()"
+        (buttonClicked)="selectToday()"
       >
         {{ i18n.t('today') }}
-      </button>
+      </app-button>
     </div>
 
     <div
@@ -22,13 +25,16 @@
     >
       <div class="flex items-start gap-4 text-center">
         @for (day of calendarDays(); track day.date.toDateString()) {
-          <button
-            class="flex w-8 shrink-0 flex-col items-center gap-3 text-sm font-medium"
+          <app-button
+            variant="link"
+            mode="form"
+            size="small"
+            customClass="flex w-8 shrink-0 flex-col items-center gap-3 text-sm font-medium"
             type="button"
             [attr.data-date-key]="day.dateKey"
-            [attr.aria-label]="i18n.t('select') + ' ' + day.date.toLocaleDateString(i18n.language() === 'fa' ? 'fa-IR' : undefined)"
+            [ariaLabel]="i18n.t('select') + ' ' + day.date.toLocaleDateString(i18n.language() === 'fa' ? 'fa-IR' : undefined)"
             [attr.aria-selected]="isSelected(day.dateKey)"
-            (click)="selectDate(day.dateKey)"
+            (buttonClicked)="selectDate(day.dateKey)"
           >
             <span class="leading-5 text-[#0070F0]">{{ day.label }}</span>
             <span
@@ -41,7 +47,7 @@
             >
               {{ day.date.getDate() }}
             </span>
-          </button>
+          </app-button>
         }
       </div>
     </div>

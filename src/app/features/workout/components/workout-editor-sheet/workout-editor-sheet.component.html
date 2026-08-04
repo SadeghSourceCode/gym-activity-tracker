@@ -3,31 +3,37 @@
   [attr.aria-label]="title()"
 >
   <div class="flex items-center justify-between gap-3">
-    <button
-      class="rounded-full bg-[#F2F4F5] px-4 py-2 text-sm font-semibold text-[#202325]"
+    <app-button
+      variant="outline"
+      mode="section"
+      size="small"
+      customClass="rounded-full bg-[#F2F4F5] px-4 py-2 text-sm font-semibold text-[#202325]"
       type="button"
-      (click)="goBack()"
+      (buttonClicked)="goBack()"
     >
       {{ text().backLabel }}
-    </button>
+    </app-button>
 
     <div class="min-w-0 text-center">
       <h1 class="truncate text-xl font-bold text-[#202325]">{{ title() }}</h1>
       <p class="text-sm text-[#72777A]">{{ selectedDateLabel() }}</p>
     </div>
 
-    <button
-      class="rounded-full bg-[#202325] px-4 py-2 text-sm font-semibold text-white disabled:bg-[#C7CBCC]"
+    <app-button
+      variant="fill"
+      mode="section"
+      size="small"
+      customClass="rounded-full bg-[#202325] px-4 py-2 text-sm font-semibold text-white disabled:bg-[#C7CBCC]"
       type="button"
       [disabled]="!canContinueFromCurrentStep()"
-      (click)="goNext()"
+      (buttonClicked)="goNext()"
     >
       @if (step() === 'planning') {
         {{ saveButtonLabel() }}
       } @else {
         {{ text().continueLabel }}
       }
-    </button>
+    </app-button>
   </div>
 
   <div class="grid grid-cols-3 gap-2" aria-hidden="true">
@@ -45,18 +51,19 @@
 
       <div class="grid grid-cols-2 gap-3">
         @for (muscle of targetMuscles(); track muscle.id) {
-          <button
-            class="rounded-2xl border border-[#E3E5E5] bg-white p-4 text-left shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
-            [class.border-[#0070F0]]="selectedTargetMuscle() === muscle.id"
-            [class.bg-[#EBF4FF]]="selectedTargetMuscle() === muscle.id"
+          <app-button
+            variant="outline"
+            mode="form"
+            customClass="rounded-2xl border border-[#E3E5E5] bg-white p-4 text-left shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+            [active]="selectedTargetMuscle() === muscle.id"
             type="button"
-            (click)="targetMuscleChanged.emit(muscle.id)"
+            (buttonClicked)="targetMuscleChanged.emit(muscle.id)"
           >
             <span class="block text-base font-bold capitalize text-[#202325]">{{ muscle.label }}</span>
             <span class="mt-1 block text-sm text-[#72777A]">
               {{ getExerciseCountLabel(muscle.exerciseCount) }}
             </span>
-          </button>
+          </app-button>
         }
       </div>
     }
@@ -85,13 +92,16 @@
 
           <div class="mt-2 flex gap-2 overflow-x-auto pb-1">
             @for (exercise of selectedExercises(); track exercise.id) {
-              <button
-                class="shrink-0 rounded-full bg-[#EBF4FF] px-3 py-1 text-sm font-medium text-[#0070F0]"
+              <app-button
+                variant="outline"
+                mode="section"
+                size="small"
+                customClass="shrink-0 rounded-full bg-[#EBF4FF] px-3 py-1 text-sm font-medium text-[#0070F0]"
                 type="button"
-                (click)="removeSelectedExercise.emit(exercise.id)"
+                (buttonClicked)="removeSelectedExercise.emit(exercise.id)"
               >
                 {{ getWorkoutExerciseName(exercise) }} ×
-              </button>
+              </app-button>
             }
           </div>
         </div>
@@ -104,13 +114,13 @@
 
         <div class="grid gap-3">
           @for (exercise of exerciseSearchResults(); track exercise.id) {
-            <button
-              class="grid w-full grid-cols-[72px_1fr] gap-3 rounded-2xl border border-[#E3E5E5] bg-white p-3 text-left shadow-sm hover:border-[#0070F0] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
-              [class.border-[#0070F0]]="isExerciseSelected(exercise.id)"
-              [class.bg-[#EBF4FF]]="isExerciseSelected(exercise.id)"
+            <app-button
+              variant="outline"
+              mode="form"
+              customClass="grid w-full grid-cols-[72px_1fr] gap-3 rounded-2xl border border-[#E3E5E5] bg-white p-3 text-left shadow-sm hover:border-[#0070F0] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+              [active]="isExerciseSelected(exercise.id)"
               type="button"
-              [attr.aria-pressed]="isExerciseSelected(exercise.id)"
-              (click)="toggleExercise.emit(exercise)"
+              (buttonClicked)="toggleExercise.emit(exercise)"
             >
               @if (getExerciseMediaUrl(exercise); as exerciseMediaUrl) {
                 <img class="size-18 rounded-xl bg-[#F7F9FA] object-cover" [src]="exerciseMediaUrl" [alt]="exercise.name" loading="lazy" />
@@ -130,16 +140,16 @@
                   }
                 </span>
               </span>
-            </button>
+            </app-button>
           }
         </div>
 
         @if (isExerciseSearchLoading()) {
           <p class="py-4 text-center text-[#72777A]">{{ text().loadingExercisesLabel }}</p>
         } @else if (exerciseSearchResults().length < exerciseSearchTotal()) {
-          <button class="mt-4 w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white" type="button" (click)="loadMore.emit()">
+          <app-button variant="fill" mode="section" customClass="mt-4 w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white" type="button" (buttonClicked)="loadMore.emit()">
             {{ text().loadMoreLabel }}
-          </button>
+          </app-button>
         } @else if (!exerciseSearchResults().length && !exerciseSearchError()) {
           <p class="py-8 text-center text-[#72777A]">{{ text().noExercisesFoundLabel }}</p>
         }

@@ -17,23 +17,28 @@
   </div>
 
   <div class="flex shrink-0 items-center gap-2">
-    <button
-      class="rounded-full border border-[#C93636] bg-white px-3 py-1 text-xs font-bold text-[#C93636]"
+    <app-button
+      variant="outline"
+      mode="section"
+      size="small"
+      customClass="rounded-full border border-[#C93636] bg-white px-3 py-1 text-xs font-bold text-[#C93636]"
       type="button"
-      [attr.aria-label]="rejectLabel() + ' ' + workout().title"
-      (click)="$event.stopPropagation(); reject.emit(workout().id)"
+      [ariaLabel]="rejectLabel() + ' ' + workout().title"
+      (buttonClicked)="$event.stopPropagation(); reject.emit(workout().id)"
     >
       {{ rejectLabel() }}
-    </button>
+    </app-button>
 
-    <button
-      class="rounded-full border border-[#0070F0] bg-white px-3 py-1 text-xs font-bold text-[#0070F0]"
+    <app-button
+      variant="outline"
+      mode="section"
+      size="small"
+      customClass="rounded-full border border-[#0070F0] bg-white px-3 py-1 text-xs font-bold text-[#0070F0]"
       type="button"
-      [attr.aria-label]="editLabel() + ' ' + workout().title"
-      (click)="$event.stopPropagation(); edit.emit(workout().id)"
+      [ariaLabel]="editLabel() + ' ' + workout().title"
+      (buttonClicked)="$event.stopPropagation(); edit.emit(workout().id)"
     >
       {{ editLabel() }}
-    </button>
+    </app-button>
   </div>
 </article>
-

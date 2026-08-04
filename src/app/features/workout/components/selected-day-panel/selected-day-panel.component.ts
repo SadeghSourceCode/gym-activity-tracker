@@ -8,6 +8,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 import { WorkoutSummaryCardComponent } from '../workout-summary-card/workout-summary-card.component';
 import { RestDayStateComponent } from '../rest-day-state/rest-day-state.component';
 import { EmptyDayStateComponent } from '../empty-day-state/empty-day-state.component';
+import { AppButton } from '../../../../components/app-button/app-button';
 
 @Component({
   selector: 'app-selected-day-panel',
@@ -17,6 +18,7 @@ import { EmptyDayStateComponent } from '../empty-day-state/empty-day-state.compo
     WorkoutSummaryCardComponent,
     RestDayStateComponent,
     EmptyDayStateComponent,
+    AppButton,
   ],
   templateUrl: './selected-day-panel.component.html',
 })

@@ -2,12 +2,13 @@ import { Component, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { I18nService } from './core/i18n/i18n.service';
+import { AppButton } from './components/app-button/app-button';
 
 type BottomNavItem = 'home' | 'search' | 'progress' | 'profile';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, AppButton],
   templateUrl: './app.html',
 })
 export class App {

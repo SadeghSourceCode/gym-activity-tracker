@@ -14,14 +14,16 @@
     >
       <div class="grid w-85 grid-cols-5 items-center justify-items-center">
         @for (item of bottomNavItems; track item.id) {
-        <button
-          class="flex h-11 items-center justify-center overflow-visible rounded-[48px] transition-colors duration-300 ease-out"
+        <app-button
+          variant="link"
+          mode="section"
+          customClass="flex h-11 items-center justify-center overflow-visible rounded-[48px] transition-colors duration-300 ease-out"
           [class.col-span-2]="isBottomNavItemSelected(item.id)"
           [class.col-auto]="!isBottomNavItemSelected(item.id)"
           type="button"
-          [attr.aria-label]="getBottomNavLabel(item.labelKey)"
-          [attr.aria-current]="isBottomNavItemSelected(item.id) ? 'page' : null"
-          (click)="selectBottomNavItem(item.id, item.route)"
+          [ariaLabel]="getBottomNavLabel(item.labelKey)"
+          [ariaCurrent]="isBottomNavItemSelected(item.id) ? 'page' : null"
+          (buttonClicked)="selectBottomNavItem(item.id, item.route)"
         >
           <span
             class="flex h-11 items-center justify-center rounded-[48px] transition-all duration-300 ease-out"
@@ -109,7 +111,7 @@
               {{ getBottomNavLabel(item.labelKey) }}
             </span>
           </span>
-        </button>
+        </app-button>
         }
       </div>
     </div>

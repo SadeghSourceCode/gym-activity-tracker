@@ -2,12 +2,14 @@ import { Component, input, output } from '@angular/core';
 import { ExerciseDbExercise, TargetMuscleOption } from '../../services/exercise-db-api.service';
 import { WorkoutExerciseSummary } from '../../models/workout-storage.models';
 import { WorkoutEditorTextConfig } from '../../models/workout-ui.models';
+import { AppButton } from '../../../../components/app-button/app-button';
 
 export type WorkoutEditorStep = 'muscle' | 'exercises' | 'planning';
 
 @Component({
   selector: 'app-workout-editor-sheet',
   standalone: true,
+  imports: [AppButton],
   templateUrl: './workout-editor-sheet.component.html',
 })
 export class WorkoutEditorSheetComponent {

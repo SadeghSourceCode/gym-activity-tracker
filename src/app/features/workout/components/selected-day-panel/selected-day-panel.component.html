@@ -14,13 +14,16 @@
   @if (selectedDayError()) {
     <div class="rounded-2xl bg-[#FFD6D6] p-3 text-[#C93636]" role="alert">
       <p>{{ selectedDayError() }}</p>
-      <button
-        class="mt-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#C93636]"
+      <app-button
+        variant="outline"
+        mode="section"
+        size="small"
+        customClass="mt-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#C93636]"
         type="button"
-        (click)="retry.emit()"
+        (buttonClicked)="retry.emit()"
       >
         {{ text().retryLabel }}
-      </button>
+      </app-button>
     </div>
   } @else {
     @switch (selectedDayViewModel().type) {

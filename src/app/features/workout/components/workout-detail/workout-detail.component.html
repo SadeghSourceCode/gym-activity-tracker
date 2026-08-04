@@ -13,14 +13,16 @@
         </p>
       </div>
 
-      <button
-        class="flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+      <app-button
+        variant="link"
+        mode="iconOnly"
+        customClass="flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
         type="button"
-        [attr.aria-label]="text().closeWorkoutDetailsLabel"
-        (click)="close.emit()"
+        [ariaLabel]="text().closeWorkoutDetailsLabel"
+        (buttonClicked)="close.emit()"
       >
         &times;
-      </button>
+      </app-button>
     </div>
 
     <div class="flex flex-col gap-4">
@@ -71,33 +73,39 @@
             }
           </div>
 
-          <button
-            class="mt-4 w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
+          <app-button
+            variant="fill"
+            mode="section"
+            customClass="mt-4 w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
             type="button"
-            (click)="addSet.emit({ workoutId: workout().id, exerciseId: exercise.id })"
+            (buttonClicked)="addSet.emit({ workoutId: workout().id, exerciseId: exercise.id })"
           >
           {{ text().addSetLabel }}
-          </button>
+          </app-button>
         </section>
       }
     </div>
 
     <div class="grid gap-3 rounded-3xl bg-white p-4 shadow-sm sm:grid-cols-2">
-      <button
-        class="rounded-full bg-[#168A4A] px-4 py-3 font-semibold text-white"
+      <app-button
+        variant="fill"
+        mode="section"
+        customClass="rounded-full bg-[#168A4A] px-4 py-3 font-semibold text-white"
         type="button"
-        (click)="complete.emit({ workoutId: workout().id, completionStatus: 'completed' })"
+        (buttonClicked)="complete.emit({ workoutId: workout().id, completionStatus: 'completed' })"
       >
         {{ text().markAsDoneLabel }}
-      </button>
+      </app-button>
 
-      <button
-        class="rounded-full bg-[#C93636] px-4 py-3 font-semibold text-white"
+      <app-button
+        variant="fill"
+        mode="section"
+        customClass="rounded-full bg-[#C93636] px-4 py-3 font-semibold text-white"
         type="button"
-        (click)="complete.emit({ workoutId: workout().id, completionStatus: 'rejected' })"
+        (buttonClicked)="complete.emit({ workoutId: workout().id, completionStatus: 'rejected' })"
       >
         {{ text().rejectWorkoutLabel }}
-      </button>
+      </app-button>
     </div>
   </div>
 </div>

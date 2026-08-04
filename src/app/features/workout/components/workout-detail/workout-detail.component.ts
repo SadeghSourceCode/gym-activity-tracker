@@ -6,10 +6,12 @@ import {
 } from '../../models/workout-storage.models';
 import { WorkoutCompletionStatus } from '../../models/workout-planner.models';
 import { WorkoutDetailTextConfig } from '../../models/workout-ui.models';
+import { AppButton } from '../../../../components/app-button/app-button';
 
 @Component({
   selector: 'app-workout-detail',
   standalone: true,
+  imports: [AppButton],
   templateUrl: './workout-detail.component.html',
 })
 export class WorkoutDetailComponent {

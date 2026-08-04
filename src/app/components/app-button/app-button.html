@@ -1,0 +1,18 @@
+<button
+  [class]="classes()"
+  [type]="type()"
+  [disabled]="isInteractionDisabled()"
+  [attr.aria-label]="ariaLabel()"
+  [attr.aria-busy]="loading() ? 'true' : null"
+  [attr.aria-pressed]="active() ? 'true' : null"
+  [attr.aria-current]="ariaCurrent()"
+  (click)="onClick($event)"
+>
+  @if (loading()) {
+    <span class="app-button__spinner" aria-hidden="true"></span>
+  } @else {
+    <span class="app-button__content">
+      <ng-content />
+    </span>
+  }
+</button>

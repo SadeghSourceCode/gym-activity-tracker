@@ -14,10 +14,12 @@ import {
   ExerciseDbExercise,
 } from '../../../workout/services/exercise-db-api.service';
 import { I18nService } from '../../../../core/i18n/i18n.service';
+import { AppButton } from '../../../../components/app-button/app-button';
 
 @Component({
   selector: 'app-search-page',
   standalone: true,
+  imports: [AppButton],
   templateUrl: './search-page.component.html',
 })
 export class SearchPageComponent {

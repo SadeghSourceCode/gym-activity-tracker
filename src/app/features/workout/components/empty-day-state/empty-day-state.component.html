@@ -5,23 +5,26 @@
   </p>
 
   <div class="mt-4 grid gap-2 sm:grid-cols-2">
-    <button
-      class="rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
+    <app-button
+      variant="fill"
+      mode="section"
+      customClass="rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
       type="button"
-      [attr.aria-label]="setWorkoutLabel()"
-      (click)="setWorkout.emit()"
+      [ariaLabel]="setWorkoutLabel()"
+      (buttonClicked)="setWorkout.emit()"
     >
       {{ setWorkoutLabel() }}
-    </button>
+    </app-button>
 
-    <button
-      class="rounded-full border border-[#0070F0] bg-white px-4 py-3 font-semibold text-[#0070F0]"
+    <app-button
+      variant="outline"
+      mode="section"
+      customClass="rounded-full border border-[#0070F0] bg-white px-4 py-3 font-semibold text-[#0070F0]"
       type="button"
-      [attr.aria-label]="markAsRestDayLabel()"
-      (click)="markAsRestDay.emit()"
+      [ariaLabel]="markAsRestDayLabel()"
+      (buttonClicked)="markAsRestDay.emit()"
     >
       {{ markAsRestDayLabel() }}
-    </button>
+    </app-button>
   </div>
 </div>
-

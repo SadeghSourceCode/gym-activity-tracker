@@ -16,6 +16,7 @@ import {
   parseDateKey,
 } from '../../utils/calendar-date.util';
 import { I18nService } from '../../../../core/i18n/i18n.service';
+import { AppButton } from '../../../../components/app-button/app-button';
 
 interface CalendarDay {
   label: string;
@@ -26,6 +27,7 @@ interface CalendarDay {
 @Component({
   selector: 'app-workout-calendar',
   standalone: true,
+  imports: [AppButton],
   templateUrl: './workout-calendar.component.html',
 })
 export class WorkoutCalendarComponent implements AfterViewInit {

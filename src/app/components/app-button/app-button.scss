@@ -1,0 +1,136 @@
+.app-button {
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0 1rem;
+  font: inherit;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease,
+    box-shadow 160ms ease;
+
+  &:focus-visible {
+    outline: 2px solid #0070f0;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.56;
+  }
+}
+
+.app-button--small {
+  min-height: 2rem;
+  font-size: 0.75rem;
+}
+
+.app-button--medium {
+  min-height: 2.75rem;
+  font-size: 0.875rem;
+}
+
+.app-button--large {
+  min-height: 3.5rem;
+  font-size: 1rem;
+}
+
+.app-button--section {
+  border-radius: 999px;
+}
+
+.app-button--form.app-button--small {
+  border-radius: 0.5rem;
+}
+
+.app-button--form.app-button--medium {
+  border-radius: 0.75rem;
+}
+
+.app-button--form.app-button--large {
+  border-radius: 1rem;
+}
+
+.app-button--iconOnly {
+  aspect-ratio: 1;
+  border-radius: 999px;
+  padding: 0;
+  width: auto;
+}
+
+.app-button--iconOnly.app-button--small {
+  min-width: 2rem;
+}
+
+.app-button--iconOnly.app-button--medium {
+  min-width: 2.75rem;
+}
+
+.app-button--iconOnly.app-button--large {
+  min-width: 3.5rem;
+}
+
+.app-button--fill {
+  background: #0070f0;
+  color: #ffffff;
+}
+
+.app-button--fill.app-button--active {
+  background: #005bc4;
+  box-shadow: 0 0 0 4px #ddefff;
+}
+
+.app-button--outline {
+  border: 1px solid #c7cbcc;
+  background: #ffffff;
+  color: #202325;
+}
+
+.app-button--outline.app-button--active {
+  border-color: #0070f0;
+  background: #ebf4ff;
+  color: #0070f0;
+}
+
+.app-button--link {
+  min-height: auto;
+  width: auto;
+  padding: 0;
+  background: transparent;
+  color: #0070f0;
+}
+
+.app-button--link.app-button--active {
+  color: #005bc4;
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+.app-button__content {
+  display: contents;
+}
+
+.app-button__spinner {
+  display: inline-block;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
+  animation: app-button-spin 700ms linear infinite;
+}
+
+@keyframes app-button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
