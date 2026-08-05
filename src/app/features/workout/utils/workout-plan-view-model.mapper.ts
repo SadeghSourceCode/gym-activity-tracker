@@ -8,6 +8,8 @@ export function mapDailyPlanToViewModel(
   plan: DailyWorkoutPlan,
   today: string,
 ): SelectedDayViewModel {
+  const canManageSelectedDay = plan.date >= today;
+
   return {
     date: plan.date,
     type: plan.type,
@@ -23,7 +25,8 @@ export function mapDailyPlanToViewModel(
         today,
       ),
     })),
-    canAddWorkout: plan.type === 'empty',
-    canMarkAsRestDay: plan.type === 'empty',
+    canAddWorkout: plan.type === 'empty' && canManageSelectedDay,
+    canManageWorkouts: canManageSelectedDay,
+    canMarkAsRestDay: plan.type === 'empty' && canManageSelectedDay,
   };
 }

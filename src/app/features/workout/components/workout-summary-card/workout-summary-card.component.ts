@@ -14,10 +14,13 @@ export class WorkoutSummaryCardComponent {
   readonly openLabel = input.required<string>();
   readonly rejectLabel = input.required<string>();
   readonly editLabel = input.required<string>();
+  readonly deleteLabel = input.required<string>();
+  readonly canManage = input.required<boolean>();
 
   readonly open = output<string>();
   readonly reject = output<string>();
   readonly edit = output<string>();
+  readonly deleteWorkout = output<string>();
 
   readonly visibleExerciseLimit = 3;
 

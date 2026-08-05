@@ -21,6 +21,7 @@ type TranslationKey =
   | 'couldNotLoadExercises'
   | 'couldNotLoadMoreWorkouts'
   | 'couldNotLoadWorkouts'
+  | 'delete'
   | 'done'
   | 'edit'
   | 'editWorkout'
@@ -116,6 +117,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     couldNotLoadExercises: 'Could not load exercises. Check your connection and try again.',
     couldNotLoadMoreWorkouts: 'Could not load more workouts. Check your connection and try again.',
     couldNotLoadWorkouts: 'Could not load workouts. Check your connection and try again.',
+    delete: 'Delete',
     done: 'Done',
     edit: 'Edit',
     editWorkout: 'Edit workout',
@@ -210,6 +212,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     couldNotLoadExercises: 'حرکت‌ها بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
     couldNotLoadMoreWorkouts: 'تمرین‌های بیشتر بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
     couldNotLoadWorkouts: 'تمرین‌ها بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
+    delete: 'حذف',
     done: 'انجام شد',
     edit: 'ویرایش',
     editWorkout: 'ویرایش تمرین',

@@ -41,5 +41,6 @@ export interface SelectedDayViewModel {
   type: DayPlanType;
   workouts: WorkoutCardViewModel[];
   canAddWorkout: boolean;
+  canManageWorkouts: boolean;
   canMarkAsRestDay: boolean;
 }

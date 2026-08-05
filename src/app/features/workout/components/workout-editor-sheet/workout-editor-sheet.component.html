@@ -70,6 +70,22 @@
         <p class="text-sm font-semibold text-[#0070F0]">{{ text().targetMuscleLabel }}: {{ selectedTargetMuscle() }}</p>
               </div>
 
+      <div class="flex gap-2 overflow-x-auto pb-1">
+        @for (muscle of targetMuscles(); track muscle.id) {
+          <app-button
+            variant="outline"
+            mode="section"
+            size="small"
+            customClass="w-auto shrink-0 rounded-full border border-[#E3E5E5] bg-white px-3 py-2 text-sm font-semibold capitalize text-[#72777A]"
+            [active]="selectedTargetMuscle() === muscle.id"
+            type="button"
+            (buttonClicked)="targetMuscleChanged.emit(muscle.id)"
+          >
+            {{ muscle.label }}
+          </app-button>
+        }
+      </div>
+
       <label class="block text-[#72777A]">
         {{ text().searchExercisesLabel }}
         <input
@@ -82,19 +98,63 @@
       </label>
 
       @if (selectedExercises().length) {
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-2 rounded-2xl bg-[#F7F9FA] p-3">
           <p class="text-sm font-semibold text-[#202325]">
             {{ text().selectedExercisesLabel }}: {{ selectedExercises().length }}
           </p>
 
-          <div class="flex gap-2 overflow-x-auto">
+          <div class="grid gap-2">
             @for (exercise of selectedExercises(); track exercise.id) {
-              <div
-                class="shrink-0 rounded-full bg-[#EBF4FF] px-3 py-1 text-sm font-medium text-[#0070F0]"
-                type="button"
-                (click)="removeSelectedExercise.emit(exercise.id)"
-              >
-                {{ getWorkoutExerciseName(exercise) }} ×
+              <div class="grid grid-cols-[1fr_auto] items-center gap-3 rounded-2xl bg-white p-3">
+                <div class="min-w-0">
+                  <p class="truncate text-sm font-bold text-[#202325]">
+                    {{ getWorkoutExerciseName(exercise) }}
+                  </p>
+                  <p class="text-xs capitalize text-[#72777A]">{{ exercise.targetMuscle }}</p>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <app-button
+                    variant="outline"
+                    mode="iconOnly"
+                    size="small"
+                    customClass="size-8 border border-[#E3E5E5] bg-white text-[#202325]"
+                    type="button"
+                    [disabled]="getSelectedExerciseSetCount(exercise) <= 1"
+                    [ariaLabel]="'Decrease sets for ' + getWorkoutExerciseName(exercise)"
+                    (buttonClicked)="selectedExerciseSetCountChanged.emit({ exerciseId: exercise.id, setCount: getSelectedExerciseSetCount(exercise) - 1 })"
+                  >
+                    −
+                  </app-button>
+
+                  <span class="min-w-12 text-center text-sm font-bold text-[#202325]">
+                    {{ getSelectedExerciseSetCount(exercise) }} sets
+                  </span>
+
+                  <app-button
+                    variant="outline"
+                    mode="iconOnly"
+                    size="small"
+                    customClass="size-8 border border-[#E3E5E5] bg-white text-[#202325]"
+                    type="button"
+                    [ariaLabel]="'Increase sets for ' + getWorkoutExerciseName(exercise)"
+                    (buttonClicked)="selectedExerciseSetCountChanged.emit({ exerciseId: exercise.id, setCount: getSelectedExerciseSetCount(exercise) + 1 })"
+                  >
+                    +
+                  </app-button>
+
+                  <app-button
+                    variant="link"
+                    mode="iconOnly"
+                    size="small"
+                    customClass="size-8 text-xl text-[#C93636]"
+                    type="button"
+                    [ariaLabel]="text().removeLabel + ' ' + getWorkoutExerciseName(exercise)"
+                    (buttonClicked)="removeSelectedExercise.emit(exercise.id)"
+                  >
+                    ×
+                  </app-button>
+                </div>
               </div>
             }
           </div>
@@ -191,6 +251,18 @@
         <p class="text-sm font-semibold text-[#202325]">
           {{ text().selectedExercisesLabel }}: {{ selectedExercises().length }}
         </p>
+        <div class="mt-2 grid gap-2">
+          @for (exercise of selectedExercises(); track exercise.id) {
+            <div class="flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-2">
+              <span class="truncate text-sm font-medium text-[#202325]">
+                {{ getWorkoutExerciseName(exercise) }}
+              </span>
+              <span class="shrink-0 text-xs font-bold text-[#72777A]">
+                {{ getSelectedExerciseSetCount(exercise) }} sets
+              </span>
+            </div>
+          }
+        </div>
       </div>
     }
   }

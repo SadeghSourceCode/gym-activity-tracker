@@ -89,6 +89,11 @@ export class WorkoutPage {
 
     return this.workouts().find((workout) => workout.id === openedWorkoutId) ?? null;
   });
+  readonly openedWorkoutCanManage = computed(() => {
+    const openedWorkout = this.openedWorkout();
+
+    return openedWorkout ? this.canManageWorkout(openedWorkout) : false;
+  });
   selectedExercise = signal<ExerciseDbExercise | null>(null);
   similarExercises = signal<ExerciseDbExercise[]>([]);
   exerciseDetailsError = signal<string | null>(null);
@@ -134,6 +139,7 @@ export class WorkoutPage {
     openLabel: this.i18n.t('open'),
     rejectLabel: this.i18n.t('reject'),
     editLabel: this.i18n.t('edit'),
+    deleteLabel: this.i18n.t('delete'),
     restDayTitle: this.i18n.t('restDay'),
     recoveryMessage: this.i18n.t('recoveryMessage'),
     removeRestDayLabel: this.i18n.t('removeRestDay'),
@@ -274,6 +280,10 @@ export class WorkoutPage {
   }
 
   openExerciseSheet() {
+    if (!this.canManageSelectedDate()) {
+      return;
+    }
+
     this.editingWorkoutId.set(null);
     this.workoutTitle.set('');
     this.selectedWorkoutExercises.set([]);
@@ -289,6 +299,10 @@ export class WorkoutPage {
 
     if (!workout) {
       this.selectedDayError.set(this.i18n.t('couldNotFindWorkoutToEdit'));
+      return;
+    }
+
+    if (!this.canManageWorkout(workout)) {
       return;
     }
 
@@ -319,7 +333,6 @@ export class WorkoutPage {
 
   selectTargetMuscle(targetMuscle: string) {
     this.selectedTargetMuscle.set(targetMuscle);
-    this.selectedWorkoutExercises.set([]);
     this.searchExercises('');
   }
 
@@ -370,6 +383,23 @@ export class WorkoutPage {
     );
   }
 
+  updateSelectedWorkoutExerciseSetCount(exerciseId: string, setCount: number) {
+    const normalizedSetCount = Math.max(Math.floor(setCount), 1);
+
+    this.selectedWorkoutExercises.update((selectedExercises) =>
+      selectedExercises.map((exercise) => {
+        if (exercise.id !== exerciseId) {
+          return exercise;
+        }
+
+        return {
+          ...exercise,
+          sets: this.resizeWorkoutSets(exercise.sets, normalizedSetCount),
+        };
+      }),
+    );
+  }
+
   openWorkoutDetails(workoutId: string) {
     const workout = this.workouts().find((candidate) => candidate.id === Number(workoutId));
 
@@ -389,6 +419,12 @@ export class WorkoutPage {
     workoutId: number,
     completionStatus: Extract<WorkoutCompletionStatus, 'completed' | 'rejected'>,
   ) {
+    const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
+
+    if (!targetWorkout || !this.canManageWorkout(targetWorkout)) {
+      return;
+    }
+
     this.workouts.update((workouts) =>
       workouts.map((workout) =>
         workout.id === workoutId
@@ -410,6 +446,10 @@ export class WorkoutPage {
   }
 
   saveWorkoutFromSelectedExercises() {
+    if (!this.canManageSelectedDate()) {
+      return;
+    }
+
     const selectedExercises = this.selectedWorkoutExercises();
 
     if (!selectedExercises.length) {
@@ -436,7 +476,7 @@ export class WorkoutPage {
           thumbnailUrl: firstExercise.thumbnailUrl,
           exercises: selectedExercises,
           date: parseDateKey(this.selectedDate()),
-          targetMuscle: this.selectedTargetMuscle() ?? firstExercise.targetMuscle,
+          targetMuscle: this.getWorkoutTargetMuscle(selectedExercises),
           isWeeklyPlan: this.isWeeklyPlan(),
           completionStatus: 'pending',
           sets: [{ id: 1, repeat: 0, weight: 0 }],
@@ -469,7 +509,7 @@ export class WorkoutPage {
               exerciseId: firstExercise.id,
               thumbnailUrl: firstExercise.thumbnailUrl,
               exercises: selectedExercises,
-              targetMuscle: this.selectedTargetMuscle() ?? firstExercise.targetMuscle,
+              targetMuscle: this.getWorkoutTargetMuscle(selectedExercises),
               isWeeklyPlan: this.isWeeklyPlan(),
             }
           : workout,
@@ -531,6 +571,12 @@ export class WorkoutPage {
   }
 
   removeWorkout(workoutId: number) {
+    const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
+
+    if (!targetWorkout || !this.canManageWorkout(targetWorkout)) {
+      return;
+    }
+
     this.workouts.update((workouts) =>
       workouts.filter((workout) => workout.id !== workoutId),
     );
@@ -541,6 +587,10 @@ export class WorkoutPage {
   }
 
   markSelectedDayAsRestDay() {
+    if (!this.canManageSelectedDate()) {
+      return;
+    }
+
     const selectedDate = this.selectedDate();
 
     if (this.getWorkoutsForDate(selectedDate).length) {
@@ -555,6 +605,10 @@ export class WorkoutPage {
   }
 
   removeSelectedRestDay() {
+    if (!this.canManageSelectedDate()) {
+      return;
+    }
+
     const selectedDate = this.selectedDate();
 
     this.selectedDayError.set(null);
@@ -616,6 +670,12 @@ export class WorkoutPage {
   }
 
   addSet(workoutId: number, exerciseId: string) {
+    const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
+
+    if (!targetWorkout || !this.canManageWorkout(targetWorkout)) {
+      return;
+    }
+
     this.workouts.update((workouts) =>
       workouts.map((workout) => {
         if (workout.id !== workoutId) {
@@ -654,6 +714,12 @@ export class WorkoutPage {
     setId: number,
     changes: Partial<Pick<WorkoutSet, 'repeat' | 'weight'>>,
   ) {
+    const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
+
+    if (!targetWorkout || !this.canManageWorkout(targetWorkout)) {
+      return;
+    }
+
     this.workouts.update((workouts) =>
       workouts.map((workout) => {
         if (workout.id !== workoutId) {
@@ -760,6 +826,14 @@ export class WorkoutPage {
     return this.workouts().filter((workout) => getDateKey(workout.date) === date);
   }
 
+  private canManageSelectedDate(): boolean {
+    return this.selectedDate() >= getTodayDateKey();
+  }
+
+  private canManageWorkout(workout: Workout): boolean {
+    return getDateKey(workout.date) >= getTodayDateKey();
+  }
+
   private normalizeCompletionStatus(
     completionStatus: WorkoutCompletionStatus | undefined,
   ): WorkoutCompletionStatus {
@@ -837,6 +911,23 @@ export class WorkoutPage {
     return normalizedSets.length ? normalizedSets : [{ id: 1, repeat: 0, weight: 0 }];
   }
 
+  private resizeWorkoutSets(sets: WorkoutSet[] | undefined, setCount: number): WorkoutSet[] {
+    const normalizedSets = this.normalizeWorkoutSets(sets);
+
+    if (normalizedSets.length >= setCount) {
+      return normalizedSets.slice(0, setCount);
+    }
+
+    const nextSets = [...normalizedSets];
+
+    while (nextSets.length < setCount) {
+      const nextSetId = Math.max(...nextSets.map((set) => set.id), 0) + 1;
+      nextSets.push({ id: nextSetId, repeat: 0, weight: 0 });
+    }
+
+    return nextSets;
+  }
+
   private getWorkoutName(): string {
     const customTitle = this.workoutTitle().trim();
 
@@ -845,6 +936,18 @@ export class WorkoutPage {
     }
 
     return this.getDefaultWorkoutTitle();
+  }
+
+  private getWorkoutTargetMuscle(selectedExercises: WorkoutExerciseSummary[]): string {
+    const selectedMuscles = [
+      ...new Set(
+        selectedExercises
+          .map((exercise) => exercise.targetMuscle)
+          .filter((targetMuscle): targetMuscle is string => Boolean(targetMuscle)),
+      ),
+    ];
+
+    return selectedMuscles.join(', ');
   }
 
   private getDateLocale(): string | undefined {

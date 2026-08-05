@@ -24,23 +24,25 @@
         size="small"
         customClass="w-auto min-h-0 px-0 text-xs font-medium text-[#72777A]"
         type="button"
-        [ariaLabel]="editLabel() + ' ' + workout().title"
-        (buttonClicked)="edit.emit(workout().id)"
+        [ariaLabel]="openLabel() + ' ' + workout().title"
+        (buttonClicked)="open.emit(workout().id)"
       >
         View ›
       </app-button>
 
-      <app-button
-        variant="fill"
-        mode="section"
-        size="medium"
-        customClass="w-auto min-w-20 rounded-full bg-[#0070F0] px-5 font-extrabold text-white"
-        type="button"
-        [ariaLabel]="openLabel() + ' ' + workout().title"
-        (buttonClicked)="open.emit(workout().id)"
-      >
-        START
-      </app-button>
+      @if (canManage()) {
+        <app-button
+          variant="fill"
+          mode="section"
+          size="medium"
+          customClass="w-auto min-w-20 rounded-full bg-[#0070F0] px-5 font-extrabold text-white"
+          type="button"
+          [ariaLabel]="openLabel() + ' ' + workout().title"
+          (buttonClicked)="open.emit(workout().id)"
+        >
+          START
+        </app-button>
+      }
     </div>
   </div>
 
@@ -63,5 +65,33 @@
     <p class="mt-2 text-xs font-medium text-[#72777A]">
       +{{ hiddenExerciseCount() }} more exercises
     </p>
+  }
+
+  @if (canManage()) {
+    <div class="mt-4 grid grid-cols-2 gap-2">
+      <app-button
+        variant="outline"
+        mode="section"
+        size="small"
+        customClass="rounded-full border border-[#0070F0] bg-white px-3 py-2 text-xs font-bold text-[#0070F0]"
+        type="button"
+        [ariaLabel]="editLabel() + ' ' + workout().title"
+        (buttonClicked)="edit.emit(workout().id)"
+      >
+        {{ editLabel() }}
+      </app-button>
+
+      <app-button
+        variant="outline"
+        mode="section"
+        size="small"
+        customClass="rounded-full border border-[#C93636] bg-white px-3 py-2 text-xs font-bold text-[#C93636]"
+        type="button"
+        [ariaLabel]="deleteLabel() + ' ' + workout().title"
+        (buttonClicked)="deleteWorkout.emit(workout().id)"
+      >
+        {{ deleteLabel() }}
+      </app-button>
+    </div>
   }
 </article>
