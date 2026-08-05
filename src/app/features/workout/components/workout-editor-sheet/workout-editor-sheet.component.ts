@@ -11,6 +11,11 @@ export type WorkoutEditorStep = 'muscle' | 'exercises' | 'planning';
   standalone: true,
   imports: [AppButton],
   templateUrl: './workout-editor-sheet.component.html',
+  styles: `
+    .selected {
+      @apply border border-[#0070F0];
+    }
+  `,
 })
 export class WorkoutEditorSheetComponent {
   readonly text = input.required<WorkoutEditorTextConfig>();
@@ -40,6 +45,7 @@ export class WorkoutEditorSheetComponent {
   readonly weeklyPlanChanged = output<boolean>();
   readonly searchExercises = output<string>();
   readonly removeSelectedExercise = output<string>();
+  readonly selectedExerciseSetCountChanged = output<{ exerciseId: string; setCount: number }>();
   readonly toggleExercise = output<ExerciseDbExercise>();
   readonly scrolled = output<Event>();
   readonly loadMore = output<void>();
@@ -53,6 +59,10 @@ export class WorkoutEditorSheetComponent {
 
   getWorkoutExerciseName(exercise: WorkoutExerciseSummary): string {
     return this.text().isPersian ? exercise.nameFa : exercise.nameEn;
+  }
+
+  getSelectedExerciseSetCount(exercise: WorkoutExerciseSummary): number {
+    return Math.max(exercise.sets.length, 1);
   }
 
   isExerciseSelected(exerciseId: string): boolean {

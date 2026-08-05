@@ -17,6 +17,7 @@ import { AppButton } from '../../../../components/app-button/app-button';
 export class WorkoutDetailComponent {
   readonly text = input.required<WorkoutDetailTextConfig>();
   readonly workout = input.required<Workout>();
+  readonly canManage = input.required<boolean>();
 
   readonly close = output<void>();
   readonly addSet = output<{ workoutId: number; exerciseId: string }>();

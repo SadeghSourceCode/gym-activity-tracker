@@ -4,6 +4,7 @@ export interface SelectedDayPanelTextConfig {
   openLabel: string;
   rejectLabel: string;
   editLabel: string;
+  deleteLabel: string;
   restDayTitle: string;
   recoveryMessage: string;
   removeRestDayLabel: string;

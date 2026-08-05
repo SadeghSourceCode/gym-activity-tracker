@@ -36,9 +36,12 @@
               [openLabel]="text().openLabel"
               [rejectLabel]="text().rejectLabel"
               [editLabel]="text().editLabel"
+              [deleteLabel]="text().deleteLabel"
+              [canManage]="selectedDayViewModel().canManageWorkouts"
               (open)="openWorkoutDetails.emit($event)"
               (reject)="rejectWorkout.emit($event)"
               (edit)="editWorkout.emit($event)"
+              (deleteWorkout)="deleteWorkout.emit($event)"
             />
           }
         </div>
@@ -54,14 +57,20 @@
       }
 
       @case ('empty') {
-        <app-empty-day-state
-          [title]="text().noWorkoutPlannedTitle"
-          [message]="text().setWorkoutOrRestMessage"
-          [setWorkoutLabel]="text().setWorkoutLabel"
-          [markAsRestDayLabel]="text().markAsRestDayLabel"
-          (setWorkout)="setWorkout.emit()"
-          (markAsRestDay)="markAsRestDay.emit()"
-        />
+        @if (selectedDayViewModel().canAddWorkout || selectedDayViewModel().canMarkAsRestDay) {
+          <app-empty-day-state
+            [title]="text().noWorkoutPlannedTitle"
+            [message]="text().setWorkoutOrRestMessage"
+            [setWorkoutLabel]="text().setWorkoutLabel"
+            [markAsRestDayLabel]="text().markAsRestDayLabel"
+            (setWorkout)="setWorkout.emit()"
+            (markAsRestDay)="markAsRestDay.emit()"
+          />
+        } @else {
+          <div class="rounded-2xl border border-dashed border-[#C7CBCC] bg-[#F7F9FA] p-4 text-center">
+            <h3 class="text-lg font-bold text-[#202325]">{{ text().noWorkoutPlannedTitle }}</h3>
+          </div>
+        }
       }
     }
   }

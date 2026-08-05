@@ -33,6 +33,7 @@ export class SelectedDayPanelComponent {
   readonly openWorkoutDetails = output<string>();
   readonly rejectWorkout = output<string>();
   readonly editWorkout = output<string>();
+  readonly deleteWorkout = output<string>();
   readonly setWorkout = output<void>();
   readonly markAsRestDay = output<void>();
   readonly removeRestDay = output<void>();
