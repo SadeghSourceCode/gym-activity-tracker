@@ -62,7 +62,7 @@ export class AddWorkoutComponent {
   readonly isExerciseSearchLoading = signal(false);
   readonly exerciseSearchError = signal<string | undefined>(undefined);
   readonly targetMuscles = signal<TargetMuscleOption[]>([]);
-  readonly selectedTargetMuscle = signal<string | undefined>('abductors');
+  readonly selectedTargetMuscle = signal<string | undefined>(undefined);
   readonly step = signal<WorkoutEditorStep>('exercises');
   readonly isWeeklyPlan = signal(false);
   readonly editingWorkoutId = signal<number | undefined>(this.getInitialEditingWorkoutId());
@@ -264,6 +264,16 @@ export class AddWorkoutComponent {
 
   getSelectedExerciseSetCount(exercise: WorkoutExerciseSummary): number {
     return Math.max(exercise.sets.length, 1);
+  }
+
+  getTargetMuscleLabel(targetMuscle: string | undefined): string {
+    if (!targetMuscle) {
+      return '';
+    }
+
+    return (
+      this.targetMuscles().find((muscle) => muscle.id === targetMuscle)?.label ?? targetMuscle
+    );
   }
 
   isExerciseSelected(exerciseId: string): boolean {

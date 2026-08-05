@@ -53,19 +53,33 @@
         />
       </label>
 
-      <div class="flex gap-2 overflow-x-auto pb-1">
+      <div class="flex gap-3 overflow-x-auto pb-1">
         @for (muscle of targetMuscles(); track muscle.id) {
-          <app-button
-            variant="outline"
-            mode="section"
-            size="small"
-            customClass="w-auto shrink-0 rounded-full border border-[#E3E5E5] bg-white px-3 py-2 text-sm font-semibold capitalize text-[#72777A]"
-            [active]="selectedTargetMuscle() === muscle.id"
-            type="button"
-            (buttonClicked)="selectTargetMuscle(muscle.id)"
+          <div
+            class="w-32 shrink-0 cursor-pointer overflow-hidden rounded-3xl border border-[#E3E5E5] bg-white shadow-sm transition duration-200"
+            role="button"
+            tabindex="0"
+            [class.border-[#0070F0]]="selectedTargetMuscle() === muscle.id"
+            [class.ring-2]="selectedTargetMuscle() === muscle.id"
+            [class.ring-[#0070F0]/20]="selectedTargetMuscle() === muscle.id"
+            (click)="selectTargetMuscle(muscle.id)"
+            (keydown.enter)="selectTargetMuscle(muscle.id)"
+            (keydown.space)="selectTargetMuscle(muscle.id); $event.preventDefault()"
           >
-            {{ muscle.label }}
-          </app-button>
+            <img
+              class="h-24 w-full bg-[#F7F9FA] object-cover"
+              [src]="muscle.imageUrl"
+              [alt]="muscle.label + ' muscle group'"
+              loading="lazy"
+            />
+
+            <div class="p-3">
+              <p class="truncate text-sm font-bold text-[#202325]">{{ muscle.label }}</p>
+              <p class="mt-1 line-clamp-2 text-[11px] leading-tight text-[#72777A]">
+                {{ muscle.mainMuscles }}
+              </p>
+            </div>
+          </div>
         }
       </div>
 
@@ -82,7 +96,9 @@
                   <p class="truncate text-sm font-bold text-[#202325]">
                     {{ getWorkoutExerciseName(exercise) }}
                   </p>
-                  <p class="text-xs capitalize text-[#72777A]">{{ exercise.targetMuscle }}</p>
+                  <p class="text-xs capitalize text-[#72777A]">
+                    {{ getTargetMuscleLabel(exercise.targetMuscle) }}
+                  </p>
                 </div>
 
                 <div class="flex items-center gap-2">
@@ -154,7 +170,7 @@
               <span class="min-w-0">
                 <span class="block font-semibold text-[#202325]">{{ exercise.name }}</span>
                 <span class="block text-sm capitalize text-[#72777A]">
-                  {{ exercise.targetMuscle }}
+                  {{ getTargetMuscleLabel(exercise.targetMuscle) }}
                   @if (exercise.equipment) {
                     · {{ exercise.equipment }}
                   }
@@ -179,7 +195,9 @@
     @case ('planning') {
       <div class="rounded-3xl bg-[#F7F9FA] p-4">
         <h2 class="text-lg font-bold text-[#202325]">{{ text().workoutPlanningLabel }}</h2>
-        <p class="mt-1 text-sm text-[#72777A]">{{ text().targetMuscleLabel }}: {{ selectedTargetMuscle() }}</p>
+        <p class="mt-1 text-sm text-[#72777A]">
+          {{ text().targetMuscleLabel }}: {{ getTargetMuscleLabel(selectedTargetMuscle()) }}
+        </p>
       </div>
 
       <label class="block text-[#72777A]">
