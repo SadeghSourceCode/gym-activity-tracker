@@ -1,62 +1,26 @@
 <div class="flex w-full min-w-0 max-w-full flex-col overflow-hidden">
-  @if (isExerciseSheetOpen()) {
-    <app-workout-editor-sheet
-      [text]="workoutEditorText()"
-      [title]="getWorkoutSheetTitle()"
-      [selectedDateLabel]="selectedDateLabel()"
-      [workingDate]="selectedDate()"
-      [workoutTitle]="workoutTitle()"
-      [defaultWorkoutTitle]="getDefaultWorkoutTitle()"
-      [saveButtonLabel]="getWorkoutSaveButtonLabel()"
-      [selectedExercises]="selectedWorkoutExercises()"
-      [imageBaseUrl]="exerciseImageBaseUrl"
-      [exerciseSearchQuery]="exerciseSearchQuery()"
-      [exerciseSearchResults]="exerciseSearchResults()"
-      [exerciseSearchTotal]="exerciseSearchTotal()"
-      [isExerciseSearchLoading]="isExerciseSearchLoading()"
-      [exerciseSearchError]="exerciseSearchError()"
-      [targetMuscles]="targetMuscles()"
-      [selectedTargetMuscle]="selectedTargetMuscle()"
-      [step]="workoutEditorStep()"
-      [isWeeklyPlan]="isWeeklyPlan()"
-      (close)="closeExerciseSheet()"
-      (stepChanged)="workoutEditorStep.set($event)"
-      (targetMuscleChanged)="selectTargetMuscle($event)"
-      (workoutTitleChanged)="workoutTitle.set($event)"
-      (workingDateChanged)="selectDate($event)"
-      (weeklyPlanChanged)="isWeeklyPlan.set($event)"
-      (searchExercises)="searchExercises($event)"
-      (removeSelectedExercise)="removeSelectedWorkoutExercise($event)"
-      (selectedExerciseSetCountChanged)="updateSelectedWorkoutExerciseSetCount($event.exerciseId, $event.setCount)"
-      (toggleExercise)="toggleWorkoutExercise($event)"
-      (scrolled)="onExerciseListScroll($event)"
-      (loadMore)="loadMoreExercises()"
-      (save)="saveWorkoutFromSelectedExercises()"
+  <div class="flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden rounded-2xl">
+    <app-workout-calendar
+      [selectedDate]="selectedDate()"
+      (dateSelected)="selectDate($event)"
     />
-  } @else {
-    <div class="flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden rounded-2xl">
-      <app-workout-calendar
-        [selectedDate]="selectedDate()"
-        (dateSelected)="selectDate($event)"
-      />
 
-      <app-selected-day-panel
-        [text]="selectedDayPanelText()"
-        [selectedDateLabel]="selectedDateLabel()"
-        [selectedDayViewModel]="selectedDayViewModel()"
-        [selectedDayWorkoutStatus]="selectedDayWorkoutStatus()"
-        [selectedDayError]="selectedDayError()"
-        (retry)="retrySelectedDay()"
-        (openWorkoutDetails)="openWorkoutDetails($event)"
-        (rejectWorkout)="setWorkoutCompletionStatus(+$event, 'rejected')"
-        (editWorkout)="openEditWorkoutSheet($event)"
-        (deleteWorkout)="removeWorkout(+$event)"
-        (setWorkout)="openExerciseSheet()"
-        (markAsRestDay)="markSelectedDayAsRestDay()"
-        (removeRestDay)="removeSelectedRestDay()"
-      />
-    </div>
-  }
+    <app-selected-day-panel
+      [text]="selectedDayPanelText()"
+      [selectedDateLabel]="selectedDateLabel()"
+      [selectedDayViewModel]="selectedDayViewModel()"
+      [selectedDayWorkoutStatus]="selectedDayWorkoutStatus()"
+      [selectedDayError]="selectedDayError()"
+      (retry)="retrySelectedDay()"
+      (openWorkoutDetails)="openWorkoutDetails($event)"
+      (rejectWorkout)="setWorkoutCompletionStatus(+$event, 'rejected')"
+      (editWorkout)="openEditWorkoutSheet($event)"
+      (deleteWorkout)="removeWorkout(+$event)"
+      (setWorkout)="openExerciseSheet()"
+      (markAsRestDay)="markSelectedDayAsRestDay()"
+      (removeRestDay)="removeSelectedRestDay()"
+    />
+  </div>
 </div>
 
 @if (exerciseDetailsError()) {

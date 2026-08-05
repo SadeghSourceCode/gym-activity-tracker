@@ -10,14 +10,14 @@ export type WorkoutEditorStep = 'muscle' | 'exercises' | 'planning';
   selector: 'app-workout-editor-sheet',
   standalone: true,
   imports: [AppButton],
-  templateUrl: './workout-editor-sheet.component.html',
+  templateUrl: './add-workout.component.html',
   styles: `
     .selected {
       @apply border border-[#0070F0];
     }
   `,
 })
-export class WorkoutEditorSheetComponent {
+export class AddWorkoutComponent {
   readonly text = input.required<WorkoutEditorTextConfig>();
   readonly title = input.required<string>();
   readonly selectedDateLabel = input.required<string>();
