@@ -5,8 +5,8 @@ export const WorkoutRoutes: Routes = [
   {
     path: 'add-workout',
     loadComponent: () =>
-      import('./features/add-workout/add-workout-page.component').then(
-        (m) => m.AddWorkoutPageComponent,
+      import('./features/add-workout/add-workout.component').then(
+        (c) => c.AddWorkoutComponent,
       ),
   },
   {

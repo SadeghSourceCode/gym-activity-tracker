@@ -152,30 +152,6 @@ export class WorkoutPage {
     similarExercisesLabel: this.i18n.t('similarExercises'),
   }));
 
-  private readonly saveWorkouts = effect(() => {
-    if (!this.isBrowser) {
-      return;
-    }
-
-    try {
-      localStorage.setItem(this.storageKey, JSON.stringify(this.workouts()));
-    } catch {
-      // Keep the app usable when storage is unavailable or full.
-    }
-  });
-
-  private readonly saveRestDayKeys = effect(() => {
-    if (!this.isBrowser) {
-      return;
-    }
-
-    try {
-      localStorage.setItem(this.restDaysStorageKey, JSON.stringify(this.restDayKeys()));
-    } catch {
-      this.selectedDayError.set('Could not save rest-day changes.');
-    }
-  });
-
   private loadWorkouts(): Workout[] {
     if (!this.isBrowser) {
       return [];
