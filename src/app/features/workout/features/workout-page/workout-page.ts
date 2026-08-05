@@ -8,6 +8,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   DailyWorkoutPlan,
@@ -23,22 +24,16 @@ import {
   ExerciseDetailsTextConfig,
   SelectedDayPanelTextConfig,
   WorkoutDetailTextConfig,
-  WorkoutEditorTextConfig,
 } from '../../models/workout-ui.models';
 import {
   ExerciseDbApiService,
   ExerciseDbExercise,
-  TargetMuscleOption,
 } from '../../services/exercise-db-api.service';
 import { getDateKey, getTodayDateKey, parseDateKey } from '../../utils/calendar-date.util';
 import { mapDailyPlanToViewModel } from '../../utils/workout-plan-view-model.mapper';
 import { WorkoutCalendarComponent } from '../../components/workout-calendar/workout-calendar.component';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { SelectedDayPanelComponent } from '../../components/selected-day-panel/selected-day-panel.component';
-import {
-  WorkoutEditorSheetComponent,
-  WorkoutEditorStep,
-} from '../../components/workout-editor-sheet/workout-editor-sheet.component';
 import { WorkoutDetailComponent } from '../../components/workout-detail/workout-detail.component';
 import { ExerciseDetailsDialogComponent } from '../../components/exercise-details-dialog/exercise-details-dialog.component';
 
@@ -47,7 +42,6 @@ import { ExerciseDetailsDialogComponent } from '../../components/exercise-detail
   imports: [
     WorkoutCalendarComponent,
     SelectedDayPanelComponent,
-    WorkoutEditorSheetComponent,
     WorkoutDetailComponent,
     ExerciseDetailsDialogComponent,
   ],
@@ -59,6 +53,7 @@ export class WorkoutPage {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly destroyRef = inject(DestroyRef);
   private readonly exerciseDbApi = inject(ExerciseDbApiService);
+  private readonly router = inject(Router);
   readonly i18n = inject(I18nService);
   private readonly pageSize = 15;
 
@@ -66,19 +61,6 @@ export class WorkoutPage {
   workouts = signal<Workout[]>(this.loadWorkouts());
   restDayKeys = signal<string[]>(this.loadRestDayKeys());
   selectedDayError = signal<string | null>(null);
-  isExerciseSheetOpen = signal(false);
-  exerciseSearchQuery = signal('');
-  exerciseSearchResults = signal<ExerciseDbExercise[]>([]);
-  exerciseSearchTotal = signal(0);
-  isExerciseSearchLoading = signal(false);
-  exerciseSearchError = signal<string | null>(null);
-  targetMuscles = signal<TargetMuscleOption[]>([]);
-  selectedTargetMuscle = signal<string | null>(null);
-  workoutEditorStep = signal<WorkoutEditorStep>('muscle');
-  isWeeklyPlan = signal(false);
-  editingWorkoutId = signal<number | null>(null);
-  workoutTitle = signal('');
-  selectedWorkoutExercises = signal<WorkoutExerciseSummary[]>([]);
   openedWorkoutId = signal<number | null>(null);
   openedWorkout = computed(() => {
     const openedWorkoutId = this.openedWorkoutId();
@@ -153,32 +135,6 @@ export class WorkoutPage {
     incomingLabel: this.i18n.t('incoming'),
     isPersian: this.i18n.language() === 'fa',
   }));
-  readonly workoutEditorText = computed<WorkoutEditorTextConfig>(() => ({
-    addWorkoutLabel: this.i18n.t('addWorkout'),
-    closeExerciseSearchLabel: this.i18n.t('closeExerciseSearch'),
-    selectExerciseForDateLabel: this.i18n.t('selectExerciseForDate'),
-    workoutTitleLabel: this.i18n.t('workoutTitle'),
-    leaveEmptyToUseLabel: this.i18n.t('leaveEmptyToUse'),
-    searchExercisesLabel: this.i18n.t('searchExercises'),
-    searchByNameMuscleEquipmentLabel: this.i18n.t('searchByNameMuscleEquipment'),
-    selectedExercisesLabel: this.i18n.t('selectedExercises'),
-    removeLabel: this.i18n.t('remove'),
-    selectedLabel: this.i18n.t('selected'),
-    loadingExercisesLabel: this.i18n.t('loadingExercises'),
-    loadMoreLabel: this.i18n.t('loadMore'),
-    noExercisesFoundLabel: this.i18n.t('noExercisesFound'),
-    backLabel: this.i18n.t('back'),
-    continueLabel: this.i18n.t('continue'),
-    targetMuscleLabel: this.i18n.t('targetMuscleLabel'),
-    chooseTargetMuscleLabel: this.i18n.t('chooseTargetMuscleLabel'),
-    chooseTargetMuscleMessage: this.i18n.t('chooseTargetMuscleMessage'),
-    chooseExercisesMessage: this.i18n.t('chooseExercisesMessage'),
-    workoutPlanningLabel: this.i18n.t('workoutPlanningLabel'),
-    workingDayLabel: this.i18n.t('workingDayLabel'),
-    weeklyPlanLabel: this.i18n.t('weeklyPlanLabel'),
-    weeklyPlanHelpLabel: this.i18n.t('weeklyPlanHelpLabel'),
-    isPersian: this.i18n.language() === 'fa',
-  }));
   readonly workoutDetailText = computed<WorkoutDetailTextConfig>(() => ({
     workoutDetailsLabel: this.i18n.t('workoutDetails'),
     closeWorkoutDetailsLabel: this.i18n.t('closeWorkoutDetails'),
@@ -195,30 +151,6 @@ export class WorkoutPage {
     noDescriptionAvailableLabel: this.i18n.t('noDescriptionAvailable'),
     similarExercisesLabel: this.i18n.t('similarExercises'),
   }));
-
-  private readonly saveWorkouts = effect(() => {
-    if (!this.isBrowser) {
-      return;
-    }
-
-    try {
-      localStorage.setItem(this.storageKey, JSON.stringify(this.workouts()));
-    } catch {
-      // Keep the app usable when storage is unavailable or full.
-    }
-  });
-
-  private readonly saveRestDayKeys = effect(() => {
-    if (!this.isBrowser) {
-      return;
-    }
-
-    try {
-      localStorage.setItem(this.restDaysStorageKey, JSON.stringify(this.restDayKeys()));
-    } catch {
-      this.selectedDayError.set('Could not save rest-day changes.');
-    }
-  });
 
   private loadWorkouts(): Workout[] {
     if (!this.isBrowser) {
@@ -284,14 +216,9 @@ export class WorkoutPage {
       return;
     }
 
-    this.editingWorkoutId.set(null);
-    this.workoutTitle.set('');
-    this.selectedWorkoutExercises.set([]);
-    this.selectedTargetMuscle.set(null);
-    this.workoutEditorStep.set('muscle');
-    this.isWeeklyPlan.set(false);
-    this.isExerciseSheetOpen.set(true);
-    this.loadTargetMuscles();
+    void this.router.navigate(['/add-workout'], {
+      queryParams: { date: this.selectedDate() },
+    });
   }
 
   openEditWorkoutSheet(workoutId: string) {
@@ -306,98 +233,9 @@ export class WorkoutPage {
       return;
     }
 
-    this.editingWorkoutId.set(workout.id);
-    this.workoutTitle.set(workout.name);
-    this.selectedWorkoutExercises.set([...workout.exercises]);
-    this.selectedTargetMuscle.set(
-      workout.targetMuscle ??
-        workout.exercises.find((exercise) => exercise.targetMuscle)?.targetMuscle ??
-        null,
-    );
-    this.workoutEditorStep.set(this.selectedTargetMuscle() ? 'exercises' : 'muscle');
-    this.isWeeklyPlan.set(Boolean(workout.isWeeklyPlan));
-    this.isExerciseSheetOpen.set(true);
-    this.loadTargetMuscles();
-    this.searchExercises('');
-  }
-
-  closeExerciseSheet() {
-    this.isExerciseSheetOpen.set(false);
-    this.editingWorkoutId.set(null);
-    this.workoutTitle.set('');
-    this.selectedWorkoutExercises.set([]);
-    this.selectedTargetMuscle.set(null);
-    this.workoutEditorStep.set('muscle');
-    this.isWeeklyPlan.set(false);
-  }
-
-  selectTargetMuscle(targetMuscle: string) {
-    this.selectedTargetMuscle.set(targetMuscle);
-    this.searchExercises('');
-  }
-
-  searchExercises(query: string) {
-    this.exerciseSearchQuery.set(query);
-    this.exerciseSearchResults.set([]);
-    this.exerciseSearchTotal.set(0);
-    this.loadExercisesPage(0);
-  }
-
-  loadMoreExercises() {
-    if (
-      this.isExerciseSearchLoading() ||
-      this.exerciseSearchResults().length >= this.exerciseSearchTotal()
-    ) {
-      return;
-    }
-
-    this.loadExercisesPage(this.exerciseSearchResults().length);
-  }
-
-  onExerciseListScroll(event: Event) {
-    const target = event.target as HTMLElement;
-    const remainingScroll = target.scrollHeight - target.scrollTop - target.clientHeight;
-
-    if (remainingScroll < 240) {
-      this.loadMoreExercises();
-    }
-  }
-
-  toggleWorkoutExercise(exercise: ExerciseDbExercise) {
-    const exerciseSummary = this.toWorkoutExerciseSummary(exercise);
-
-    this.selectedWorkoutExercises.update((selectedExercises) =>
-      selectedExercises.some((selectedExercise) => selectedExercise.id === exercise.id)
-        ? selectedExercises.filter((selectedExercise) => selectedExercise.id !== exercise.id)
-        : [...selectedExercises, exerciseSummary],
-    );
-  }
-
-  isWorkoutExerciseSelected(exerciseId: string): boolean {
-    return this.selectedWorkoutExercises().some((exercise) => exercise.id === exerciseId);
-  }
-
-  removeSelectedWorkoutExercise(exerciseId: string) {
-    this.selectedWorkoutExercises.update((selectedExercises) =>
-      selectedExercises.filter((exercise) => exercise.id !== exerciseId),
-    );
-  }
-
-  updateSelectedWorkoutExerciseSetCount(exerciseId: string, setCount: number) {
-    const normalizedSetCount = Math.max(Math.floor(setCount), 1);
-
-    this.selectedWorkoutExercises.update((selectedExercises) =>
-      selectedExercises.map((exercise) => {
-        if (exercise.id !== exerciseId) {
-          return exercise;
-        }
-
-        return {
-          ...exercise,
-          sets: this.resizeWorkoutSets(exercise.sets, normalizedSetCount),
-        };
-      }),
-    );
+    void this.router.navigate(['/add-workout'], {
+      queryParams: { date: getDateKey(workout.date), editId: workout.id },
+    });
   }
 
   openWorkoutDetails(workoutId: string) {
@@ -443,80 +281,6 @@ export class WorkoutPage {
   ) {
     this.setWorkoutCompletionStatus(workoutId, completionStatus);
     this.closeWorkoutDetails();
-  }
-
-  saveWorkoutFromSelectedExercises() {
-    if (!this.canManageSelectedDate()) {
-      return;
-    }
-
-    const selectedExercises = this.selectedWorkoutExercises();
-
-    if (!selectedExercises.length) {
-      this.exerciseSearchError.set(this.i18n.t('selectAtLeastOneExercise'));
-      return;
-    }
-
-    if (this.editingWorkoutId() !== null) {
-      this.updateWorkoutFromSelectedExercises(selectedExercises);
-      return;
-    }
-
-    this.workouts.update((workouts) => {
-      const nextWorkoutId = Math.max(...workouts.map((workout) => workout.id), 0) + 1;
-      const firstExercise = selectedExercises[0];
-      const workoutName = this.getWorkoutName();
-
-      return [
-        ...workouts,
-        {
-          id: nextWorkoutId,
-          name: workoutName,
-          exerciseId: firstExercise.id,
-          thumbnailUrl: firstExercise.thumbnailUrl,
-          exercises: selectedExercises,
-          date: parseDateKey(this.selectedDate()),
-          targetMuscle: this.getWorkoutTargetMuscle(selectedExercises),
-          isWeeklyPlan: this.isWeeklyPlan(),
-          completionStatus: 'pending',
-          sets: [{ id: 1, repeat: 0, weight: 0 }],
-        },
-      ];
-    });
-
-    this.restDayKeys.update((dateKeys) =>
-      dateKeys.filter((dateKey) => dateKey !== this.selectedDate()),
-    );
-    this.closeExerciseSheet();
-  }
-
-  private updateWorkoutFromSelectedExercises(selectedExercises: WorkoutExerciseSummary[]) {
-    const editingWorkoutId = this.editingWorkoutId();
-
-    if (editingWorkoutId === null) {
-      return;
-    }
-
-    const firstExercise = selectedExercises[0];
-    const workoutName = this.getWorkoutName();
-
-    this.workouts.update((workouts) =>
-      workouts.map((workout) =>
-        workout.id === editingWorkoutId
-          ? {
-              ...workout,
-              name: workoutName,
-              exerciseId: firstExercise.id,
-              thumbnailUrl: firstExercise.thumbnailUrl,
-              exercises: selectedExercises,
-              targetMuscle: this.getWorkoutTargetMuscle(selectedExercises),
-              isWeeklyPlan: this.isWeeklyPlan(),
-            }
-          : workout,
-      ),
-    );
-
-    this.closeExerciseSheet();
   }
 
   getExerciseMediaUrl(exercise: ExerciseDbExercise): string | null {
@@ -644,31 +408,6 @@ export class WorkoutPage {
     return this.i18n.language() === 'fa' ? exercise.nameFa : exercise.nameEn;
   }
 
-  getWorkoutSheetTitle(): string {
-    return this.editingWorkoutId() === null ? this.i18n.t('addWorkout') : this.i18n.t('editWorkout');
-  }
-
-  getWorkoutSaveButtonLabel(): string {
-    return this.editingWorkoutId() === null ? this.i18n.t('addWorkout') : this.i18n.t('saveWorkout');
-  }
-
-  getDefaultWorkoutTitle(): string {
-    const selectedDate = parseDateKey(this.selectedDate());
-    const saturdayFirstDayIndexes = [6, 0, 1, 2, 3, 4, 5];
-    const dayIndex = saturdayFirstDayIndexes.indexOf(selectedDate.getDay());
-    const dayLabels = [
-      this.i18n.t('firstDay'),
-      this.i18n.t('secondDay'),
-      this.i18n.t('thirdDay'),
-      this.i18n.t('fourthDay'),
-      this.i18n.t('fifthDay'),
-      this.i18n.t('sixthDay'),
-      this.i18n.t('seventhDay'),
-    ];
-
-    return dayLabels[dayIndex] ?? this.i18n.t('workoutDay');
-  }
-
   addSet(workoutId: number, exerciseId: string) {
     const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
 
@@ -741,42 +480,6 @@ export class WorkoutPage {
         };
       }),
     );
-  }
-
-  private loadExercisesPage(offset: number) {
-    this.isExerciseSearchLoading.set(true);
-    this.exerciseSearchError.set(null);
-
-    this.exerciseDbApi
-      .search(this.exerciseSearchQuery(), offset, this.pageSize, this.selectedTargetMuscle())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: ({ items, total }) => {
-          this.exerciseSearchResults.update((results) =>
-            offset === 0 ? items : [...results, ...items],
-          );
-          this.exerciseSearchTotal.set(total);
-          this.isExerciseSearchLoading.set(false);
-        },
-        error: () => {
-          this.exerciseSearchError.set(this.i18n.t('couldNotLoadExercises'));
-          this.isExerciseSearchLoading.set(false);
-        },
-      });
-  }
-
-  private loadTargetMuscles() {
-    if (this.targetMuscles().length) {
-      return;
-    }
-
-    this.exerciseDbApi
-      .getTargetMuscles()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (targetMuscles) => this.targetMuscles.set(targetMuscles),
-        error: () => this.exerciseSearchError.set(this.i18n.t('couldNotLoadExercises')),
-      });
   }
 
   private getDailyPlan(date: string): DailyWorkoutPlan {
@@ -884,18 +587,6 @@ export class WorkoutPage {
     return [];
   }
 
-  private toWorkoutExerciseSummary(exercise: ExerciseDbExercise): WorkoutExerciseSummary {
-    return {
-      id: exercise.id,
-      name: exercise.name,
-      nameEn: exercise.nameEn,
-      nameFa: exercise.nameFa,
-      targetMuscle: exercise.targetMuscle,
-      thumbnailUrl: this.getExerciseMediaUrl(exercise) ?? undefined,
-      sets: [{ id: 1, repeat: 0, weight: 0 }],
-    };
-  }
-
   private normalizeWorkoutSets(sets: WorkoutSet[] | undefined): WorkoutSet[] {
     if (!Array.isArray(sets)) {
       return [{ id: 1, repeat: 0, weight: 0 }];
@@ -909,45 +600,6 @@ export class WorkoutPage {
     );
 
     return normalizedSets.length ? normalizedSets : [{ id: 1, repeat: 0, weight: 0 }];
-  }
-
-  private resizeWorkoutSets(sets: WorkoutSet[] | undefined, setCount: number): WorkoutSet[] {
-    const normalizedSets = this.normalizeWorkoutSets(sets);
-
-    if (normalizedSets.length >= setCount) {
-      return normalizedSets.slice(0, setCount);
-    }
-
-    const nextSets = [...normalizedSets];
-
-    while (nextSets.length < setCount) {
-      const nextSetId = Math.max(...nextSets.map((set) => set.id), 0) + 1;
-      nextSets.push({ id: nextSetId, repeat: 0, weight: 0 });
-    }
-
-    return nextSets;
-  }
-
-  private getWorkoutName(): string {
-    const customTitle = this.workoutTitle().trim();
-
-    if (customTitle) {
-      return customTitle;
-    }
-
-    return this.getDefaultWorkoutTitle();
-  }
-
-  private getWorkoutTargetMuscle(selectedExercises: WorkoutExerciseSummary[]): string {
-    const selectedMuscles = [
-      ...new Set(
-        selectedExercises
-          .map((exercise) => exercise.targetMuscle)
-          .filter((targetMuscle): targetMuscle is string => Boolean(targetMuscle)),
-      ),
-    ];
-
-    return selectedMuscles.join(', ');
   }
 
   private getDateLocale(): string | undefined {

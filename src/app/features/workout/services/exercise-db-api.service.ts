@@ -45,8 +45,104 @@ export interface ExerciseSearchResult {
 export interface TargetMuscleOption {
   id: string;
   label: string;
+  mainMuscles: string;
+  imageUrl: string;
   exerciseCount: number;
 }
+
+const TARGET_MUSCLE_GROUPS = [
+  {
+    id: 'chest',
+    label: 'Chest',
+    mainMuscles: 'Pectorals',
+    imageUrl: '/assets/images/muscle-groups/chest.png',
+    keywords: ['chest', 'pectorals', 'pectoralis'],
+  },
+  {
+    id: 'back',
+    label: 'Back',
+    mainMuscles: 'Lats, Traps, Rhomboids',
+    imageUrl: '/assets/images/muscle-groups/back.png',
+    keywords: ['back', 'lats', 'latissimus', 'traps', 'trapezius', 'rhomboids'],
+  },
+  {
+    id: 'shoulders',
+    label: 'Shoulders',
+    mainMuscles: 'Deltoids',
+    imageUrl: '/assets/images/muscle-groups/shoulder.png',
+    keywords: ['shoulders', 'shoulder', 'deltoids', 'deltoid'],
+  },
+  {
+    id: 'biceps',
+    label: 'Biceps',
+    mainMuscles: 'Biceps, Brachialis',
+    imageUrl: '/assets/images/muscle-groups/biceps.png',
+    keywords: ['biceps', 'bicep', 'brachialis'],
+  },
+  {
+    id: 'triceps',
+    label: 'Triceps',
+    mainMuscles: 'Triceps',
+    imageUrl: '/assets/images/muscle-groups/tricept.png',
+    keywords: ['triceps', 'tricep'],
+  },
+  {
+    id: 'forearms',
+    label: 'Forearms',
+    mainMuscles: 'Grip, Wrist Flexors/Extensors',
+    imageUrl: '/assets/images/muscle-groups/forearms.png',
+    keywords: ['forearms', 'forearm', 'grip', 'wrist', 'flexors', 'extensors'],
+  },
+  {
+    id: 'quadriceps',
+    label: 'Quadriceps',
+    mainMuscles: 'Front of thigh',
+    imageUrl: '/assets/images/muscle-groups/legs.png',
+    keywords: ['quadriceps', 'quads', 'quad', 'front thigh'],
+  },
+  {
+    id: 'hamstrings',
+    label: 'Hamstrings',
+    mainMuscles: 'Back of thigh',
+    imageUrl: '/assets/images/muscle-groups/legs.png',
+    keywords: ['hamstrings', 'hamstring', 'back thigh'],
+  },
+  {
+    id: 'glutes',
+    label: 'Glutes',
+    mainMuscles: 'Buttocks',
+    imageUrl: '/assets/images/muscle-groups/legs.png',
+    keywords: ['glutes', 'glute', 'buttocks', 'butt'],
+  },
+  {
+    id: 'calves',
+    label: 'Calves',
+    mainMuscles: 'Gastrocnemius, Soleus',
+    imageUrl: '/assets/images/muscle-groups/legs.png',
+    keywords: ['calves', 'calf', 'gastrocnemius', 'soleus'],
+  },
+  {
+    id: 'core',
+    label: 'Core',
+    mainMuscles: 'Abs, Obliques',
+    imageUrl: '/assets/images/muscle-groups/core-abs.png',
+    keywords: ['core', 'abs', 'abdominals', 'abdominal', 'obliques', 'oblique', 'waist'],
+  },
+  {
+    id: 'lower-back',
+    label: 'Lower Back',
+    mainMuscles: 'Erector Spinae',
+    imageUrl: '/assets/images/muscle-groups/lower-back.png',
+    keywords: ['lower back', 'erector spinae', 'spinae'],
+  },
+  {
+    id: 'cardio',
+    label: 'Cardio',
+    mainMuscles: 'Whole body/endurance',
+    imageUrl: '/assets/images/muscle-groups/cardio.png',
+    keywords: ['cardio', 'endurance', 'whole body', 'full body'],
+  },
+] as const;
 
 @Injectable({ providedIn: 'root' })
 export class ExerciseDbApiService {
@@ -80,9 +176,7 @@ export class ExerciseDbApiService {
       map((exercises) => {
         const localizedExercises = exercises.map((exercise) => this.localizeExercise(exercise));
         const muscleFilteredExercises = normalizedTargetMuscle
-          ? localizedExercises.filter(
-              (exercise) => exercise.targetMuscle.toLowerCase() === normalizedTargetMuscle,
-            )
+          ? localizedExercises.filter((exercise) => exercise.targetMuscle === normalizedTargetMuscle)
           : localizedExercises;
         const filteredExercises = normalizedQuery
           ? muscleFilteredExercises.filter((exercise) => this.matchesExercise(exercise, normalizedQuery))
@@ -105,9 +199,13 @@ export class ExerciseDbApiService {
           counts.set(exercise.targetMuscle, (counts.get(exercise.targetMuscle) ?? 0) + 1);
         }
 
-        return [...counts.entries()]
-          .map(([label, exerciseCount]) => ({ id: label, label, exerciseCount }))
-          .sort((a, b) => a.label.localeCompare(b.label));
+        return TARGET_MUSCLE_GROUPS.map(({ id, label, mainMuscles, imageUrl }) => ({
+          id,
+          label,
+          mainMuscles,
+          imageUrl,
+          exerciseCount: counts.get(id) ?? 0,
+        }));
       }),
     );
   }
@@ -151,6 +249,7 @@ export class ExerciseDbApiService {
       exercise.nameEn,
       exercise.nameFa,
       exercise.category,
+      exercise.targetMuscle,
       exercise.equipment,
       ...exercise.primaryMuscles,
       ...exercise.secondaryMuscles,
@@ -182,12 +281,14 @@ export class ExerciseDbApiService {
   }
 
   private toExerciseDbExercise(exercise: ExercisesDatasetExercise): ExerciseDbExercise {
+    const targetMuscle = this.getTargetMuscleGroup(exercise);
+
     return {
       id: exercise.id,
       name: exercise.name,
       nameEn: exercise.name,
       nameFa: translateExerciseNameToPersian(exercise.name),
-      targetMuscle: exercise.target || exercise.muscle_group || exercise.body_part || exercise.category,
+      targetMuscle,
       equipment: exercise.equipment,
       primaryMuscles: [exercise.target, exercise.muscle_group].filter(Boolean),
       secondaryMuscles: exercise.secondary_muscles ?? [],
@@ -208,5 +309,33 @@ export class ExerciseDbApiService {
       ...exercise,
       name: this.profilePreferences.language() === 'fa' ? exercise.nameFa : exercise.nameEn,
     };
+  }
+
+  private getTargetMuscleGroup(exercise: ExercisesDatasetExercise): string {
+    const searchableText = [
+      exercise.target,
+      exercise.muscle_group,
+      exercise.body_part,
+      exercise.category,
+      exercise.name,
+      ...(exercise.secondary_muscles ?? []),
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+
+    const matchingGroups = TARGET_MUSCLE_GROUPS.map((group) => ({
+      group,
+      matchedKeywordLength: Math.max(
+        0,
+        ...group.keywords
+          .filter((keyword) => searchableText.includes(keyword))
+          .map((keyword) => keyword.length),
+      ),
+    }))
+      .filter(({ matchedKeywordLength }) => matchedKeywordLength > 0)
+      .sort((a, b) => b.matchedKeywordLength - a.matchedKeywordLength);
+
+    return matchingGroups[0]?.group.id ?? 'cardio';
   }
 }
