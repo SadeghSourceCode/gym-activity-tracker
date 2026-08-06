@@ -8,7 +8,9 @@ type TranslationKey =
   | 'ageBirthday'
   | 'back'
   | 'birthday'
+  | 'changeExercise'
   | 'chooseExercisesMessage'
+  | 'chooseReplacement'
   | 'chooseTargetMuscleLabel'
   | 'chooseTargetMuscleMessage'
   | 'close'
@@ -43,6 +45,7 @@ type TranslationKey =
   | 'markAsRestDay'
   | 'noDescriptionAvailable'
   | 'noExercisesFound'
+  | 'noSimilarExercises'
   | 'noWorkoutPlanned'
   | 'noWorkoutsFound'
   | 'open'
@@ -53,6 +56,7 @@ type TranslationKey =
   | 'rejected'
   | 'rejectWorkout'
   | 'remove'
+  | 'removeExercise'
   | 'removeRestDay'
   | 'removeWorkoutBeforeRest'
   | 'repeat'
@@ -104,7 +108,9 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     ageBirthday: 'Age / birthday',
     back: 'Back',
     birthday: 'Birthday',
+    changeExercise: 'Change',
     chooseExercisesMessage: 'Search and select exercises for the selected muscle.',
+    chooseReplacement: 'Choose a related exercise',
     chooseTargetMuscleLabel: 'Choose target muscle',
     chooseTargetMuscleMessage: 'Start with the body area you want to train.',
     close: 'Close',
@@ -139,6 +145,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     markAsRestDay: 'Mark as rest day',
     noDescriptionAvailable: 'No description is available for this exercise.',
     noExercisesFound: 'No exercises found.',
+    noSimilarExercises: 'No related exercises found.',
     noWorkoutPlanned: 'No workout planned for this day.',
     noWorkoutsFound: 'No workouts found.',
     open: 'Open',
@@ -149,6 +156,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     rejected: 'Rejected',
     rejectWorkout: 'Reject Workout',
     remove: 'Remove',
+    removeExercise: 'Remove',
     removeRestDay: 'Remove rest day',
     removeWorkoutBeforeRest: 'Remove this day’s workouts before marking it as a rest day.',
     repeat: 'Repeat',
@@ -199,7 +207,9 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     ageBirthday: 'سن / تاریخ تولد',
     back: 'بازگشت',
     birthday: 'تاریخ تولد',
+    changeExercise: 'تغییر',
     chooseExercisesMessage: 'حرکت‌های مناسب عضله انتخاب‌شده را جستجو و انتخاب کنید.',
+    chooseReplacement: 'یک حرکت مرتبط انتخاب کنید',
     chooseTargetMuscleLabel: 'انتخاب عضله هدف',
     chooseTargetMuscleMessage: 'ابتدا بخشی از بدن را که می‌خواهید تمرین دهید انتخاب کنید.',
     close: 'بستن',
@@ -234,6 +244,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     markAsRestDay: 'ثبت به‌عنوان روز استراحت',
     noDescriptionAvailable: 'توضیحی برای این حرکت موجود نیست.',
     noExercisesFound: 'حرکتی پیدا نشد.',
+    noSimilarExercises: 'حرکت مرتبطی پیدا نشد.',
     noWorkoutPlanned: 'برای این روز تمرینی ثبت نشده است.',
     noWorkoutsFound: 'تمرینی پیدا نشد.',
     open: 'باز کردن',
@@ -244,6 +255,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     rejected: 'رد شده',
     rejectWorkout: 'رد کردن تمرین',
     remove: 'حذف',
+    removeExercise: 'حذف',
     removeRestDay: 'حذف روز استراحت',
     removeWorkoutBeforeRest: 'قبل از ثبت روز استراحت، تمرین‌های این روز را حذف کنید.',
     repeat: 'تکرار',
