@@ -266,6 +266,12 @@ export class AddWorkoutComponent {
     return Math.max(exercise.sets.length, 1);
   }
 
+  getSelectedExerciseSetCountById(exerciseId: string): number {
+    const selectedExercise = this.selectedExercises().find((exercise) => exercise.id === exerciseId);
+
+    return selectedExercise ? this.getSelectedExerciseSetCount(selectedExercise) : 1;
+  }
+
   getTargetMuscleLabel(targetMuscle: string | undefined): string {
     if (!targetMuscle) {
       return '';
