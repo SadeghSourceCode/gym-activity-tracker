@@ -4,7 +4,6 @@ import {
   DestroyRef,
   PLATFORM_ID,
   computed,
-  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -124,18 +123,6 @@ export class AddWorkoutComponent {
     isPersian: this.i18n.language() === 'fa',
   }));
 
-  private readonly saveWorkouts = effect(() => {
-    if (this.isBrowser) {
-      localStorage.setItem(this.storageKey, JSON.stringify(this.workouts()));
-    }
-  });
-
-  private readonly saveRestDayKeys = effect(() => {
-    if (this.isBrowser) {
-      localStorage.setItem(this.restDaysStorageKey, JSON.stringify(this.restDayKeys()));
-    }
-  });
-
   constructor() {
     this.loadTargetMuscles();
     this.initializeEditState();
@@ -249,6 +236,8 @@ export class AddWorkoutComponent {
     this.restDayKeys.update((dateKeys) =>
       dateKeys.filter((dateKey) => dateKey !== this.selectedDate()),
     );
+    this.saveWorkouts();
+    this.saveRestDayKeys();
     void this.router.navigateByUrl('/');
   }
 
@@ -435,6 +424,12 @@ export class AddWorkoutComponent {
     }
   }
 
+  private saveWorkouts() {
+    if (this.isBrowser) {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.workouts()));
+    }
+  }
+
   private loadRestDayKeys(): string[] {
     if (!this.isBrowser) {
       return [];
@@ -449,6 +444,12 @@ export class AddWorkoutComponent {
         : [];
     } catch {
       return [];
+    }
+  }
+
+  private saveRestDayKeys() {
+    if (this.isBrowser) {
+      localStorage.setItem(this.restDaysStorageKey, JSON.stringify(this.restDayKeys()));
     }
   }
 

@@ -52,6 +52,11 @@ export interface WorkoutDetailTextConfig {
   repeatLabel: string;
   weightLabel: string;
   addSetLabel: string;
+  changeExerciseLabel: string;
+  removeExerciseLabel: string;
+  chooseReplacementLabel: string;
+  noSimilarExercisesLabel: string;
+  loadingExercisesLabel: string;
   markAsDoneLabel: string;
   rejectWorkoutLabel: string;
   isPersian: boolean;

@@ -4,7 +4,6 @@ import {
   DestroyRef,
   PLATFORM_ID,
   computed,
-  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -78,6 +77,9 @@ export class WorkoutPage {
   });
   selectedExercise = signal<ExerciseDbExercise | null>(null);
   similarExercises = signal<ExerciseDbExercise[]>([]);
+  replacingExerciseId = signal<string | null>(null);
+  replacementExercises = signal<ExerciseDbExercise[]>([]);
+  replacementExercisesLoading = signal(false);
   exerciseDetailsError = signal<string | null>(null);
 
   readonly exerciseImageBaseUrl = this.exerciseDbApi.imageBaseUrl;
@@ -141,6 +143,11 @@ export class WorkoutPage {
     repeatLabel: this.i18n.t('repeat'),
     weightLabel: this.i18n.t('weight'),
     addSetLabel: this.i18n.t('addSet'),
+    changeExerciseLabel: this.i18n.t('changeExercise'),
+    removeExerciseLabel: this.i18n.t('removeExercise'),
+    chooseReplacementLabel: this.i18n.t('chooseReplacement'),
+    noSimilarExercisesLabel: this.i18n.t('noSimilarExercises'),
+    loadingExercisesLabel: this.i18n.t('loadingExercises'),
     markAsDoneLabel: this.i18n.t('markAsDone'),
     rejectWorkoutLabel: this.i18n.t('rejectWorkout'),
     isPersian: this.i18n.language() === 'fa',
@@ -251,6 +258,127 @@ export class WorkoutPage {
 
   closeWorkoutDetails() {
     this.openedWorkoutId.set(null);
+    this.cancelExerciseReplacement();
+  }
+
+  requestExerciseReplacement(exercise: WorkoutExerciseSummary) {
+    const workout = this.openedWorkout();
+
+    if (!workout || !this.canManageWorkout(workout)) {
+      return;
+    }
+
+    this.replacingExerciseId.set(exercise.id);
+    this.replacementExercises.set([]);
+    this.replacementExercisesLoading.set(true);
+
+    this.exerciseDbApi
+      .getById(exercise.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (sourceExercise) => {
+          if (!sourceExercise || this.replacingExerciseId() !== exercise.id) {
+            this.replacementExercisesLoading.set(false);
+            return;
+          }
+
+          this.exerciseDbApi
+            .getSimilar(sourceExercise, 12)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+              next: (relatedExercises) => {
+                if (this.replacingExerciseId() === exercise.id) {
+                  this.replacementExercises.set(relatedExercises);
+                  this.replacementExercisesLoading.set(false);
+                }
+              },
+              error: () => this.finishReplacementLoading(exercise.id),
+            });
+        },
+        error: () => this.finishReplacementLoading(exercise.id),
+      });
+  }
+
+  cancelExerciseReplacement() {
+    this.replacingExerciseId.set(null);
+    this.replacementExercises.set([]);
+    this.replacementExercisesLoading.set(false);
+  }
+
+  removeExercise(workoutId: number, exerciseId: string) {
+    const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
+
+    if (!targetWorkout || !this.canManageWorkout(targetWorkout)) {
+      return;
+    }
+
+    if (targetWorkout.exercises.length === 1) {
+      this.removeWorkout(workoutId);
+      this.saveWorkouts();
+      return;
+    }
+
+    this.workouts.update((workouts) =>
+      workouts.map((workout) => {
+        if (workout.id !== workoutId) {
+          return workout;
+        }
+
+        const exercises = workout.exercises.filter((exercise) => exercise.id !== exerciseId);
+        const firstExercise = exercises[0];
+
+        return {
+          ...workout,
+          exercises,
+          exerciseId: firstExercise.id,
+          thumbnailUrl: firstExercise.thumbnailUrl,
+          targetMuscle: firstExercise.targetMuscle,
+        };
+      }),
+    );
+    this.cancelExerciseReplacement();
+    this.saveWorkouts();
+  }
+
+  replaceExercise(workoutId: number, exerciseId: string, replacement: ExerciseDbExercise) {
+    const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
+
+    if (!targetWorkout || !this.canManageWorkout(targetWorkout)) {
+      return;
+    }
+
+    this.workouts.update((workouts) =>
+      workouts.map((workout) => {
+        if (workout.id !== workoutId) {
+          return workout;
+        }
+
+        const exercises = workout.exercises.map((exercise) =>
+          exercise.id === exerciseId
+            ? {
+                ...exercise,
+                id: replacement.id,
+                name: replacement.name,
+                nameEn: replacement.nameEn,
+                nameFa: replacement.nameFa,
+                targetMuscle: replacement.targetMuscle,
+                thumbnailUrl: this.getExerciseMediaUrl(replacement) ?? undefined,
+              }
+            : exercise,
+        );
+        const firstExercise = exercises[0];
+
+        return {
+          ...workout,
+          exercises,
+          exerciseId: firstExercise.id,
+          thumbnailUrl: firstExercise.thumbnailUrl,
+          targetMuscle: firstExercise.targetMuscle,
+        };
+      }),
+    );
+    this.cancelExerciseReplacement();
+    this.saveWorkouts();
   }
 
   setWorkoutCompletionStatus(
@@ -600,6 +728,19 @@ export class WorkoutPage {
     );
 
     return normalizedSets.length ? normalizedSets : [{ id: 1, repeat: 0, weight: 0 }];
+  }
+
+  private finishReplacementLoading(exerciseId: string) {
+    if (this.replacingExerciseId() === exerciseId) {
+      this.replacementExercises.set([]);
+      this.replacementExercisesLoading.set(false);
+    }
+  }
+
+  private saveWorkouts() {
+    if (this.isBrowser) {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.workouts()));
+    }
   }
 
   private getDateLocale(): string | undefined {
