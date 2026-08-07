@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map, shareReplay } from 'rxjs';
+import { Observable, defer, from, map, of, shareReplay, switchMap, tap } from 'rxjs';
 import { ProfilePreferencesService } from '../../profile/data-access/services/profile-preferences.service';
 import { translateExerciseNameToPersian } from '../utils/exercise-persian-name.util';
 
@@ -35,6 +35,12 @@ interface ExercisesDatasetExercise {
   image: string;
   gif_url: string;
   created_at: string;
+}
+
+interface ExercisesCacheRecord {
+  version: number;
+  cachedAt: number;
+  exercises: ExerciseDbExercise[];
 }
 
 export interface ExerciseSearchResult {
@@ -73,79 +79,74 @@ const TARGET_MUSCLE_GROUPS = [
     keywords: ['shoulders', 'shoulder', 'deltoids', 'deltoid'],
   },
   {
-    id: 'biceps',
-    label: 'Biceps',
-    mainMuscles: 'Biceps, Brachialis',
+    id: 'arms',
+    label: 'Arms',
+    mainMuscles: 'Biceps, Triceps, Forearms',
     imageUrl: '/assets/images/muscle-groups/biceps.png',
-    keywords: ['biceps', 'bicep', 'brachialis'],
+    keywords: [
+      'biceps',
+      'bicep',
+      'brachialis',
+      'triceps',
+      'tricep',
+      'forearms',
+      'forearm',
+      'grip',
+      'wrist',
+      'flexors',
+      'extensors',
+    ],
   },
   {
-    id: 'triceps',
-    label: 'Triceps',
-    mainMuscles: 'Triceps',
-    imageUrl: '/assets/images/muscle-groups/tricept.png',
-    keywords: ['triceps', 'tricep'],
-  },
-  {
-    id: 'forearms',
-    label: 'Forearms',
-    mainMuscles: 'Grip, Wrist Flexors/Extensors',
-    imageUrl: '/assets/images/muscle-groups/forearms.png',
-    keywords: ['forearms', 'forearm', 'grip', 'wrist', 'flexors', 'extensors'],
-  },
-  {
-    id: 'quadriceps',
-    label: 'Quadriceps',
-    mainMuscles: 'Front of thigh',
+    id: 'legs',
+    label: 'Leg',
+    mainMuscles: 'Quadriceps, Hamstrings, Glutes, Calves',
     imageUrl: '/assets/images/muscle-groups/legs.png',
-    keywords: ['quadriceps', 'quads', 'quad', 'front thigh'],
-  },
-  {
-    id: 'hamstrings',
-    label: 'Hamstrings',
-    mainMuscles: 'Back of thigh',
-    imageUrl: '/assets/images/muscle-groups/legs.png',
-    keywords: ['hamstrings', 'hamstring', 'back thigh'],
-  },
-  {
-    id: 'glutes',
-    label: 'Glutes',
-    mainMuscles: 'Buttocks',
-    imageUrl: '/assets/images/muscle-groups/legs.png',
-    keywords: ['glutes', 'glute', 'buttocks', 'butt'],
-  },
-  {
-    id: 'calves',
-    label: 'Calves',
-    mainMuscles: 'Gastrocnemius, Soleus',
-    imageUrl: '/assets/images/muscle-groups/legs.png',
-    keywords: ['calves', 'calf', 'gastrocnemius', 'soleus'],
+    keywords: [
+      'quadriceps',
+      'quads',
+      'quad',
+      'front thigh',
+      'hamstrings',
+      'hamstring',
+      'back thigh',
+      'glutes',
+      'glute',
+      'buttocks',
+      'butt',
+      'calves',
+      'calf',
+      'gastrocnemius',
+      'soleus',
+    ],
   },
   {
     id: 'core',
     label: 'Core',
-    mainMuscles: 'Abs, Obliques',
+    mainMuscles: 'Abs, Obliques, Lower Back',
     imageUrl: '/assets/images/muscle-groups/core-abs.png',
-    keywords: ['core', 'abs', 'abdominals', 'abdominal', 'obliques', 'oblique', 'waist'],
-  },
-  {
-    id: 'lower-back',
-    label: 'Lower Back',
-    mainMuscles: 'Erector Spinae',
-    imageUrl: '/assets/images/muscle-groups/lower-back.png',
-    keywords: ['lower back', 'erector spinae', 'spinae'],
-  },
-  {
-    id: 'cardio',
-    label: 'Cardio',
-    mainMuscles: 'Whole body/endurance',
-    imageUrl: '/assets/images/muscle-groups/cardio.png',
-    keywords: ['cardio', 'endurance', 'whole body', 'full body'],
+    keywords: [
+      'core',
+      'abs',
+      'abdominals',
+      'abdominal',
+      'obliques',
+      'oblique',
+      'waist',
+      'lower back',
+      'erector spinae',
+      'spinae',
+    ],
   },
 ] as const;
 
 @Injectable({ providedIn: 'root' })
 export class ExerciseDbApiService {
+  private readonly cacheDatabaseName = 'gym-activity-tracker';
+  private readonly cacheStoreName = 'exercise-cache';
+  private readonly cacheKey = 'exercises';
+  private readonly cacheVersion = 2;
+  private readonly cacheMaxAge = 30 * 24 * 60 * 60 * 1000;
   private readonly http = inject(HttpClient);
   private readonly profilePreferences = inject(ProfilePreferencesService);
   private readonly exerciseDbUrl =
@@ -154,13 +155,11 @@ export class ExerciseDbApiService {
   readonly imageBaseUrl =
     'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/';
 
-  private readonly exercises$ = this.http.get<ExercisesDatasetExercise[]>(this.exerciseDbUrl).pipe(
-    map((exercises) =>
-      exercises
-        .map((exercise) => this.toExerciseDbExercise(exercise))
-        .sort((a, b) => a.nameEn.localeCompare(b.nameEn)),
+  private readonly exercises$ = defer(() => from(this.readCachedExercises())).pipe(
+    switchMap((cachedExercises) =>
+      cachedExercises ? of(cachedExercises) : this.fetchAndCacheExercises(),
     ),
-    shareReplay({ bufferSize: 1, refCount: true }),
+    shareReplay({ bufferSize: 1, refCount: false }),
   );
 
   search(
@@ -243,6 +242,95 @@ export class ExerciseDbApiService {
     );
   }
 
+  private fetchAndCacheExercises(): Observable<ExerciseDbExercise[]> {
+    return this.http.get<ExercisesDatasetExercise[]>(this.exerciseDbUrl).pipe(
+      map((exercises) =>
+        exercises
+          .map((exercise) => this.toExerciseDbExercise(exercise))
+          .filter((exercise): exercise is ExerciseDbExercise => exercise !== null)
+          .sort((a, b) => a.nameEn.localeCompare(b.nameEn)),
+      ),
+      tap((exercises) => void this.writeCachedExercises(exercises)),
+    );
+  }
+
+  private async readCachedExercises(): Promise<ExerciseDbExercise[] | null> {
+    if (typeof indexedDB === 'undefined') {
+      return null;
+    }
+
+    try {
+      const database = await this.openCacheDatabase();
+      const record = await new Promise<ExercisesCacheRecord | undefined>((resolve, reject) => {
+        const request = database
+          .transaction(this.cacheStoreName, 'readonly')
+          .objectStore(this.cacheStoreName)
+          .get(this.cacheKey);
+
+        request.onsuccess = () => resolve(request.result as ExercisesCacheRecord | undefined);
+        request.onerror = () => reject(request.error);
+      });
+      database.close();
+
+      if (
+        !record ||
+        record.version !== this.cacheVersion ||
+        Date.now() - record.cachedAt >= this.cacheMaxAge ||
+        !Array.isArray(record.exercises)
+      ) {
+        return null;
+      }
+
+      return record.exercises;
+    } catch {
+      return null;
+    }
+  }
+
+  private async writeCachedExercises(exercises: ExerciseDbExercise[]): Promise<void> {
+    if (typeof indexedDB === 'undefined') {
+      return;
+    }
+
+    try {
+      const database = await this.openCacheDatabase();
+
+      await new Promise<void>((resolve, reject) => {
+        const transaction = database.transaction(this.cacheStoreName, 'readwrite');
+
+        transaction.objectStore(this.cacheStoreName).put(
+          {
+            version: this.cacheVersion,
+            cachedAt: Date.now(),
+            exercises,
+          } satisfies ExercisesCacheRecord,
+          this.cacheKey,
+        );
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+        transaction.onabort = () => reject(transaction.error);
+      });
+      database.close();
+    } catch {
+      // IndexedDB can be unavailable in private browsing or restricted environments.
+    }
+  }
+
+  private openCacheDatabase(): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.cacheDatabaseName, 1);
+
+      request.onupgradeneeded = () => {
+        if (!request.result.objectStoreNames.contains(this.cacheStoreName)) {
+          request.result.createObjectStore(this.cacheStoreName);
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+      request.onblocked = () => reject(new Error('Exercise cache database is blocked.'));
+    });
+  }
+
   private matchesExercise(exercise: ExerciseDbExercise, query: string): boolean {
     return [
       exercise.name,
@@ -280,8 +368,12 @@ export class ExerciseDbApiService {
     return score;
   }
 
-  private toExerciseDbExercise(exercise: ExercisesDatasetExercise): ExerciseDbExercise {
+  private toExerciseDbExercise(exercise: ExercisesDatasetExercise): ExerciseDbExercise | null {
     const targetMuscle = this.getTargetMuscleGroup(exercise);
+
+    if (!targetMuscle) {
+      return null;
+    }
 
     return {
       id: exercise.id,
@@ -311,7 +403,7 @@ export class ExerciseDbApiService {
     };
   }
 
-  private getTargetMuscleGroup(exercise: ExercisesDatasetExercise): string {
+  private getTargetMuscleGroup(exercise: ExercisesDatasetExercise): string | null {
     const searchableText = [
       exercise.target,
       exercise.muscle_group,
@@ -323,6 +415,10 @@ export class ExerciseDbApiService {
       .filter(Boolean)
       .join(' ')
       .toLowerCase();
+
+    if (/\b(cardio|cardiovascular|endurance)\b/.test(searchableText)) {
+      return null;
+    }
 
     const matchingGroups = TARGET_MUSCLE_GROUPS.map((group) => ({
       group,
@@ -336,6 +432,6 @@ export class ExerciseDbApiService {
       .filter(({ matchedKeywordLength }) => matchedKeywordLength > 0)
       .sort((a, b) => b.matchedKeywordLength - a.matchedKeywordLength);
 
-    return matchingGroups[0]?.group.id ?? 'cardio';
+    return matchingGroups[0]?.group.id ?? null;
   }
 }

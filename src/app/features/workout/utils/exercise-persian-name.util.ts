@@ -73,7 +73,6 @@ const wordTranslations = new Map<string, string>([
   ['cable', 'کابل'],
   ['calf', 'ساق'],
   ['captains', 'کاپیتان'],
-  ['cardio', 'هوازی'],
   ['chair', 'صندلی'],
   ['chest', 'سینه'],
   ['chin', 'چانه'],
@@ -219,4 +218,3 @@ export function translateExerciseNameToPersian(name: string): string {
     .replace(/\s+/g, ' ')
     .trim();
 }
-
