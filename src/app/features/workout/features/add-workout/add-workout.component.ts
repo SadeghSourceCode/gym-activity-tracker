@@ -61,7 +61,7 @@ export class AddWorkoutComponent {
   readonly isExerciseSearchLoading = signal(false);
   readonly exerciseSearchError = signal<string | undefined>(undefined);
   readonly targetMuscles = signal<TargetMuscleOption[]>([]);
-  readonly selectedTargetMuscle = signal<string | undefined>(undefined);
+  readonly selectedTargetMuscle = signal<string | undefined>('chest');
   readonly step = signal<WorkoutEditorStep>('exercises');
   readonly isWeeklyPlan = signal(false);
   readonly editingWorkoutId = signal<number | undefined>(this.getInitialEditingWorkoutId());
@@ -160,7 +160,11 @@ export class AddWorkoutComponent {
   }
 
   selectTargetMuscle(targetMuscle: string) {
-    this.selectedTargetMuscle.set(this.selectedTargetMuscle() === targetMuscle ? undefined : targetMuscle);
+    if (this.selectedTargetMuscle() === targetMuscle) {
+      this.selectedTargetMuscle.set('');
+    } else {
+      this.selectedTargetMuscle.set(targetMuscle);
+    }
     this.searchExercises('');
   }
 
