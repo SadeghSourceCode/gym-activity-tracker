@@ -37,11 +37,14 @@
               [rejectLabel]="text().rejectLabel"
               [editLabel]="text().editLabel"
               [deleteLabel]="text().deleteLabel"
+              [copyLabel]="text().copyLabel"
+              [copiedLabel]="text().copiedLabel"
               [canManage]="selectedDayViewModel().canManageWorkouts"
               (open)="openWorkoutDetails.emit($event)"
               (reject)="rejectWorkout.emit($event)"
               (edit)="editWorkout.emit($event)"
               (deleteWorkout)="deleteWorkout.emit($event)"
+              (copy)="copyWorkout.emit($event)"
             />
           }
         </div>

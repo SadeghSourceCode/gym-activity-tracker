@@ -14,6 +14,8 @@ describe('mapDailyPlanToViewModel', () => {
           title: 'Upper Body',
           scheduledDate: today,
           exerciseCount: 6,
+          estimatedMinutes: 15,
+          exercises: [],
           completionStatus: 'pending',
         },
         {
@@ -21,6 +23,8 @@ describe('mapDailyPlanToViewModel', () => {
           title: 'Core',
           scheduledDate: today,
           exerciseCount: 0,
+          estimatedMinutes: 15,
+          exercises: [],
           completionStatus: 'completed',
         },
       ],
@@ -34,16 +38,21 @@ describe('mapDailyPlanToViewModel', () => {
           id: '1',
           title: 'Upper Body',
           exerciseCount: 6,
+          estimatedMinutes: 15,
+          exercises: [],
           status: 'in-progress',
         },
         {
           id: '2',
           title: 'Core',
           exerciseCount: 0,
+          estimatedMinutes: 15,
+          exercises: [],
           status: 'done',
         },
       ],
       canAddWorkout: false,
+      canManageWorkouts: true,
       canMarkAsRestDay: false,
     });
   });
@@ -63,6 +72,7 @@ describe('mapDailyPlanToViewModel', () => {
       type: 'empty',
       workouts: [],
       canAddWorkout: true,
+      canManageWorkouts: true,
       canMarkAsRestDay: true,
     });
   });
@@ -82,6 +92,7 @@ describe('mapDailyPlanToViewModel', () => {
       type: 'rest',
       workouts: [],
       canAddWorkout: false,
+      canManageWorkouts: true,
       canMarkAsRestDay: false,
     });
   });

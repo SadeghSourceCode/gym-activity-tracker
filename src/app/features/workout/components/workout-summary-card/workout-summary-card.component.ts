@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { WorkoutCardViewModel } from '../../models/workout-planner.models';
 import { AppButton } from '../../../../components/app-button/app-button';
 
@@ -15,14 +15,24 @@ export class WorkoutSummaryCardComponent {
   readonly rejectLabel = input.required<string>();
   readonly editLabel = input.required<string>();
   readonly deleteLabel = input.required<string>();
+  readonly copyLabel = input.required<string>();
+  readonly copiedLabel = input.required<string>();
   readonly canManage = input.required<boolean>();
 
   readonly open = output<string>();
   readonly reject = output<string>();
   readonly edit = output<string>();
   readonly deleteWorkout = output<string>();
+  readonly copy = output<string>();
 
   readonly visibleExerciseLimit = 3;
+
+  readonly isCopied = signal(false);
+  readonly copyButtonClass = computed(() =>
+    this.isCopied()
+      ? 'size-8 bg-[#EBF4FF] text-[#0070F0]'
+      : 'size-8 bg-[#F2F4F5] text-[#72777A]',
+  );
 
   visibleExercises() {
     return this.workout().exercises.slice(0, this.visibleExerciseLimit);
@@ -34,5 +44,11 @@ export class WorkoutSummaryCardComponent {
 
   getEstimatedDurationLabel(): string {
     return `est. ${this.workout().estimatedMinutes} min`;
+  }
+
+  onCopy() {
+    this.copy.emit(this.workout().id);
+    this.isCopied.set(true);
+    setTimeout(() => this.isCopied.set(false), 2000);
   }
 }

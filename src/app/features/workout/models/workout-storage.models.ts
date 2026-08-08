@@ -28,3 +28,8 @@ export interface Workout {
   sets: WorkoutSet[];
   completionStatus?: WorkoutCompletionStatus;
 }
+
+export interface CopiedWorkoutClipboard {
+  name: string;
+  exercises: WorkoutExerciseSummary[];
+}

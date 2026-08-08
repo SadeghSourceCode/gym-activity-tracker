@@ -47,6 +47,10 @@
             >
               {{ day.date.getDate() }}
             </span>
+            <span
+              class="size-1.5 shrink-0 rounded-full"
+              [class.bg-[#0070F0]]="isWorkoutDay(day.dateKey)"
+            ></span>
           </app-button>
         }
       </div>

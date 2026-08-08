@@ -37,6 +37,26 @@ export function isDateKey(value: string): boolean {
   return getDateKey(date) === value;
 }
 
+export function startOfDay(date: Date): Date {
+  const nextDate = new Date(date);
+  nextDate.setHours(0, 0, 0, 0);
+
+  return nextDate;
+}
+
+export function addMonths(date: Date, months: number): Date {
+  const nextDate = startOfDay(date);
+
+  return new Date(nextDate.getFullYear(), nextDate.getMonth() + months, nextDate.getDate());
+}
+
+export function daysBetweenDates(leftDate: Date, rightDate: Date): number {
+  const left = startOfDay(leftDate).getTime();
+  const right = startOfDay(rightDate).getTime();
+
+  return Math.round((right - left) / 86_400_000);
+}
+
 function assertDateKey(value: string): void {
   if (!isDateKey(value)) {
     throw new Error(`Invalid calendar date key: ${value}`);

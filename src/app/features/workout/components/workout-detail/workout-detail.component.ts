@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import {
   Workout,
   WorkoutExerciseSummary,
@@ -44,6 +44,24 @@ export class WorkoutDetailComponent {
     workoutId: number;
     completionStatus: Extract<WorkoutCompletionStatus, 'completed' | 'rejected'>;
   }>();
+
+  readonly expandedExerciseId = signal<string | null | undefined>(undefined);
+
+  isExerciseExpanded(exerciseId: string): boolean {
+    const expandedExerciseId = this.expandedExerciseId();
+
+    if (expandedExerciseId === undefined) {
+      return this.workout().exercises[0]?.id === exerciseId;
+    }
+
+    return expandedExerciseId === exerciseId;
+  }
+
+  toggleExercise(exerciseId: string) {
+    this.expandedExerciseId.set(
+      this.isExerciseExpanded(exerciseId) ? null : exerciseId,
+    );
+  }
 
   getExerciseCountLabel(exerciseCount: number): string {
     return this.text().isPersian

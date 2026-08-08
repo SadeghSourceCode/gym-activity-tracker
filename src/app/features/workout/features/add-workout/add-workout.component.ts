@@ -13,6 +13,7 @@ import { AppButton } from '../../../../components/app-button/app-button';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { WorkoutCompletionStatus } from '../../models/workout-planner.models';
 import {
+  CopiedWorkoutClipboard,
   Workout,
   WorkoutExerciseSummary,
   WorkoutSet,
@@ -24,6 +25,7 @@ import {
   TargetMuscleOption,
 } from '../../services/exercise-db-api.service';
 import { getDateKey, getTodayDateKey, isDateKey, parseDateKey } from '../../utils/calendar-date.util';
+import { clearCopiedWorkout, loadCopiedWorkout } from '../../utils/workout-clipboard.util';
 
 export type WorkoutEditorStep = 'exercises' | 'planning';
 
@@ -65,6 +67,7 @@ export class AddWorkoutComponent {
   readonly step = signal<WorkoutEditorStep>('exercises');
   readonly isWeeklyPlan = signal(false);
   readonly editingWorkoutId = signal<number | undefined>(this.getInitialEditingWorkoutId());
+  readonly copiedWorkout = signal<CopiedWorkoutClipboard | null>(loadCopiedWorkout());
 
   readonly imageBaseUrl = this.exerciseDbApi.imageBaseUrl;
   readonly selectedDateLabel = computed(() =>
@@ -112,6 +115,9 @@ export class AddWorkoutComponent {
     noExercisesFoundLabel: this.i18n.t('noExercisesFound'),
     backLabel: this.i18n.t('back'),
     continueLabel: this.i18n.t('continue'),
+    closeLabel: this.i18n.t('close'),
+    pasteLabel: this.i18n.t('paste'),
+    pasteCopiedWorkoutLabel: this.i18n.t('pasteCopiedWorkout'),
     targetMuscleLabel: this.i18n.t('targetMuscleLabel'),
     chooseTargetMuscleLabel: this.i18n.t('chooseTargetMuscleLabel'),
     chooseTargetMuscleMessage: this.i18n.t('chooseTargetMuscleMessage'),
@@ -209,6 +215,40 @@ export class AddWorkoutComponent {
     this.selectedExercises.update((selectedExercises) =>
       selectedExercises.filter((exercise) => exercise.id !== exerciseId),
     );
+  }
+
+  pasteCopiedWorkout() {
+    const copiedWorkout = this.copiedWorkout();
+
+    if (!copiedWorkout) {
+      return;
+    }
+
+    const pastedExercises = copiedWorkout.exercises.map((exercise) => ({
+      ...exercise,
+      sets: exercise.sets.map((set) => ({ ...set })),
+    }));
+
+    this.selectedExercises.update((selectedExercises) => {
+      const mergedExercises = [...selectedExercises];
+
+      for (const exercise of pastedExercises) {
+        if (!mergedExercises.some((selectedExercise) => selectedExercise.id === exercise.id)) {
+          mergedExercises.push(exercise);
+        }
+      }
+
+      return mergedExercises;
+    });
+
+    if (!this.workoutTitle().trim()) {
+      this.workoutTitle.set(copiedWorkout.name);
+    }
+  }
+
+  dismissCopiedWorkout() {
+    this.copiedWorkout.set(null);
+    clearCopiedWorkout();
   }
 
   updateSelectedExerciseSetCount(exerciseId: string, setCount: number) {

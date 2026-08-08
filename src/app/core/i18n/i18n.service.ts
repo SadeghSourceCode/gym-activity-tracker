@@ -18,6 +18,8 @@ type TranslationKey =
   | 'closeExerciseSearch'
   | 'closeWorkoutDetails'
   | 'continue'
+  | 'copied'
+  | 'copy'
   | 'couldNotFindWorkout'
   | 'couldNotFindWorkoutToEdit'
   | 'couldNotLoadExercises'
@@ -49,6 +51,8 @@ type TranslationKey =
   | 'noWorkoutPlanned'
   | 'noWorkoutsFound'
   | 'open'
+  | 'paste'
+  | 'pasteCopiedWorkout'
   | 'profile'
   | 'profileImage'
   | 'progress'
@@ -118,6 +122,8 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     closeExerciseSearch: 'Close exercise search',
     closeWorkoutDetails: 'Close workout details',
     continue: 'Continue',
+    copied: 'Copied',
+    copy: 'Copy',
     couldNotFindWorkout: 'Could not find this workout.',
     couldNotFindWorkoutToEdit: 'Could not find this workout to edit.',
     couldNotLoadExercises: 'Could not load exercises. Check your connection and try again.',
@@ -149,6 +155,8 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     noWorkoutPlanned: 'No workout planned for this day.',
     noWorkoutsFound: 'No workouts found.',
     open: 'Open',
+    paste: 'Paste',
+    pasteCopiedWorkout: 'Paste copied workout',
     profile: 'Profile',
     profileImage: 'Profile image',
     progress: 'Progress',
@@ -217,6 +225,8 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     closeExerciseSearch: 'بستن جستجوی حرکت',
     closeWorkoutDetails: 'بستن جزئیات تمرین',
     continue: 'ادامه',
+    copied: 'کپی شد',
+    copy: 'کپی',
     couldNotFindWorkout: 'این تمرین پیدا نشد.',
     couldNotFindWorkoutToEdit: 'این تمرین برای ویرایش پیدا نشد.',
     couldNotLoadExercises: 'حرکت‌ها بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
@@ -248,6 +258,8 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     noWorkoutPlanned: 'برای این روز تمرینی ثبت نشده است.',
     noWorkoutsFound: 'تمرینی پیدا نشد.',
     open: 'باز کردن',
+    paste: 'چسباندن',
+    pasteCopiedWorkout: 'چسباندن تمرین کپی‌شده',
     profile: 'پروفایل',
     profileImage: 'تصویر پروفایل',
     progress: 'پیشرفت',

@@ -5,6 +5,8 @@ export interface SelectedDayPanelTextConfig {
   rejectLabel: string;
   editLabel: string;
   deleteLabel: string;
+  copyLabel: string;
+  copiedLabel: string;
   restDayTitle: string;
   recoveryMessage: string;
   removeRestDayLabel: string;
@@ -35,6 +37,9 @@ export interface WorkoutEditorTextConfig {
   noExercisesFoundLabel: string;
   backLabel: string;
   continueLabel: string;
+  closeLabel: string;
+  pasteLabel: string;
+  pasteCopiedWorkoutLabel: string;
   targetMuscleLabel: string;
   chooseTargetMuscleLabel: string;
   chooseTargetMuscleMessage: string;

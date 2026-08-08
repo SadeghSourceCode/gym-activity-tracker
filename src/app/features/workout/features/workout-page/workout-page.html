@@ -2,6 +2,7 @@
   <div class="flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden rounded-2xl">
     <app-workout-calendar
       [selectedDate]="selectedDate()"
+      [workouts]="workouts()"
       (dateSelected)="selectDate($event)"
     />
 
@@ -16,6 +17,7 @@
       (rejectWorkout)="setWorkoutCompletionStatus(+$event, 'rejected')"
       (editWorkout)="openEditWorkoutSheet($event)"
       (deleteWorkout)="removeWorkout(+$event)"
+      (copyWorkout)="copyWorkout($event)"
       (setWorkout)="openExerciseSheet()"
       (markAsRestDay)="markSelectedDayAsRestDay()"
       (removeRestDay)="removeSelectedRestDay()"
@@ -27,26 +29,6 @@
   <p class="mt-4 rounded-xl bg-[#FFD6D6] p-3 text-center text-[#FF6D6D]">
     {{ exerciseDetailsError() }}
   </p>
-}
-
-@if (openedWorkout(); as workout) {
-  <app-workout-detail
-    [text]="workoutDetailText()"
-    [workout]="workout"
-    [canManage]="openedWorkoutCanManage()"
-    [replacingExerciseId]="replacingExerciseId()"
-    [replacementExercises]="replacementExercises()"
-    [replacementExercisesLoading]="replacementExercisesLoading()"
-    [imageBaseUrl]="exerciseImageBaseUrl"
-    (close)="closeWorkoutDetails()"
-    (addSet)="addSet($event.workoutId, $event.exerciseId)"
-    (removeExercise)="removeExercise($event.workoutId, $event.exerciseId)"
-    (requestExerciseReplacement)="requestExerciseReplacement($event)"
-    (cancelExerciseReplacement)="cancelExerciseReplacement()"
-    (replaceExercise)="replaceExercise($event.workoutId, $event.exerciseId, $event.replacement)"
-    (updateSet)="updateSet($event.workoutId, $event.exerciseId, $event.setId, $event.changes)"
-    (complete)="completeWorkoutFromDetails($event.workoutId, $event.completionStatus)"
-  />
 }
 
 @if (selectedExercise(); as exercise) {

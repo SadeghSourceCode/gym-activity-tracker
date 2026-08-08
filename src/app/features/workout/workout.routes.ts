@@ -10,6 +10,13 @@ export const WorkoutRoutes: Routes = [
       ),
   },
   {
+    path: 'workout-detail/:id',
+    loadComponent: () =>
+      import('./features/workout-detail/workout-detail-page').then(
+        (c) => c.WorkoutDetailPage,
+      ),
+  },
+  {
     path: '',
     loadComponent: () => WorkoutPage,
   },
