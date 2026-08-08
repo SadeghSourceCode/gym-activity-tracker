@@ -261,6 +261,7 @@ export class WorkoutPage {
           : workout,
       ),
     );
+    this.saveWorkouts();
   }
 
   openExerciseDetails(workout: Workout) {
@@ -318,6 +319,7 @@ export class WorkoutPage {
     this.workouts.update((workouts) =>
       workouts.filter((workout) => workout.id !== workoutId),
     );
+    this.saveWorkouts();
   }
 
   markSelectedDayAsRestDay() {
@@ -477,6 +479,12 @@ export class WorkoutPage {
     );
 
     return normalizedSets.length ? normalizedSets : [{ id: 1, repeat: 0, weight: 0 }];
+  }
+
+  private saveWorkouts() {
+    if (this.isBrowser) {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.workouts()));
+    }
   }
 
   private getDateLocale(): string | undefined {
