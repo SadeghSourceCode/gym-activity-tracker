@@ -40,6 +40,8 @@ export interface WorkoutEditorTextConfig {
   closeLabel: string;
   pasteLabel: string;
   pasteCopiedWorkoutLabel: string;
+  pasteFromClipboardLabel: string;
+  invalidCopiedWorkoutLabel: string;
   targetMuscleLabel: string;
   chooseTargetMuscleLabel: string;
   chooseTargetMuscleMessage: string;

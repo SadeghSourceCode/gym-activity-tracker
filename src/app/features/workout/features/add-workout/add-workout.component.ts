@@ -25,7 +25,11 @@ import {
   TargetMuscleOption,
 } from '../../services/exercise-db-api.service';
 import { getDateKey, getTodayDateKey, isDateKey, parseDateKey } from '../../utils/calendar-date.util';
-import { clearCopiedWorkout, loadCopiedWorkout } from '../../utils/workout-clipboard.util';
+import {
+  clearCopiedWorkout,
+  loadCopiedWorkout,
+  readCopiedWorkoutFromSystemClipboard,
+} from '../../utils/workout-clipboard.util';
 
 export type WorkoutEditorStep = 'exercises' | 'planning';
 
@@ -67,7 +71,13 @@ export class AddWorkoutComponent {
   readonly step = signal<WorkoutEditorStep>('exercises');
   readonly isWeeklyPlan = signal(false);
   readonly editingWorkoutId = signal<number | undefined>(this.getInitialEditingWorkoutId());
-  readonly copiedWorkout = signal<CopiedWorkoutClipboard | null>(loadCopiedWorkout());
+  readonly copiedWorkoutState = signal(loadCopiedWorkout());
+  readonly copiedWorkoutPasteError = signal<string | undefined>(undefined);
+  readonly copiedWorkout = computed(() => {
+    const state = this.copiedWorkoutState();
+
+    return state.status === 'ok' ? state.clipboard : null;
+  });
 
   readonly imageBaseUrl = this.exerciseDbApi.imageBaseUrl;
   readonly selectedDateLabel = computed(() =>
@@ -118,6 +128,8 @@ export class AddWorkoutComponent {
     closeLabel: this.i18n.t('close'),
     pasteLabel: this.i18n.t('paste'),
     pasteCopiedWorkoutLabel: this.i18n.t('pasteCopiedWorkout'),
+    pasteFromClipboardLabel: this.i18n.t('pasteFromClipboard'),
+    invalidCopiedWorkoutLabel: this.i18n.t('invalidCopiedWorkout'),
     targetMuscleLabel: this.i18n.t('targetMuscleLabel'),
     chooseTargetMuscleLabel: this.i18n.t('chooseTargetMuscleLabel'),
     chooseTargetMuscleMessage: this.i18n.t('chooseTargetMuscleMessage'),
@@ -218,12 +230,31 @@ export class AddWorkoutComponent {
   }
 
   pasteCopiedWorkout() {
-    const copiedWorkout = this.copiedWorkout();
+    const state = this.copiedWorkoutState();
 
-    if (!copiedWorkout) {
+    if (state.status !== 'ok') {
       return;
     }
 
+    this.applyCopiedWorkout(state.clipboard);
+  }
+
+  async pasteFromClipboard() {
+    this.copiedWorkoutPasteError.set(undefined);
+
+    const result = await readCopiedWorkoutFromSystemClipboard();
+
+    if (result.status === 'invalid') {
+      this.copiedWorkoutPasteError.set(this.i18n.t('invalidCopiedWorkout'));
+      return;
+    }
+
+    if (result.status === 'ok') {
+      this.applyCopiedWorkout(result.clipboard);
+    }
+  }
+
+  private applyCopiedWorkout(copiedWorkout: CopiedWorkoutClipboard) {
     const pastedExercises = copiedWorkout.exercises.map((exercise) => ({
       ...exercise,
       sets: exercise.sets.map((set) => ({ ...set })),
@@ -247,7 +278,8 @@ export class AddWorkoutComponent {
   }
 
   dismissCopiedWorkout() {
-    this.copiedWorkout.set(null);
+    this.copiedWorkoutState.set({ status: 'empty' });
+    this.copiedWorkoutPasteError.set(undefined);
     clearCopiedWorkout();
   }
 

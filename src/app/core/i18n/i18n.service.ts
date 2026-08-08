@@ -37,6 +37,7 @@ type TranslationKey =
   | 'home'
   | 'incoming'
   | 'inProgress'
+  | 'invalidCopiedWorkout'
   | 'language'
   | 'leaveEmptyToUse'
   | 'loadMore'
@@ -53,6 +54,7 @@ type TranslationKey =
   | 'open'
   | 'paste'
   | 'pasteCopiedWorkout'
+  | 'pasteFromClipboard'
   | 'profile'
   | 'profileImage'
   | 'progress'
@@ -141,6 +143,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     home: 'Home',
     incoming: 'Incoming',
     inProgress: 'In Progress',
+    invalidCopiedWorkout: 'The copied workout text is invalid or unrecognized.',
     language: 'Language',
     leaveEmptyToUse: 'Leave empty to use',
     loadMore: 'Load more',
@@ -157,6 +160,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     open: 'Open',
     paste: 'Paste',
     pasteCopiedWorkout: 'Paste copied workout',
+    pasteFromClipboard: 'Paste from clipboard',
     profile: 'Profile',
     profileImage: 'Profile image',
     progress: 'Progress',
@@ -244,6 +248,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     home: 'خانه',
     incoming: 'در پیش',
     inProgress: 'در حال انجام',
+    invalidCopiedWorkout: 'متن تمرین کپی‌شده نامعتبر یا ناشناخته است.',
     language: 'زبان',
     leaveEmptyToUse: 'برای استفاده از این عنوان خالی بگذارید',
     loadMore: 'بارگذاری بیشتر',
@@ -260,6 +265,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     open: 'باز کردن',
     paste: 'چسباندن',
     pasteCopiedWorkout: 'چسباندن تمرین کپی‌شده',
+    pasteFromClipboard: 'چسباندن از کلیپ‌بورد',
     profile: 'پروفایل',
     profileImage: 'تصویر پروفایل',
     progress: 'پیشرفت',

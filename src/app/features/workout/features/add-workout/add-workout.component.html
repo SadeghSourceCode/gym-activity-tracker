@@ -62,17 +62,54 @@
             </p>
           </div>
 
-          <div class="flex shrink-0 items-center gap-2">
-            <app-button
-              variant="fill"
-              mode="section"
-              size="small"
-              customClass="rounded-full bg-[#0070F0] px-4 py-2 text-xs font-bold text-white"
-              type="button"
-              (buttonClicked)="pasteCopiedWorkout()"
-            >
-              {{ text().pasteLabel }}
-            </app-button>
+            <div class="flex shrink-0 items-center gap-2">
+              <app-button
+                variant="fill"
+                mode="section"
+                size="small"
+                customClass="rounded-full bg-[#0070F0] px-4 py-2 text-xs font-bold text-white"
+                type="button"
+                (buttonClicked)="pasteCopiedWorkout()"
+              >
+                {{ text().pasteLabel }}
+              </app-button>
+
+              <app-button
+                variant="outline"
+                mode="iconOnly"
+                size="small"
+                customClass="size-8 border border-[#C7CBCC] bg-white text-[#72777A]"
+                type="button"
+                [ariaLabel]="text().closeLabel"
+                (buttonClicked)="dismissCopiedWorkout()"
+              >
+                <svg
+                  class="size-4"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M6 6l12 12" />
+                  <path d="M18 6L6 18" />
+                </svg>
+              </app-button>
+            </div>
+          </div>
+        }
+        @else if (copiedWorkoutState().status === 'invalid') {
+          <div
+            class="flex items-center justify-between gap-3 rounded-2xl border border-dashed border-[#C93636] bg-[#FFD6D6] p-3"
+            role="alert"
+          >
+            <div class="min-w-0">
+              <p class="truncate text-sm font-bold text-[#C93636]">
+                {{ text().invalidCopiedWorkoutLabel }}
+              </p>
+            </div>
 
             <app-button
               variant="outline"
@@ -98,8 +135,22 @@
               </svg>
             </app-button>
           </div>
-        </div>
+        }
+
+      @if (copiedWorkoutPasteError(); as pasteError) {
+        <p class="rounded-xl bg-[#FFD6D6] p-3 text-[#C93636]">{{ pasteError }}</p>
       }
+
+      <app-button
+        variant="outline"
+        mode="section"
+        size="small"
+        customClass="rounded-full border border-[#0070F0] bg-white px-4 py-2 text-xs font-bold text-[#0070F0]"
+        type="button"
+        (buttonClicked)="pasteFromClipboard()"
+      >
+        {{ text().pasteFromClipboardLabel }}
+      </app-button>
 
       <label class="block text-[#72777A]">
         <input
