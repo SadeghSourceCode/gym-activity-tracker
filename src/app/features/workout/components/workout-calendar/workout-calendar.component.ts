@@ -17,6 +17,11 @@ import {
 } from '../../utils/calendar-date.util';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { AppButton } from '../../../../components/app-button/app-button';
+import { Workout } from '../../models/workout-storage.models';
+import {
+  getWeeklyRecurrenceEnd,
+  isWorkoutOnDate,
+} from '../../utils/weekly-recurrence.util';
 
 interface CalendarDay {
   label: string;
@@ -39,6 +44,7 @@ export class WorkoutCalendarComponent implements AfterViewInit {
   private readonly today = getTodayDateKey();
 
   readonly selectedDate = input<string>(this.today);
+  readonly workouts = input<Workout[]>([]);
 
   readonly dateSelected = output<string>();
 
@@ -49,12 +55,34 @@ export class WorkoutCalendarComponent implements AfterViewInit {
     }),
   );
 
+  readonly calendarEndDate = computed<Date>(() => {
+    let endDate = parseDateKey(this.today);
+    endDate.setDate(endDate.getDate() + 14);
+
+    for (const workout of this.workouts()) {
+      const recurrenceEnd = getWeeklyRecurrenceEnd(workout);
+
+      if (recurrenceEnd && recurrenceEnd > endDate) {
+        endDate = recurrenceEnd;
+      }
+    }
+
+    const endWeekStart = this.getWeekStart(endDate);
+    const lastVisibleDay = new Date(endWeekStart);
+    lastVisibleDay.setDate(endWeekStart.getDate() + 6);
+
+    return lastVisibleDay;
+  });
+
   readonly calendarDays = computed<CalendarDay[]>(() => {
     const currentWeekStart = this.getWeekStart(parseDateKey(this.today));
     const firstVisibleDay = new Date(currentWeekStart);
     firstVisibleDay.setDate(currentWeekStart.getDate() - 14);
+    const lastVisibleDay = this.calendarEndDate();
+    const visibleDayCount =
+      Math.round((lastVisibleDay.getTime() - firstVisibleDay.getTime()) / 86_400_000) + 1;
 
-    return Array.from({ length: 35 }, (_, index) => {
+    return Array.from({ length: visibleDayCount }, (_, index) => {
       const date = new Date(firstVisibleDay);
       date.setDate(firstVisibleDay.getDate() + index);
 
@@ -64,6 +92,20 @@ export class WorkoutCalendarComponent implements AfterViewInit {
         dateKey: getDateKey(date),
       };
     });
+  });
+
+  readonly workoutDayKeys = computed<Set<string>>(() => {
+    const workoutDateKeys = new Set<string>();
+
+    for (const workout of this.workouts()) {
+      for (const day of this.calendarDays()) {
+        if (isWorkoutOnDate(workout, day.dateKey)) {
+          workoutDateKeys.add(day.dateKey);
+        }
+      }
+    }
+
+    return workoutDateKeys;
   });
 
   readonly weekRangeLabel = computed(() => {
@@ -97,6 +139,10 @@ export class WorkoutCalendarComponent implements AfterViewInit {
 
   isToday(dateKey: string): boolean {
     return this.today === dateKey;
+  }
+
+  isWorkoutDay(dateKey: string): boolean {
+    return this.workoutDayKeys().has(dateKey);
   }
 
   private getWeekStart(date: Date): Date {

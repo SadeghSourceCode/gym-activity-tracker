@@ -1,0 +1,32 @@
+@if (workoutError()) {
+  <div class="flex min-h-dvh flex-col items-center justify-center gap-4 p-4 text-center">
+    <p class="text-lg font-semibold text-[#202325]">{{ workoutError() }}</p>
+    <app-button
+      variant="fill"
+      mode="section"
+      customClass="rounded-full bg-[#0070F0] px-6 py-3 font-semibold text-white"
+      type="button"
+      (buttonClicked)="goBack()"
+    >
+      {{ i18n.t('back') }}
+    </app-button>
+  </div>
+} @else if (workout(); as workout) {
+  <app-workout-detail
+    [text]="workoutDetailText()"
+    [workout]="workout"
+    [canManage]="canManage()"
+    [replacingExerciseId]="replacingExerciseId()"
+    [replacementExercises]="replacementExercises()"
+    [replacementExercisesLoading]="replacementExercisesLoading()"
+    [imageBaseUrl]="exerciseImageBaseUrl"
+    (close)="goBack()"
+    (addSet)="addSet($event.workoutId, $event.exerciseId)"
+    (removeExercise)="removeExercise($event.workoutId, $event.exerciseId)"
+    (requestExerciseReplacement)="requestExerciseReplacement($event)"
+    (cancelExerciseReplacement)="cancelExerciseReplacement()"
+    (replaceExercise)="replaceExercise($event.workoutId, $event.exerciseId, $event.replacement)"
+    (updateSet)="updateSet($event.workoutId, $event.exerciseId, $event.setId, $event.changes)"
+    (complete)="complete($event.workoutId, $event.completionStatus)"
+  />
+}

@@ -18,6 +18,8 @@ type TranslationKey =
   | 'closeExerciseSearch'
   | 'closeWorkoutDetails'
   | 'continue'
+  | 'copied'
+  | 'copy'
   | 'couldNotFindWorkout'
   | 'couldNotFindWorkoutToEdit'
   | 'couldNotLoadExercises'
@@ -35,6 +37,7 @@ type TranslationKey =
   | 'home'
   | 'incoming'
   | 'inProgress'
+  | 'invalidCopiedWorkout'
   | 'language'
   | 'leaveEmptyToUse'
   | 'loadMore'
@@ -49,6 +52,9 @@ type TranslationKey =
   | 'noWorkoutPlanned'
   | 'noWorkoutsFound'
   | 'open'
+  | 'paste'
+  | 'pasteCopiedWorkout'
+  | 'pasteFromClipboard'
   | 'profile'
   | 'profileImage'
   | 'progress'
@@ -118,6 +124,8 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     closeExerciseSearch: 'Close exercise search',
     closeWorkoutDetails: 'Close workout details',
     continue: 'Continue',
+    copied: 'Copied',
+    copy: 'Copy',
     couldNotFindWorkout: 'Could not find this workout.',
     couldNotFindWorkoutToEdit: 'Could not find this workout to edit.',
     couldNotLoadExercises: 'Could not load exercises. Check your connection and try again.',
@@ -135,6 +143,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     home: 'Home',
     incoming: 'Incoming',
     inProgress: 'In Progress',
+    invalidCopiedWorkout: 'The copied workout text is invalid or unrecognized.',
     language: 'Language',
     leaveEmptyToUse: 'Leave empty to use',
     loadMore: 'Load more',
@@ -149,6 +158,9 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     noWorkoutPlanned: 'No workout planned for this day.',
     noWorkoutsFound: 'No workouts found.',
     open: 'Open',
+    paste: 'Paste',
+    pasteCopiedWorkout: 'Paste copied workout',
+    pasteFromClipboard: 'Paste from clipboard',
     profile: 'Profile',
     profileImage: 'Profile image',
     progress: 'Progress',
@@ -217,6 +229,8 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     closeExerciseSearch: 'بستن جستجوی حرکت',
     closeWorkoutDetails: 'بستن جزئیات تمرین',
     continue: 'ادامه',
+    copied: 'کپی شد',
+    copy: 'کپی',
     couldNotFindWorkout: 'این تمرین پیدا نشد.',
     couldNotFindWorkoutToEdit: 'این تمرین برای ویرایش پیدا نشد.',
     couldNotLoadExercises: 'حرکت‌ها بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
@@ -234,6 +248,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     home: 'خانه',
     incoming: 'در پیش',
     inProgress: 'در حال انجام',
+    invalidCopiedWorkout: 'متن تمرین کپی‌شده نامعتبر یا ناشناخته است.',
     language: 'زبان',
     leaveEmptyToUse: 'برای استفاده از این عنوان خالی بگذارید',
     loadMore: 'بارگذاری بیشتر',
@@ -248,6 +263,9 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     noWorkoutPlanned: 'برای این روز تمرینی ثبت نشده است.',
     noWorkoutsFound: 'تمرینی پیدا نشد.',
     open: 'باز کردن',
+    paste: 'چسباندن',
+    pasteCopiedWorkout: 'چسباندن تمرین کپی‌شده',
+    pasteFromClipboard: 'چسباندن از کلیپ‌بورد',
     profile: 'پروفایل',
     profileImage: 'تصویر پروفایل',
     progress: 'پیشرفت',
