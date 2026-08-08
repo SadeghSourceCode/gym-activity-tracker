@@ -237,6 +237,7 @@ export class AddWorkoutComponent {
     }
 
     this.applyCopiedWorkout(state.clipboard);
+    this.dismissCopiedWorkout();
   }
 
   async pasteFromClipboard() {
