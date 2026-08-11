@@ -1,4 +1,4 @@
-import { Component, HostListener, input, output, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { WorkoutCardViewModel } from '../../models/workout-planner.models';
 import { AppButton } from '../../../../components/app-button/app-button';
 
@@ -9,6 +9,7 @@ import { AppButton } from '../../../../components/app-button/app-button';
   templateUrl: './workout-summary-card.component.html',
 })
 export class WorkoutSummaryCardComponent {
+  private readonly actionsMenuWidth = 144;
   readonly workout = input.required<WorkoutCardViewModel>();
   readonly exerciseCountLabel = input.required<string>();
   readonly openLabel = input.required<string>();
@@ -28,7 +29,7 @@ export class WorkoutSummaryCardComponent {
   readonly visibleExerciseLimit = 3;
 
   readonly isCopied = signal(false);
-  readonly isActionsMenuOpen = signal(false);
+  readonly actionsMenuAlignment = signal<'left' | 'right'>('right');
 
   visibleExercises() {
     return this.workout().exercises.slice(0, this.visibleExerciseLimit);
@@ -42,40 +43,46 @@ export class WorkoutSummaryCardComponent {
     return `est. ${this.workout().estimatedMinutes} min`;
   }
 
-  toggleActionsMenu(event: MouseEvent) {
-    event.stopPropagation();
-    this.isActionsMenuOpen.update((isOpen) => !isOpen);
+  onActionsMenuToggle(actionsMenu: HTMLDetailsElement) {
+    if (!actionsMenu.open || typeof window === 'undefined') {
+      return;
+    }
+
+    const trigger = actionsMenu.querySelector('summary');
+    const menu = actionsMenu.querySelector<HTMLElement>('[role="menu"]');
+
+    if (!trigger) {
+      return;
+    }
+
+    const triggerRect = trigger.getBoundingClientRect();
+    const menuWidth = Math.max(menu?.getBoundingClientRect().width ?? 0, this.actionsMenuWidth);
+    const spaceToRight = window.innerWidth - triggerRect.left;
+    const spaceToLeft = triggerRect.right;
+    const opensToRight = spaceToRight >= menuWidth || spaceToRight >= spaceToLeft;
+
+    this.actionsMenuAlignment.set(opensToRight ? 'left' : 'right');
   }
 
-  onCopy() {
+  onCopy(actionsMenu: HTMLDetailsElement) {
+    actionsMenu.removeAttribute('open');
     this.copy.emit(this.workout().id);
-    this.isActionsMenuOpen.set(false);
     this.isCopied.set(true);
     setTimeout(() => this.isCopied.set(false), 2000);
   }
 
-  onOpen() {
-    this.isActionsMenuOpen.set(false);
+  onOpen(actionsMenu: HTMLDetailsElement) {
+    actionsMenu.removeAttribute('open');
     this.open.emit(this.workout().id);
   }
 
-  onEdit() {
-    this.isActionsMenuOpen.set(false);
+  onEdit(actionsMenu: HTMLDetailsElement) {
+    actionsMenu.removeAttribute('open');
     this.edit.emit(this.workout().id);
   }
 
-  onDelete() {
-    this.isActionsMenuOpen.set(false);
+  onDelete(actionsMenu: HTMLDetailsElement) {
+    actionsMenu.removeAttribute('open');
     this.deleteWorkout.emit(this.workout().id);
-  }
-
-  @HostListener('document:click')
-  closeActionsMenu() {
-    this.isActionsMenuOpen.set(false);
-  }
-
-  @HostListener('document:keydown.escape')
-  closeActionsMenuFromKeyboard() {
-    this.isActionsMenuOpen.set(false);
   }
 }
