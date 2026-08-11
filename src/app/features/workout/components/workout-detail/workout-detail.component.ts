@@ -1,6 +1,7 @@
 import { Component, input, output, signal } from '@angular/core';
 import {
   Workout,
+  WorkoutExerciseSection,
   WorkoutExerciseSummary,
   WorkoutSet,
 } from '../../models/workout-storage.models';
@@ -16,6 +17,7 @@ import { ExerciseDbExercise } from '../../services/exercise-db-api.service';
   templateUrl: './workout-detail.component.html',
 })
 export class WorkoutDetailComponent {
+  readonly exerciseSections: readonly WorkoutExerciseSection[] = ['warmup', 'main', 'cooldown'];
   readonly text = input.required<WorkoutDetailTextConfig>();
   readonly workout = input.required<Workout>();
   readonly canManage = input.required<boolean>();
@@ -58,9 +60,7 @@ export class WorkoutDetailComponent {
   }
 
   toggleExercise(exerciseId: string) {
-    this.expandedExerciseId.set(
-      this.isExerciseExpanded(exerciseId) ? null : exerciseId,
-    );
+    this.expandedExerciseId.set(this.isExerciseExpanded(exerciseId) ? null : exerciseId);
   }
 
   getExerciseCountLabel(exerciseCount: number): string {
@@ -71,6 +71,25 @@ export class WorkoutDetailComponent {
 
   getWorkoutExerciseName(exercise: WorkoutExerciseSummary): string {
     return this.text().isPersian ? exercise.nameFa : exercise.nameEn;
+  }
+
+  getSectionExercises(section: WorkoutExerciseSection): WorkoutExerciseSummary[] {
+    return this.workout().exercises.filter((exercise) => {
+      const exerciseSection =
+        exercise.section === 'warmup' || exercise.section === 'cooldown'
+          ? exercise.section
+          : 'main';
+
+      return exerciseSection === section;
+    });
+  }
+
+  getSectionLabel(section: WorkoutExerciseSection): string {
+    return section === 'warmup'
+      ? this.text().warmupLabel
+      : section === 'main'
+        ? this.text().mainWorkoutLabel
+        : this.text().cooldownLabel;
   }
 
   getExerciseMediaUrl(exercise: ExerciseDbExercise): string | null {

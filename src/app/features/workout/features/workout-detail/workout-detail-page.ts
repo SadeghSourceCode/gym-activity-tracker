@@ -1,27 +1,13 @@
 import { isPlatformBrowser, Location } from '@angular/common';
-import {
-  Component,
-  DestroyRef,
-  PLATFORM_ID,
-  computed,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, DestroyRef, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { AppButton } from '../../../../components/app-button/app-button';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { WorkoutCompletionStatus } from '../../models/workout-planner.models';
-import {
-  Workout,
-  WorkoutExerciseSummary,
-  WorkoutSet,
-} from '../../models/workout-storage.models';
+import { Workout, WorkoutExerciseSummary, WorkoutSet } from '../../models/workout-storage.models';
 import { WorkoutDetailTextConfig } from '../../models/workout-ui.models';
-import {
-  ExerciseDbApiService,
-  ExerciseDbExercise,
-} from '../../services/exercise-db-api.service';
+import { ExerciseDbApiService, ExerciseDbExercise } from '../../services/exercise-db-api.service';
 import { getDateKey, getTodayDateKey } from '../../utils/calendar-date.util';
 import { WorkoutDetailComponent } from '../../components/workout-detail/workout-detail.component';
 
@@ -43,8 +29,8 @@ export class WorkoutDetailPage {
   private readonly workoutId = Number(this.route.snapshot.paramMap.get('id'));
 
   readonly workouts = signal<Workout[]>(this.loadWorkouts());
-  readonly workout = computed(() =>
-    this.workouts().find((candidate) => candidate.id === this.workoutId) ?? null,
+  readonly workout = computed(
+    () => this.workouts().find((candidate) => candidate.id === this.workoutId) ?? null,
   );
   readonly workoutError = signal<string | null>(null);
   readonly canManage = computed(() => {
@@ -61,6 +47,9 @@ export class WorkoutDetailPage {
   readonly workoutDetailText = computed<WorkoutDetailTextConfig>(() => ({
     workoutDetailsLabel: this.i18n.t('workoutDetails'),
     closeWorkoutDetailsLabel: this.i18n.t('closeWorkoutDetails'),
+    warmupLabel: this.i18n.t('warmup'),
+    mainWorkoutLabel: this.i18n.t('mainWorkout'),
+    cooldownLabel: this.i18n.t('cooldown'),
     repeatLabel: this.i18n.t('repeat'),
     weightLabel: this.i18n.t('weight'),
     addSetLabel: this.i18n.t('addSet'),
@@ -136,9 +125,7 @@ export class WorkoutDetailPage {
     }
 
     if (targetWorkout.exercises.length === 1) {
-      this.workouts.update((workouts) =>
-        workouts.filter((workout) => workout.id !== workoutId),
-      );
+      this.workouts.update((workouts) => workouts.filter((workout) => workout.id !== workoutId));
       this.saveWorkouts();
       this.goBack();
       return;
@@ -326,12 +313,12 @@ export class WorkoutDetailPage {
       }
 
       return workouts.map((workout) => ({
-          ...workout,
-          date: new Date(workout.date),
-          exercises: this.normalizeWorkoutExercises(workout),
-          sets: Array.isArray(workout.sets) ? workout.sets : [],
-          completionStatus: this.normalizeCompletionStatus(workout.completionStatus),
-        }));
+        ...workout,
+        date: new Date(workout.date),
+        exercises: this.normalizeWorkoutExercises(workout),
+        sets: Array.isArray(workout.sets) ? workout.sets : [],
+        completionStatus: this.normalizeCompletionStatus(workout.completionStatus),
+      }));
     } catch {
       return [];
     }
@@ -374,6 +361,10 @@ export class WorkoutDetailPage {
               ? (exercise.nameFa ?? exercise.name)
               : (exercise.nameEn ?? exercise.name),
           sets: this.normalizeWorkoutSets(exercise.sets),
+          section:
+            exercise.section === 'warmup' || exercise.section === 'cooldown'
+              ? exercise.section
+              : 'main',
         }));
     }
 
@@ -387,6 +378,7 @@ export class WorkoutDetailPage {
           targetMuscle: workout.targetMuscle,
           thumbnailUrl: workout.thumbnailUrl,
           sets: this.normalizeWorkoutSets(workout.sets),
+          section: 'main',
         },
       ];
     }

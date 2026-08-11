@@ -56,6 +56,9 @@ export interface WorkoutEditorTextConfig {
 export interface WorkoutDetailTextConfig {
   workoutDetailsLabel: string;
   closeWorkoutDetailsLabel: string;
+  warmupLabel: string;
+  mainWorkoutLabel: string;
+  cooldownLabel: string;
   repeatLabel: string;
   weightLabel: string;
   addSetLabel: string;
