@@ -38,7 +38,7 @@
           @for (exercise of getSectionExercises(section); track exercise.id) {
             <section class="overflow-hidden rounded-3xl border border-[#E3E5E5] bg-white shadow-sm">
               <button
-                class="flex w-full items-center gap-3 p-4 text-start focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#0070F0]"
+                class="flex w-full items-center gap-3 p-4 text-start"
                 type="button"
                 [attr.aria-expanded]="isExerciseExpanded(exercise.id)"
                 [attr.aria-label]="getWorkoutExerciseName(exercise)"
@@ -162,7 +162,7 @@
                   }
 
                   <div class="grid gap-3">
-                    @for (set of exercise.sets; track set.id) {
+                    @for (set of exercise.sets; track set.id; let setIndex = $index) {
                       <div class="grid grid-cols-2 gap-3 rounded-2xl bg-[#F7F9FA] p-3">
                         <label class="block min-w-0 text-sm font-medium text-[#72777A]">
                           {{ text().repeatLabel }}
@@ -201,6 +201,20 @@
                             "
                           />
                         </label>
+
+                        @if (canManage()) {
+                          <div class="col-span-2">
+                            <app-button
+                              variant="outline"
+                              mode="section"
+                              customClass="w-full rounded-full border border-[#0070F0] bg-white px-4 py-2.5 text-sm font-bold text-[#0070F0]"
+                              type="button"
+                              (buttonClicked)="startRestTimer(exercise, setIndex)"
+                            >
+                              {{ text().startRestLabel }}
+                            </app-button>
+                          </div>
+                        }
                       </div>
                     }
                   </div>
@@ -253,3 +267,75 @@
     }
   </div>
 </div>
+
+@if (isRestTimerOpen()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-[#202325]/70 p-4 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="text().restTimerLabel"
+  >
+    <div class="w-full max-w-sm rounded-[2rem] bg-white p-6 text-center shadow-2xl">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0 text-start">
+          <h2 class="text-xl font-bold text-[#202325]">{{ text().restTimerLabel }}</h2>
+          <p class="mt-1 truncate text-sm text-[#72777A]">{{ restTimerSetLabel() }}</p>
+        </div>
+
+        <app-button
+          variant="link"
+          mode="iconOnly"
+          customClass="flex size-9 shrink-0 items-center justify-center rounded-full text-2xl text-[#72777A] hover:bg-[#F2F4F5]"
+          type="button"
+          [ariaLabel]="text().closeRestTimerLabel"
+          (buttonClicked)="closeRestTimer()"
+        >
+          &times;
+        </app-button>
+      </div>
+
+      <p
+        class="my-8 font-mono text-7xl font-bold tabular-nums text-[#0070F0]"
+        role="timer"
+        aria-live="polite"
+      >
+        {{ formatRestTime(restTimerSeconds()) }}
+      </p>
+
+      <div class="grid grid-cols-2 gap-3">
+        <app-button
+          variant="outline"
+          mode="section"
+          customClass="rounded-full border border-[#C7CBCC] bg-white px-4 py-3 text-lg font-bold text-[#202325]"
+          type="button"
+          [disabled]="restTimerSeconds() === 0"
+          [ariaLabel]="text().removeFifteenSecondsLabel"
+          (buttonClicked)="adjustRestTimer(-15)"
+        >
+          −15s
+        </app-button>
+
+        <app-button
+          variant="fill"
+          mode="section"
+          customClass="rounded-full bg-[#0070F0] px-4 py-3 text-lg font-bold text-white"
+          type="button"
+          [ariaLabel]="text().addFifteenSecondsLabel"
+          (buttonClicked)="adjustRestTimer(15)"
+        >
+          +15s
+        </app-button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (isRestCompletionNotificationOpen()) {
+  <div
+    class="fixed inset-x-4 bottom-6 z-[60] mx-auto max-w-sm rounded-2xl border border-[#A6E6C5] bg-[#EAF8F0] px-4 py-3 text-center font-bold text-[#146C3A] shadow-xl"
+    role="status"
+    aria-live="assertive"
+  >
+    {{ text().restCompleteLabel }}
+  </div>
+}

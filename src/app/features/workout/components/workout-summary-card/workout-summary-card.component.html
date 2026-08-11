@@ -18,17 +18,18 @@
     </div>
 
     <div class="flex shrink-0 flex-col items-end gap-4">
-      <div class="flex items-center gap-2">
-        <app-button
-          variant="outline"
-          mode="iconOnly"
-          size="small"
-          [customClass]="copyButtonClass()"
+      <div class="relative" (click)="$event.stopPropagation()">
+        <button
+          class="flex size-8 items-center justify-center rounded-full border border-[#E3E5E5] transition focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
           type="button"
-          [ariaLabel]="
-            (isCopied() ? copiedLabel() : copyLabel()) + ' ' + workout().title
-          "
-          (buttonClicked)="onCopy()"
+          [class.bg-[#EBF4FF]]="isCopied()"
+          [class.text-[#0070F0]]="isCopied()"
+          [class.bg-[#F2F4F5]]="!isCopied()"
+          [class.text-[#72777A]]="!isCopied()"
+          [attr.aria-label]="openLabel() + ' / ' + copyLabel() + ' ' + workout().title"
+          [attr.aria-expanded]="isActionsMenuOpen()"
+          aria-haspopup="menu"
+          (click)="toggleActionsMenu($event)"
         >
           @if (isCopied()) {
             <svg
@@ -50,27 +51,63 @@
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.8"
+              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
             >
-              <rect x="9" y="9" width="12" height="12" rx="2.5" />
-              <path d="M15 4.5A2.5 2.5 0 0 0 12.5 2h-6A2.5 2.5 0 0 0 4 4.5v6A2.5 2.5 0 0 0 6.5 13" />
+              <circle cx="5" cy="12" r="1" fill="currentColor" stroke="none" />
+              <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+              <circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" />
             </svg>
           }
-        </app-button>
+        </button>
 
-        <app-button
-          variant="link"
-          mode="section"
-          size="small"
-          customClass="w-auto min-h-0 px-0 text-xs font-medium text-[#72777A]"
-          type="button"
-          [ariaLabel]="openLabel() + ' ' + workout().title"
-          (buttonClicked)="open.emit(workout().id)"
-        >
-          View ›
-        </app-button>
+        @if (isActionsMenuOpen()) {
+          <div
+            class="absolute inset-end-0 top-10 z-20 min-w-36 overflow-hidden rounded-xl border border-[#E3E5E5] bg-white p-1 shadow-lg"
+            role="menu"
+          >
+            <button
+              class="flex w-full items-center rounded-lg px-3 py-2 text-start text-sm font-semibold text-[#202325] hover:bg-[#F2F4F5] focus:bg-[#F2F4F5] focus:outline-none"
+              type="button"
+              role="menuitem"
+              (click)="onOpen()"
+            >
+              {{ openLabel() }}
+            </button>
+
+            <button
+              class="flex w-full items-center rounded-lg px-3 py-2 text-start text-sm font-semibold text-[#202325] hover:bg-[#F2F4F5] focus:bg-[#F2F4F5] focus:outline-none"
+              type="button"
+              role="menuitem"
+              (click)="onCopy()"
+            >
+              {{ isCopied() ? copiedLabel() : copyLabel() }}
+            </button>
+
+            @if (canManage()) {
+              <div class="my-1 border-t border-[#E3E5E5]" aria-hidden="true"></div>
+
+              <button
+                class="flex w-full items-center rounded-lg px-3 py-2 text-start text-sm font-semibold text-[#0070F0] hover:bg-[#EBF4FF] focus:bg-[#EBF4FF] focus:outline-none"
+                type="button"
+                role="menuitem"
+                (click)="onEdit()"
+              >
+                {{ editLabel() }}
+              </button>
+
+              <button
+                class="flex w-full items-center rounded-lg px-3 py-2 text-start text-sm font-semibold text-[#C93636] hover:bg-[#FFF0F0] focus:bg-[#FFF0F0] focus:outline-none"
+                type="button"
+                role="menuitem"
+                (click)="onDelete()"
+              >
+                {{ deleteLabel() }}
+              </button>
+            }
+          </div>
+        }
       </div>
 
       @if (canManage()) {
@@ -91,7 +128,9 @@
 
   <div class="mt-5 grid gap-0">
     @for (exercise of visibleExercises(); track exercise.id) {
-      <div class="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-[#E3E5E5] py-2 last:border-b-0">
+      <div
+        class="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-[#E3E5E5] py-2 last:border-b-0"
+      >
         <div class="flex min-w-0 items-center gap-2">
           <span class="size-1.5 shrink-0 rounded-full bg-[#0070F0]"></span>
           <span class="truncate text-sm font-medium text-[#202325]">{{ exercise.name }}</span>
@@ -108,33 +147,5 @@
     <p class="mt-2 text-xs font-medium text-[#72777A]">
       +{{ hiddenExerciseCount() }} more exercises
     </p>
-  }
-
-  @if (canManage()) {
-    <div class="mt-4 grid grid-cols-2 gap-2">
-      <app-button
-        variant="outline"
-        mode="section"
-        size="small"
-        customClass="rounded-full border border-[#0070F0] bg-white px-3 py-2 text-xs font-bold text-[#0070F0]"
-        type="button"
-        [ariaLabel]="editLabel() + ' ' + workout().title"
-        (buttonClicked)="edit.emit(workout().id)"
-      >
-        {{ editLabel() }}
-      </app-button>
-
-      <app-button
-        variant="outline"
-        mode="section"
-        size="small"
-        customClass="rounded-full border border-[#C93636] bg-white px-3 py-2 text-xs font-bold text-[#C93636]"
-        type="button"
-        [ariaLabel]="deleteLabel() + ' ' + workout().title"
-        (buttonClicked)="deleteWorkout.emit(workout().id)"
-      >
-        {{ deleteLabel() }}
-      </app-button>
-    </div>
   }
 </article>

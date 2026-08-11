@@ -59,6 +59,12 @@ export interface WorkoutDetailTextConfig {
   warmupLabel: string;
   mainWorkoutLabel: string;
   cooldownLabel: string;
+  startRestLabel: string;
+  restTimerLabel: string;
+  restCompleteLabel: string;
+  closeRestTimerLabel: string;
+  addFifteenSecondsLabel: string;
+  removeFifteenSecondsLabel: string;
   repeatLabel: string;
   weightLabel: string;
   addSetLabel: string;
