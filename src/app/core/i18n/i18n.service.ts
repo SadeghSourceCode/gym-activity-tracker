@@ -8,8 +8,10 @@ type TranslationKey =
   | 'ageBirthday'
   | 'back'
   | 'birthday'
+  | 'cooldown'
   | 'changeExercise'
   | 'chooseExercisesMessage'
+  | 'chooseExerciseSection'
   | 'chooseReplacement'
   | 'chooseTargetMuscleLabel'
   | 'chooseTargetMuscleMessage'
@@ -44,6 +46,7 @@ type TranslationKey =
   | 'loadingExercises'
   | 'loadingMoreWorkouts'
   | 'loadingWorkouts'
+  | 'mainWorkout'
   | 'markAsDone'
   | 'markAsRestDay'
   | 'noDescriptionAvailable'
@@ -104,7 +107,8 @@ type TranslationKey =
   | 'workoutDay'
   | 'workoutDetails'
   | 'workoutPlanningLabel'
-  | 'workoutTitle';
+  | 'workoutTitle'
+  | 'warmup';
 
 const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
   en: {
@@ -114,8 +118,10 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     ageBirthday: 'Age / birthday',
     back: 'Back',
     birthday: 'Birthday',
+    cooldown: 'Cool-down',
     changeExercise: 'Change',
     chooseExercisesMessage: 'Search and select exercises for the selected muscle.',
+    chooseExerciseSection: 'Choose an exercise section',
     chooseReplacement: 'Choose a related exercise',
     chooseTargetMuscleLabel: 'Choose target muscle',
     chooseTargetMuscleMessage: 'Start with the body area you want to train.',
@@ -150,6 +156,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     loadingExercises: 'Loading exercises...',
     loadingMoreWorkouts: 'Loading more workouts...',
     loadingWorkouts: 'Loading workouts...',
+    mainWorkout: 'Main',
     markAsDone: 'Mark as Done',
     markAsRestDay: 'Mark as rest day',
     noDescriptionAvailable: 'No description is available for this exercise.',
@@ -211,6 +218,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     workoutDetails: 'Workout details',
     workoutPlanningLabel: 'Plan workout',
     workoutTitle: 'Workout title',
+    warmup: 'Warm-up',
   },
   fa: {
     addSet: 'افزودن ست',
@@ -219,8 +227,10 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     ageBirthday: 'سن / تاریخ تولد',
     back: 'بازگشت',
     birthday: 'تاریخ تولد',
+    cooldown: 'سرد کردن',
     changeExercise: 'تغییر',
     chooseExercisesMessage: 'حرکت‌های مناسب عضله انتخاب‌شده را جستجو و انتخاب کنید.',
+    chooseExerciseSection: 'بخش حرکات را انتخاب کنید',
     chooseReplacement: 'یک حرکت مرتبط انتخاب کنید',
     chooseTargetMuscleLabel: 'انتخاب عضله هدف',
     chooseTargetMuscleMessage: 'ابتدا بخشی از بدن را که می‌خواهید تمرین دهید انتخاب کنید.',
@@ -234,7 +244,8 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     couldNotFindWorkout: 'این تمرین پیدا نشد.',
     couldNotFindWorkoutToEdit: 'این تمرین برای ویرایش پیدا نشد.',
     couldNotLoadExercises: 'حرکت‌ها بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
-    couldNotLoadMoreWorkouts: 'تمرین‌های بیشتر بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
+    couldNotLoadMoreWorkouts:
+      'تمرین‌های بیشتر بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
     couldNotLoadWorkouts: 'تمرین‌ها بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
     delete: 'حذف',
     done: 'انجام شد',
@@ -255,6 +266,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     loadingExercises: 'در حال بارگذاری حرکت‌ها...',
     loadingMoreWorkouts: 'در حال بارگذاری تمرین‌های بیشتر...',
     loadingWorkouts: 'در حال بارگذاری تمرین‌ها...',
+    mainWorkout: 'تمرین اصلی',
     markAsDone: 'ثبت به‌عنوان انجام‌شده',
     markAsRestDay: 'ثبت به‌عنوان روز استراحت',
     noDescriptionAvailable: 'توضیحی برای این حرکت موجود نیست.',
@@ -316,6 +328,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     workoutDetails: 'جزئیات تمرین',
     workoutPlanningLabel: 'برنامه‌ریزی تمرین',
     workoutTitle: 'عنوان تمرین',
+    warmup: 'گرم کردن',
   },
 };
 
