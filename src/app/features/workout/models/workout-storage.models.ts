@@ -6,6 +6,8 @@ export interface WorkoutSet {
   weight: number;
 }
 
+export type WorkoutExerciseSection = 'warmup' | 'main' | 'cooldown';
+
 export interface WorkoutExerciseSummary {
   id: string;
   name: string;
@@ -14,6 +16,7 @@ export interface WorkoutExerciseSummary {
   targetMuscle?: string;
   thumbnailUrl?: string;
   sets: WorkoutSet[];
+  section?: WorkoutExerciseSection;
 }
 
 export interface Workout {

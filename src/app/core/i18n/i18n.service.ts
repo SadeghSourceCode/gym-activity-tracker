@@ -3,19 +3,23 @@ import { ProfilePreferencesService } from '../../features/profile/data-access/se
 
 type TranslationKey =
   | 'addSet'
+  | 'addFifteenSeconds'
   | 'addWorkout'
   | 'allWorkoutsLoaded'
   | 'ageBirthday'
   | 'back'
   | 'birthday'
+  | 'cooldown'
   | 'changeExercise'
   | 'chooseExercisesMessage'
+  | 'chooseExerciseSection'
   | 'chooseReplacement'
   | 'chooseTargetMuscleLabel'
   | 'chooseTargetMuscleMessage'
   | 'close'
   | 'closeExerciseDetails'
   | 'closeExerciseSearch'
+  | 'closeRestTimer'
   | 'closeWorkoutDetails'
   | 'continue'
   | 'copied'
@@ -44,6 +48,7 @@ type TranslationKey =
   | 'loadingExercises'
   | 'loadingMoreWorkouts'
   | 'loadingWorkouts'
+  | 'mainWorkout'
   | 'markAsDone'
   | 'markAsRestDay'
   | 'noDescriptionAvailable'
@@ -63,12 +68,15 @@ type TranslationKey =
   | 'rejectWorkout'
   | 'remove'
   | 'removeExercise'
+  | 'removeFifteenSeconds'
   | 'removeRestDay'
   | 'removeWorkoutBeforeRest'
   | 'repeat'
   | 'retry'
   | 'recoveryMessage'
   | 'restDay'
+  | 'restComplete'
+  | 'restTimer'
   | 'save'
   | 'saveWorkout'
   | 'search'
@@ -86,6 +94,7 @@ type TranslationKey =
   | 'setWorkoutOrRest'
   | 'seventhDay'
   | 'similarExercises'
+  | 'startRest'
   | 'sixthDay'
   | 'systemTheme'
   | 'tall'
@@ -104,24 +113,29 @@ type TranslationKey =
   | 'workoutDay'
   | 'workoutDetails'
   | 'workoutPlanningLabel'
-  | 'workoutTitle';
+  | 'workoutTitle'
+  | 'warmup';
 
 const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
   en: {
     addSet: 'Add set',
+    addFifteenSeconds: 'Add 15 seconds',
     addWorkout: 'Add new workout',
     allWorkoutsLoaded: 'All workouts loaded.',
     ageBirthday: 'Age / birthday',
     back: 'Back',
     birthday: 'Birthday',
+    cooldown: 'Cool-down',
     changeExercise: 'Change',
     chooseExercisesMessage: 'Search and select exercises for the selected muscle.',
+    chooseExerciseSection: 'Choose an exercise section',
     chooseReplacement: 'Choose a related exercise',
     chooseTargetMuscleLabel: 'Choose target muscle',
     chooseTargetMuscleMessage: 'Start with the body area you want to train.',
     close: 'Close',
     closeExerciseDetails: 'Close exercise details',
     closeExerciseSearch: 'Close exercise search',
+    closeRestTimer: 'Close rest timer',
     closeWorkoutDetails: 'Close workout details',
     continue: 'Continue',
     copied: 'Copied',
@@ -150,6 +164,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     loadingExercises: 'Loading exercises...',
     loadingMoreWorkouts: 'Loading more workouts...',
     loadingWorkouts: 'Loading workouts...',
+    mainWorkout: 'Main',
     markAsDone: 'Mark as Done',
     markAsRestDay: 'Mark as rest day',
     noDescriptionAvailable: 'No description is available for this exercise.',
@@ -169,12 +184,15 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     rejectWorkout: 'Reject Workout',
     remove: 'Remove',
     removeExercise: 'Remove',
+    removeFifteenSeconds: 'Remove 15 seconds',
     removeRestDay: 'Remove rest day',
     removeWorkoutBeforeRest: 'Remove this day’s workouts before marking it as a rest day.',
     repeat: 'Repeat',
     retry: 'Retry',
     recoveryMessage: 'Recovery is part of your training plan.',
     restDay: 'Rest Day',
+    restComplete: 'Rest complete. Start your next set.',
+    restTimer: 'Rest timer',
     save: 'Save',
     saveWorkout: 'Save workout',
     search: 'Search',
@@ -192,6 +210,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     setWorkoutOrRest: 'Set a workout or mark this day as rest.',
     seventhDay: 'Seventh Day',
     similarExercises: 'Similar exercises',
+    startRest: 'Start rest',
     sixthDay: 'Sixth Day',
     systemTheme: 'System theme',
     tall: 'Tall',
@@ -211,22 +230,27 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     workoutDetails: 'Workout details',
     workoutPlanningLabel: 'Plan workout',
     workoutTitle: 'Workout title',
+    warmup: 'Warm-up',
   },
   fa: {
     addSet: 'افزودن ست',
+    addFifteenSeconds: 'افزودن ۱۵ ثانیه',
     addWorkout: 'افزودن تمرین جدید',
     allWorkoutsLoaded: 'همه تمرین‌ها بارگذاری شدند.',
     ageBirthday: 'سن / تاریخ تولد',
     back: 'بازگشت',
     birthday: 'تاریخ تولد',
+    cooldown: 'سرد کردن',
     changeExercise: 'تغییر',
     chooseExercisesMessage: 'حرکت‌های مناسب عضله انتخاب‌شده را جستجو و انتخاب کنید.',
+    chooseExerciseSection: 'بخش حرکات را انتخاب کنید',
     chooseReplacement: 'یک حرکت مرتبط انتخاب کنید',
     chooseTargetMuscleLabel: 'انتخاب عضله هدف',
     chooseTargetMuscleMessage: 'ابتدا بخشی از بدن را که می‌خواهید تمرین دهید انتخاب کنید.',
     close: 'بستن',
     closeExerciseDetails: 'بستن جزئیات حرکت',
     closeExerciseSearch: 'بستن جستجوی حرکت',
+    closeRestTimer: 'بستن زمان‌سنج استراحت',
     closeWorkoutDetails: 'بستن جزئیات تمرین',
     continue: 'ادامه',
     copied: 'کپی شد',
@@ -234,7 +258,8 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     couldNotFindWorkout: 'این تمرین پیدا نشد.',
     couldNotFindWorkoutToEdit: 'این تمرین برای ویرایش پیدا نشد.',
     couldNotLoadExercises: 'حرکت‌ها بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
-    couldNotLoadMoreWorkouts: 'تمرین‌های بیشتر بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
+    couldNotLoadMoreWorkouts:
+      'تمرین‌های بیشتر بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
     couldNotLoadWorkouts: 'تمرین‌ها بارگذاری نشدند. اتصال خود را بررسی کنید و دوباره تلاش کنید.',
     delete: 'حذف',
     done: 'انجام شد',
@@ -255,6 +280,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     loadingExercises: 'در حال بارگذاری حرکت‌ها...',
     loadingMoreWorkouts: 'در حال بارگذاری تمرین‌های بیشتر...',
     loadingWorkouts: 'در حال بارگذاری تمرین‌ها...',
+    mainWorkout: 'تمرین اصلی',
     markAsDone: 'ثبت به‌عنوان انجام‌شده',
     markAsRestDay: 'ثبت به‌عنوان روز استراحت',
     noDescriptionAvailable: 'توضیحی برای این حرکت موجود نیست.',
@@ -274,12 +300,15 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     rejectWorkout: 'رد کردن تمرین',
     remove: 'حذف',
     removeExercise: 'حذف',
+    removeFifteenSeconds: 'کم کردن ۱۵ ثانیه',
     removeRestDay: 'حذف روز استراحت',
     removeWorkoutBeforeRest: 'قبل از ثبت روز استراحت، تمرین‌های این روز را حذف کنید.',
     repeat: 'تکرار',
     retry: 'تلاش دوباره',
     recoveryMessage: 'ریکاوری بخشی از برنامه تمرینی شماست.',
     restDay: 'روز استراحت',
+    restComplete: 'زمان استراحت تمام شد. ست بعدی را شروع کنید.',
+    restTimer: 'زمان‌سنج استراحت',
     save: 'ذخیره',
     saveWorkout: 'ذخیره تمرین',
     search: 'جستجو',
@@ -297,6 +326,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     setWorkoutOrRest: 'یک تمرین ثبت کنید یا این روز را استراحت بزنید.',
     seventhDay: 'روز هفتم',
     similarExercises: 'حرکت‌های مشابه',
+    startRest: 'شروع استراحت',
     sixthDay: 'روز ششم',
     systemTheme: 'تم سیستم',
     tall: 'قد',
@@ -316,6 +346,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     workoutDetails: 'جزئیات تمرین',
     workoutPlanningLabel: 'برنامه‌ریزی تمرین',
     workoutTitle: 'عنوان تمرین',
+    warmup: 'گرم کردن',
   },
 };
 

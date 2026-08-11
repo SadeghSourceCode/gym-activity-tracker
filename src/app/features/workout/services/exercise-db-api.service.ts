@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, defer, from, map, of, shareReplay, switchMap, tap } from 'rxjs';
+import { Observable, defer, forkJoin, from, map, of, shareReplay, switchMap, tap } from 'rxjs';
 import { ProfilePreferencesService } from '../../profile/data-access/services/profile-preferences.service';
+import { WorkoutExerciseSection } from '../models/workout-storage.models';
 import { translateExerciseNameToPersian } from '../utils/exercise-persian-name.util';
 
 export interface ExerciseDbExercise {
@@ -17,6 +18,7 @@ export interface ExerciseDbExercise {
   category: string;
   images: string[];
   gifUrl: string | null;
+  section: WorkoutExerciseSection;
 }
 
 interface ExercisesDatasetExercise {
@@ -55,6 +57,17 @@ export interface TargetMuscleOption {
   imageUrl: string;
   exerciseCount: number;
 }
+
+interface ExerciseDatasetSource {
+  url: string;
+  section: WorkoutExerciseSection;
+}
+
+const EXERCISE_DATASET_SOURCES: readonly ExerciseDatasetSource[] = [
+  { url: 'assets/exercises/warm-up-exercises.json', section: 'warmup' },
+  { url: 'assets/exercises/main-exercises.json', section: 'main' },
+  { url: 'assets/exercises/cooldown-exercises.json', section: 'cooldown' },
+];
 
 const TARGET_MUSCLE_GROUPS = [
   {
@@ -145,15 +158,11 @@ export class ExerciseDbApiService {
   private readonly cacheDatabaseName = 'gym-activity-tracker';
   private readonly cacheStoreName = 'exercise-cache';
   private readonly cacheKey = 'exercises';
-  private readonly cacheVersion = 2;
+  private readonly cacheVersion = 3;
   private readonly cacheMaxAge = 30 * 24 * 60 * 60 * 1000;
   private readonly http = inject(HttpClient);
   private readonly profilePreferences = inject(ProfilePreferencesService);
-  private readonly exerciseDbUrl =
-    'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/data/exercises.json';
-
-  readonly imageBaseUrl =
-    'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/';
+  readonly imageBaseUrl = 'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/';
 
   private readonly exercises$ = defer(() => from(this.readCachedExercises())).pipe(
     switchMap((cachedExercises) =>
@@ -167,6 +176,7 @@ export class ExerciseDbApiService {
     offset = 0,
     limit = 15,
     targetMuscle: string | null = null,
+    section: WorkoutExerciseSection | null = null,
   ): Observable<ExerciseSearchResult> {
     const normalizedQuery = query.trim().toLowerCase();
     const normalizedTargetMuscle = targetMuscle?.trim().toLowerCase() ?? '';
@@ -174,11 +184,18 @@ export class ExerciseDbApiService {
     return this.exercises$.pipe(
       map((exercises) => {
         const localizedExercises = exercises.map((exercise) => this.localizeExercise(exercise));
-        const muscleFilteredExercises = normalizedTargetMuscle
-          ? localizedExercises.filter((exercise) => exercise.targetMuscle === normalizedTargetMuscle)
+        const sectionFilteredExercises = section
+          ? localizedExercises.filter((exercise) => exercise.section === section)
           : localizedExercises;
+        const muscleFilteredExercises = normalizedTargetMuscle
+          ? sectionFilteredExercises.filter(
+              (exercise) => exercise.targetMuscle === normalizedTargetMuscle,
+            )
+          : sectionFilteredExercises;
         const filteredExercises = normalizedQuery
-          ? muscleFilteredExercises.filter((exercise) => this.matchesExercise(exercise, normalizedQuery))
+          ? muscleFilteredExercises.filter((exercise) =>
+              this.matchesExercise(exercise, normalizedQuery),
+            )
           : muscleFilteredExercises;
 
         return {
@@ -194,7 +211,7 @@ export class ExerciseDbApiService {
       map((exercises) => {
         const counts = new Map<string, number>();
 
-        for (const exercise of exercises) {
+        for (const exercise of exercises.filter((candidate) => candidate.section === 'main')) {
           counts.set(exercise.targetMuscle, (counts.get(exercise.targetMuscle) ?? 0) + 1);
         }
 
@@ -243,10 +260,17 @@ export class ExerciseDbApiService {
   }
 
   private fetchAndCacheExercises(): Observable<ExerciseDbExercise[]> {
-    return this.http.get<ExercisesDatasetExercise[]>(this.exerciseDbUrl).pipe(
-      map((exercises) =>
-        exercises
-          .map((exercise) => this.toExerciseDbExercise(exercise))
+    return forkJoin(
+      EXERCISE_DATASET_SOURCES.map(({ url, section }) =>
+        this.http
+          .get<ExercisesDatasetExercise[]>(url)
+          .pipe(map((exercises) => exercises.map((exercise) => ({ exercise, section })))),
+      ),
+    ).pipe(
+      map((exerciseGroups) =>
+        exerciseGroups
+          .flat()
+          .map(({ exercise, section }) => this.toExerciseDbExercise(exercise, section))
           .filter((exercise): exercise is ExerciseDbExercise => exercise !== null)
           .sort((a, b) => a.nameEn.localeCompare(b.nameEn)),
       ),
@@ -368,7 +392,10 @@ export class ExerciseDbApiService {
     return score;
   }
 
-  private toExerciseDbExercise(exercise: ExercisesDatasetExercise): ExerciseDbExercise | null {
+  private toExerciseDbExercise(
+    exercise: ExercisesDatasetExercise,
+    section: WorkoutExerciseSection,
+  ): ExerciseDbExercise | null {
     const targetMuscle = this.getTargetMuscleGroup(exercise);
 
     if (!targetMuscle) {
@@ -393,6 +420,7 @@ export class ExerciseDbApiService {
       category: exercise.category || exercise.body_part,
       images: exercise.image ? [exercise.image] : [],
       gifUrl: exercise.gif_url || null,
+      section,
     };
   }
 

@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, HostListener, input, output, signal } from '@angular/core';
 import { WorkoutCardViewModel } from '../../models/workout-planner.models';
 import { AppButton } from '../../../../components/app-button/app-button';
 
@@ -28,11 +28,7 @@ export class WorkoutSummaryCardComponent {
   readonly visibleExerciseLimit = 3;
 
   readonly isCopied = signal(false);
-  readonly copyButtonClass = computed(() =>
-    this.isCopied()
-      ? 'size-8 bg-[#EBF4FF] text-[#0070F0]'
-      : 'size-8 bg-[#F2F4F5] text-[#72777A]',
-  );
+  readonly isActionsMenuOpen = signal(false);
 
   visibleExercises() {
     return this.workout().exercises.slice(0, this.visibleExerciseLimit);
@@ -46,9 +42,40 @@ export class WorkoutSummaryCardComponent {
     return `est. ${this.workout().estimatedMinutes} min`;
   }
 
+  toggleActionsMenu(event: MouseEvent) {
+    event.stopPropagation();
+    this.isActionsMenuOpen.update((isOpen) => !isOpen);
+  }
+
   onCopy() {
     this.copy.emit(this.workout().id);
+    this.isActionsMenuOpen.set(false);
     this.isCopied.set(true);
     setTimeout(() => this.isCopied.set(false), 2000);
+  }
+
+  onOpen() {
+    this.isActionsMenuOpen.set(false);
+    this.open.emit(this.workout().id);
+  }
+
+  onEdit() {
+    this.isActionsMenuOpen.set(false);
+    this.edit.emit(this.workout().id);
+  }
+
+  onDelete() {
+    this.isActionsMenuOpen.set(false);
+    this.deleteWorkout.emit(this.workout().id);
+  }
+
+  @HostListener('document:click')
+  closeActionsMenu() {
+    this.isActionsMenuOpen.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  closeActionsMenuFromKeyboard() {
+    this.isActionsMenuOpen.set(false);
   }
 }

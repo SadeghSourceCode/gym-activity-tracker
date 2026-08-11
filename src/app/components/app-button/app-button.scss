@@ -1,11 +1,6 @@
 .app-button {
   border: 0;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
   padding: 0 1rem;
   font: inherit;
   font-weight: 700;
@@ -115,9 +110,6 @@
   text-underline-offset: 0.25rem;
 }
 
-.app-button__content {
-  display: contents;
-}
 
 .app-button__spinner {
   display: inline-block;

@@ -68,7 +68,6 @@ describe('AppButton', () => {
     expect(button.disabled).toBe(true);
     expect(button.getAttribute('aria-busy')).toBe('true');
     expect(button.querySelector('.app-button__spinner')).toBeTruthy();
-    expect(button.querySelector('.app-button__content')).toBeFalsy();
   });
 
   it('should emit click when enabled', () => {

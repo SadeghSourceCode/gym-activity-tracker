@@ -1,12 +1,5 @@
 import { isPlatformBrowser, Location } from '@angular/common';
-import {
-  Component,
-  DestroyRef,
-  PLATFORM_ID,
-  computed,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, DestroyRef, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppButton } from '../../../../components/app-button/app-button';
@@ -15,6 +8,7 @@ import { WorkoutCompletionStatus } from '../../models/workout-planner.models';
 import {
   CopiedWorkoutClipboard,
   Workout,
+  WorkoutExerciseSection,
   WorkoutExerciseSummary,
   WorkoutSet,
 } from '../../models/workout-storage.models';
@@ -24,7 +18,12 @@ import {
   ExerciseDbExercise,
   TargetMuscleOption,
 } from '../../services/exercise-db-api.service';
-import { getDateKey, getTodayDateKey, isDateKey, parseDateKey } from '../../utils/calendar-date.util';
+import {
+  getDateKey,
+  getTodayDateKey,
+  isDateKey,
+  parseDateKey,
+} from '../../utils/calendar-date.util';
 import {
   clearCopiedWorkout,
   loadCopiedWorkout,
@@ -55,12 +54,15 @@ export class AddWorkoutComponent {
   private readonly location = inject(Location);
   readonly i18n = inject(I18nService);
   private readonly pageSize = 15;
+  private exerciseSearchRequestId = 0;
 
   readonly workouts = signal<Workout[]>(this.loadWorkouts());
   readonly restDayKeys = signal<string[]>(this.loadRestDayKeys());
   readonly selectedDate = signal(this.getInitialSelectedDate());
   readonly workoutTitle = signal('');
   readonly selectedExercises = signal<WorkoutExerciseSummary[]>([]);
+  readonly selectedExerciseSection = signal<WorkoutExerciseSection | undefined>(undefined);
+  readonly exerciseSections: readonly WorkoutExerciseSection[] = ['warmup', 'main', 'cooldown'];
   readonly exerciseSearchQuery = signal('');
   readonly exerciseSearchResults = signal<ExerciseDbExercise[]>([]);
   readonly exerciseSearchTotal = signal(0);
@@ -144,7 +146,6 @@ export class AddWorkoutComponent {
   constructor() {
     this.loadTargetMuscles();
     this.initializeEditState();
-    this.searchExercises('');
   }
 
   goBack() {
@@ -187,10 +188,15 @@ export class AddWorkoutComponent {
   }
 
   searchExercises(query: string) {
+    if (!this.selectedExerciseSection()) {
+      return;
+    }
+
     this.exerciseSearchQuery.set(query);
     this.exerciseSearchResults.set([]);
     this.exerciseSearchTotal.set(0);
-    this.loadExercisesPage(0);
+    this.exerciseSearchRequestId += 1;
+    this.loadExercisesPage(0, this.exerciseSearchRequestId);
   }
 
   loadMoreExercises() {
@@ -201,7 +207,7 @@ export class AddWorkoutComponent {
       return;
     }
 
-    this.loadExercisesPage(this.exerciseSearchResults().length);
+    this.loadExercisesPage(this.exerciseSearchResults().length, this.exerciseSearchRequestId);
   }
 
   onExerciseListScroll(event: Event) {
@@ -216,11 +222,33 @@ export class AddWorkoutComponent {
   toggleExercise(exercise: ExerciseDbExercise) {
     const exerciseSummary = this.toWorkoutExerciseSummary(exercise);
 
-    this.selectedExercises.update((selectedExercises) =>
-      selectedExercises.some((selectedExercise) => selectedExercise.id === exercise.id)
-        ? selectedExercises.filter((selectedExercise) => selectedExercise.id !== exercise.id)
-        : [...selectedExercises, exerciseSummary],
+    this.selectedExercises.update((selectedExercises) => {
+      const selectedExercise = selectedExercises.find((candidate) => candidate.id === exercise.id);
+
+      if (!selectedExercise) {
+        return [...selectedExercises, exerciseSummary];
+      }
+
+      return selectedExercises.filter((candidate) => candidate.id !== exercise.id);
+    });
+  }
+
+  selectExerciseSection(section: WorkoutExerciseSection) {
+    this.selectedExerciseSection.set(section);
+    this.selectedTargetMuscle.set(section === 'main' ? 'chest' : undefined);
+    this.searchExercises('');
+  }
+
+  getExerciseSectionLabel(section: WorkoutExerciseSection): string {
+    return this.i18n.t(
+      section === 'warmup' ? 'warmup' : section === 'main' ? 'mainWorkout' : 'cooldown',
     );
+  }
+
+  getExerciseSectionCount(section: WorkoutExerciseSection): number {
+    return this.selectedExercises().filter(
+      (exercise) => this.getExerciseSection(exercise) === section,
+    ).length;
   }
 
   removeSelectedExercise(exerciseId: string) {
@@ -259,6 +287,7 @@ export class AddWorkoutComponent {
     const pastedExercises = copiedWorkout.exercises.map((exercise) => ({
       ...exercise,
       sets: exercise.sets.map((set) => ({ ...set })),
+      section: this.getExerciseSection(exercise),
     }));
 
     this.selectedExercises.update((selectedExercises) => {
@@ -333,7 +362,9 @@ export class AddWorkoutComponent {
   }
 
   getSelectedExerciseSetCountById(exerciseId: string): number {
-    const selectedExercise = this.selectedExercises().find((exercise) => exercise.id === exerciseId);
+    const selectedExercise = this.selectedExercises().find(
+      (exercise) => exercise.id === exerciseId,
+    );
 
     return selectedExercise ? this.getSelectedExerciseSetCount(selectedExercise) : 1;
   }
@@ -343,9 +374,7 @@ export class AddWorkoutComponent {
       return '';
     }
 
-    return (
-      this.targetMuscles().find((muscle) => muscle.id === targetMuscle)?.label ?? targetMuscle
-    );
+    return this.targetMuscles().find((muscle) => muscle.id === targetMuscle)?.label ?? targetMuscle;
   }
 
   isExerciseSelected(exerciseId: string): boolean {
@@ -408,15 +437,25 @@ export class AddWorkoutComponent {
     );
   }
 
-  private loadExercisesPage(offset: number) {
+  private loadExercisesPage(offset: number, requestId: number) {
     this.isExerciseSearchLoading.set(true);
     this.exerciseSearchError.set(undefined);
 
     this.exerciseDbApi
-      .search(this.exerciseSearchQuery(), offset, this.pageSize, this.selectedTargetMuscle())
+      .search(
+        this.exerciseSearchQuery(),
+        offset,
+        this.pageSize,
+        this.selectedTargetMuscle(),
+        this.selectedExerciseSection(),
+      )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ items, total }) => {
+          if (requestId !== this.exerciseSearchRequestId) {
+            return;
+          }
+
           this.exerciseSearchResults.update((results) =>
             offset === 0 ? items : [...results, ...items],
           );
@@ -424,6 +463,10 @@ export class AddWorkoutComponent {
           this.isExerciseSearchLoading.set(false);
         },
         error: () => {
+          if (requestId !== this.exerciseSearchRequestId) {
+            return;
+          }
+
           this.exerciseSearchError.set(this.i18n.t('couldNotLoadExercises'));
           this.isExerciseSearchLoading.set(false);
         },
@@ -552,6 +595,7 @@ export class AddWorkoutComponent {
             ? (exercise.nameFa ?? exercise.name)
             : (exercise.nameEn ?? exercise.name),
         sets: this.normalizeWorkoutSets(exercise.sets),
+        section: this.getExerciseSection(exercise),
       }));
     }
 
@@ -565,6 +609,7 @@ export class AddWorkoutComponent {
             targetMuscle: workout.targetMuscle,
             thumbnailUrl: workout.thumbnailUrl,
             sets: this.normalizeWorkoutSets(workout.sets),
+            section: 'main',
           },
         ]
       : [];
@@ -579,7 +624,14 @@ export class AddWorkoutComponent {
       targetMuscle: exercise.targetMuscle,
       thumbnailUrl: this.getExerciseMediaUrl(exercise) ?? undefined,
       sets: [{ id: 1, repeat: 0, weight: 0 }],
+      section: exercise.section,
     };
+  }
+
+  private getExerciseSection(exercise: WorkoutExerciseSummary): WorkoutExerciseSection {
+    return exercise.section === 'warmup' || exercise.section === 'cooldown'
+      ? exercise.section
+      : 'main';
   }
 
   private normalizeWorkoutSets(sets: WorkoutSet[] | undefined): WorkoutSet[] {

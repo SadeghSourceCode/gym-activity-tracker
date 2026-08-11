@@ -9,10 +9,8 @@
   (click)="onClick($event)"
 >
   @if (loading()) {
-    <span class="app-button__spinner" aria-hidden="true"></span>
+  <span class="app-button__spinner" aria-hidden="true"></span>
   } @else {
-    <span class="app-button__content">
-      <ng-content />
-    </span>
+  <ng-content />
   }
 </button>
