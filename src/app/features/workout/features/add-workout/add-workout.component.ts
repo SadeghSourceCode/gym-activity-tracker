@@ -61,7 +61,7 @@ export class AddWorkoutComponent {
   readonly selectedDate = signal(this.getInitialSelectedDate());
   readonly workoutTitle = signal('');
   readonly selectedExercises = signal<WorkoutExerciseSummary[]>([]);
-  readonly selectedExerciseSection = signal<WorkoutExerciseSection | undefined>(undefined);
+  readonly selectedExerciseSection = signal<WorkoutExerciseSection | undefined>('warmup');
   readonly exerciseSections: readonly WorkoutExerciseSection[] = ['warmup', 'main', 'cooldown'];
   readonly exerciseSearchQuery = signal('');
   readonly exerciseSearchResults = signal<ExerciseDbExercise[]>([]);
