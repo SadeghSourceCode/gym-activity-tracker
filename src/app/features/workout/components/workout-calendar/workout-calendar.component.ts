@@ -10,21 +10,16 @@ import {
   output,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import {
-  getDateKey,
-  getTodayDateKey,
-  parseDateKey,
-} from '../../utils/calendar-date.util';
+import { getDateKey, getTodayDateKey, parseDateKey } from '../../utils/calendar-date.util';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { AppButton } from '../../../../components/app-button/app-button';
 import { Workout } from '../../models/workout-storage.models';
-import {
-  getWeeklyRecurrenceEnd,
-  isWorkoutOnDate,
-} from '../../utils/weekly-recurrence.util';
+import { getWeeklyRecurrenceEnd, isWorkoutOnDate } from '../../utils/weekly-recurrence.util';
 
 interface CalendarDay {
   label: string;
+  dayNumberLabel: string;
+  accessibleDateLabel: string;
   date: Date;
   dateKey: string;
 }
@@ -88,6 +83,8 @@ export class WorkoutCalendarComponent implements AfterViewInit {
 
       return {
         label: this.formatWeekdayLabel(date),
+        dayNumberLabel: this.formatDayNumber(date),
+        accessibleDateLabel: this.formatAccessibleDate(date),
         date,
         dateKey: getDateKey(date),
       };
@@ -106,14 +103,6 @@ export class WorkoutCalendarComponent implements AfterViewInit {
     }
 
     return workoutDateKeys;
-  });
-
-  readonly weekRangeLabel = computed(() => {
-    const selectedWeekStart = this.getWeekStart(parseDateKey(this.selectedDate()));
-    const selectedWeekEnd = new Date(selectedWeekStart);
-    selectedWeekEnd.setDate(selectedWeekStart.getDate() + 6);
-
-    return `${this.formatShortDate(selectedWeekStart)} - ${this.formatShortDate(selectedWeekEnd)}`;
   });
 
   selectDate(dateKey: string) {
@@ -169,6 +158,14 @@ export class WorkoutCalendarComponent implements AfterViewInit {
     });
   }
 
+  private formatDayNumber(date: Date): string {
+    return date.toLocaleDateString(this.getDateLocale(), { day: 'numeric' });
+  }
+
+  private formatAccessibleDate(date: Date): string {
+    return date.toLocaleDateString(this.getDateLocale());
+  }
+
   private formatWeekdayLabel(date: Date): string {
     if (this.i18n.language() === 'fa') {
       const persianWeekdayLabels = ['یک', 'دو', 'سه', 'چها', 'پنج', 'جمعه', 'شنبه'];
@@ -180,7 +177,7 @@ export class WorkoutCalendarComponent implements AfterViewInit {
   }
 
   private getDateLocale(): string | undefined {
-    return this.i18n.language() === 'fa' ? 'fa-IR' : undefined;
+    return this.i18n.language() === 'fa' ? 'fa-IR-u-ca-persian' : undefined;
   }
 
   private scrollTodayToCenter(behavior: ScrollBehavior) {
