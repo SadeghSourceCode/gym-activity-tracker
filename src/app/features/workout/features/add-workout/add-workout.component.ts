@@ -4,20 +4,24 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppButton } from '../../../../components/app-button/app-button';
 import { I18nService } from '../../../../core/i18n/i18n.service';
-import { WorkoutCompletionStatus } from '../../models/workout-planner.models';
+import { AddWorkoutHeaderComponent } from '../../components/add-workout-header/add-workout-header.component';
+import {
+  AddWorkoutHeaderConfig,
+  AddWorkoutStep,
+} from '../../data-access/models/add-workout-header-config.interface';
+import { WorkoutPlanningStepComponent } from '../../components/workout-planning-step/workout-planning-step.component';
+import { AddWorkoutService } from '../../data-access/add-workout.service';
+import { WorkoutPlanningChangedOutput } from '../../data-access/models/workout-planning-changed-output.interface';
+import { AddWorkoutSaveConfig } from '../../data-access/models/add-workout-save-config.interface';
+import { WorkoutPlanningStepConfig } from '../../data-access/models/workout-planning-step-config.interface';
 import {
   CopiedWorkoutClipboard,
   Workout,
   WorkoutExerciseSection,
   WorkoutExerciseSummary,
-  WorkoutSet,
 } from '../../models/workout-storage.models';
 import { WorkoutEditorTextConfig } from '../../models/workout-ui.models';
-import {
-  ExerciseDbApiService,
-  ExerciseDbExercise,
-  TargetMuscleOption,
-} from '../../services/exercise-db-api.service';
+import { ExerciseDbExercise, TargetMuscleOption } from '../../services/exercise-db-api.service';
 import {
   getDateKey,
   getTodayDateKey,
@@ -30,12 +34,10 @@ import {
   readCopiedWorkoutFromSystemClipboard,
 } from '../../utils/workout-clipboard.util';
 
-export type WorkoutEditorStep = 'exercises' | 'planning';
-
 @Component({
   selector: 'app-add-workout',
   standalone: true,
-  imports: [AppButton],
+  imports: [AppButton, AddWorkoutHeaderComponent, WorkoutPlanningStepComponent],
   templateUrl: './add-workout.component.html',
   styles: `
     .selected {
@@ -44,11 +46,9 @@ export type WorkoutEditorStep = 'exercises' | 'planning';
   `,
 })
 export class AddWorkoutComponent {
-  private readonly storageKey = 'gym-activity-tracker.workouts';
-  private readonly restDaysStorageKey = 'gym-activity-tracker.rest-days';
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly destroyRef = inject(DestroyRef);
-  private readonly exerciseDbApi = inject(ExerciseDbApiService);
+  private readonly addWorkoutService = inject(AddWorkoutService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly location = inject(Location);
@@ -56,12 +56,14 @@ export class AddWorkoutComponent {
   private readonly pageSize = 15;
   private exerciseSearchRequestId = 0;
 
-  readonly workouts = signal<Workout[]>(this.loadWorkouts());
-  readonly restDayKeys = signal<string[]>(this.loadRestDayKeys());
+  readonly workouts = signal<Workout[]>(
+    this.addWorkoutService.loadWorkouts(this.isBrowser, this.i18n.language() === 'fa'),
+  );
+  readonly restDayKeys = signal<string[]>(this.addWorkoutService.loadRestDayKeys(this.isBrowser));
   readonly selectedDate = signal(this.getInitialSelectedDate());
   readonly workoutTitle = signal('');
   readonly selectedExercises = signal<WorkoutExerciseSummary[]>([]);
-  readonly selectedExerciseSection = signal<WorkoutExerciseSection | undefined>(undefined);
+  readonly selectedExerciseSection = signal<WorkoutExerciseSection | undefined>('warmup');
   readonly exerciseSections: readonly WorkoutExerciseSection[] = ['warmup', 'main', 'cooldown'];
   readonly exerciseSearchQuery = signal('');
   readonly exerciseSearchResults = signal<ExerciseDbExercise[]>([]);
@@ -70,7 +72,7 @@ export class AddWorkoutComponent {
   readonly exerciseSearchError = signal<string | undefined>(undefined);
   readonly targetMuscles = signal<TargetMuscleOption[]>([]);
   readonly selectedTargetMuscle = signal<string | undefined>('chest');
-  readonly step = signal<WorkoutEditorStep>('exercises');
+  readonly step = signal<AddWorkoutStep>('exercises');
   readonly isWeeklyPlan = signal(false);
   readonly editingWorkoutId = signal<number | undefined>(this.getInitialEditingWorkoutId());
   readonly copiedWorkoutState = signal(loadCopiedWorkout());
@@ -81,7 +83,7 @@ export class AddWorkoutComponent {
     return state.status === 'ok' ? state.clipboard : null;
   });
 
-  readonly imageBaseUrl = this.exerciseDbApi.imageBaseUrl;
+  readonly imageBaseUrl = this.addWorkoutService.imageBaseUrl;
   readonly selectedDateLabel = computed(() =>
     parseDateKey(this.selectedDate()).toLocaleDateString(this.getDateLocale(), {
       weekday: 'long',
@@ -95,6 +97,14 @@ export class AddWorkoutComponent {
   readonly saveButtonLabel = computed(() =>
     this.editingWorkoutId() === undefined ? this.i18n.t('addWorkout') : this.i18n.t('saveWorkout'),
   );
+  readonly headerConfig = computed<AddWorkoutHeaderConfig>(() => ({
+    title: this.title(),
+    selectedDateLabel: this.selectedDateLabel(),
+    step: this.step(),
+    backLabel: this.text().backLabel,
+    nextLabel: this.step() === 'planning' ? this.saveButtonLabel() : this.text().continueLabel,
+    nextDisabled: !this.canContinueFromCurrentStep(),
+  }));
   readonly defaultWorkoutTitle = computed(() => {
     const selectedDate = parseDateKey(this.selectedDate());
     const saturdayFirstDayIndexes = [6, 0, 1, 2, 3, 4, 5];
@@ -142,6 +152,23 @@ export class AddWorkoutComponent {
     weeklyPlanHelpLabel: this.i18n.t('weeklyPlanHelpLabel'),
     isPersian: this.i18n.language() === 'fa',
   }));
+  readonly planningConfig = computed<WorkoutPlanningStepConfig>(() => ({
+    workoutTitle: this.workoutTitle(),
+    defaultWorkoutTitle: this.defaultWorkoutTitle(),
+    selectedDate: this.selectedDate(),
+    isWeeklyPlan: this.isWeeklyPlan(),
+    exercises: this.selectedExercises().map((exercise) => ({
+      id: exercise.id,
+      name: this.getWorkoutExerciseName(exercise),
+      setCount: this.getSelectedExerciseSetCount(exercise),
+    })),
+    workoutTitleLabel: this.text().workoutTitleLabel,
+    leaveEmptyToUseLabel: this.text().leaveEmptyToUseLabel,
+    workingDayLabel: this.text().workingDayLabel,
+    weeklyPlanLabel: this.text().weeklyPlanLabel,
+    weeklyPlanHelpLabel: this.text().weeklyPlanHelpLabel,
+    selectedExercisesLabel: this.text().selectedExercisesLabel,
+  }));
 
   constructor() {
     this.loadTargetMuscles();
@@ -175,6 +202,18 @@ export class AddWorkoutComponent {
   selectDate(dateKey: string) {
     if (isDateKey(dateKey)) {
       this.selectedDate.set(dateKey);
+    }
+  }
+
+  handlePlanningChanged(change: WorkoutPlanningChangedOutput) {
+    if (change.workoutTitle !== undefined) {
+      this.workoutTitle.set(change.workoutTitle);
+    }
+    if (change.selectedDate !== undefined) {
+      this.selectDate(change.selectedDate);
+    }
+    if (change.isWeeklyPlan !== undefined) {
+      this.isWeeklyPlan.set(change.isWeeklyPlan);
     }
   }
 
@@ -220,17 +259,9 @@ export class AddWorkoutComponent {
   }
 
   toggleExercise(exercise: ExerciseDbExercise) {
-    const exerciseSummary = this.toWorkoutExerciseSummary(exercise);
-
-    this.selectedExercises.update((selectedExercises) => {
-      const selectedExercise = selectedExercises.find((candidate) => candidate.id === exercise.id);
-
-      if (!selectedExercise) {
-        return [...selectedExercises, exerciseSummary];
-      }
-
-      return selectedExercises.filter((candidate) => candidate.id !== exercise.id);
-    });
+    this.selectedExercises.update((selectedExercises) =>
+      this.addWorkoutService.toggleExercise(selectedExercises, exercise, this.imageBaseUrl),
+    );
   }
 
   selectExerciseSection(section: WorkoutExerciseSection) {
@@ -247,7 +278,7 @@ export class AddWorkoutComponent {
 
   getExerciseSectionCount(section: WorkoutExerciseSection): number {
     return this.selectedExercises().filter(
-      (exercise) => this.getExerciseSection(exercise) === section,
+      (exercise) => this.addWorkoutService.getExerciseSection(exercise) === section,
     ).length;
   }
 
@@ -284,23 +315,9 @@ export class AddWorkoutComponent {
   }
 
   private applyCopiedWorkout(copiedWorkout: CopiedWorkoutClipboard) {
-    const pastedExercises = copiedWorkout.exercises.map((exercise) => ({
-      ...exercise,
-      sets: exercise.sets.map((set) => ({ ...set })),
-      section: this.getExerciseSection(exercise),
-    }));
-
-    this.selectedExercises.update((selectedExercises) => {
-      const mergedExercises = [...selectedExercises];
-
-      for (const exercise of pastedExercises) {
-        if (!mergedExercises.some((selectedExercise) => selectedExercise.id === exercise.id)) {
-          mergedExercises.push(exercise);
-        }
-      }
-
-      return mergedExercises;
-    });
+    this.selectedExercises.update((selectedExercises) =>
+      this.addWorkoutService.mergeCopiedWorkout(selectedExercises, copiedWorkout),
+    );
 
     if (!this.workoutTitle().trim()) {
       this.workoutTitle.set(copiedWorkout.name);
@@ -314,13 +331,45 @@ export class AddWorkoutComponent {
   }
 
   updateSelectedExerciseSetCount(exerciseId: string, setCount: number) {
-    const normalizedSetCount = Math.max(Math.floor(setCount), 1);
-
     this.selectedExercises.update((selectedExercises) =>
-      selectedExercises.map((exercise) =>
-        exercise.id === exerciseId
-          ? { ...exercise, sets: this.resizeWorkoutSets(exercise.sets, normalizedSetCount) }
-          : exercise,
+      this.addWorkoutService.updateExerciseSetCount(selectedExercises, exerciseId, setCount),
+    );
+  }
+
+  private getSaveConfig(selectedExercises: WorkoutExerciseSummary[]): AddWorkoutSaveConfig {
+    return {
+      workoutTitle: this.workoutTitle(),
+      defaultWorkoutTitle: this.defaultWorkoutTitle(),
+      selectedDate: this.selectedDate(),
+      selectedExercises,
+      targetMuscle: this.addWorkoutService.getWorkoutTargetMuscle(selectedExercises),
+      isWeeklyPlan: this.isWeeklyPlan(),
+    };
+  }
+
+  private persistWorkoutChanges() {
+    this.addWorkoutService.saveWorkouts(this.isBrowser, this.workouts());
+    this.addWorkoutService.saveRestDayKeys(this.isBrowser, this.restDayKeys());
+  }
+
+  private createWorkout(selectedExercises: WorkoutExerciseSummary[]) {
+    this.workouts.update((workouts) =>
+      this.addWorkoutService.createWorkout(workouts, this.getSaveConfig(selectedExercises)),
+    );
+  }
+
+  private updateWorkout(selectedExercises: WorkoutExerciseSummary[]) {
+    const editingWorkoutId = this.editingWorkoutId();
+
+    if (editingWorkoutId === undefined) {
+      return;
+    }
+
+    this.workouts.update((workouts) =>
+      this.addWorkoutService.updateWorkout(
+        workouts,
+        editingWorkoutId,
+        this.getSaveConfig(selectedExercises),
       ),
     );
   }
@@ -342,8 +391,7 @@ export class AddWorkoutComponent {
     this.restDayKeys.update((dateKeys) =>
       dateKeys.filter((dateKey) => dateKey !== this.selectedDate()),
     );
-    this.saveWorkouts();
-    this.saveRestDayKeys();
+    this.persistWorkoutChanges();
     void this.router.navigateByUrl('/');
   }
 
@@ -387,62 +435,12 @@ export class AddWorkoutComponent {
     return mediaPath ? this.imageBaseUrl + mediaPath : undefined;
   }
 
-  private createWorkout(selectedExercises: WorkoutExerciseSummary[]) {
-    this.workouts.update((workouts) => {
-      const nextWorkoutId = Math.max(...workouts.map((workout) => workout.id), 0) + 1;
-      const firstExercise = selectedExercises[0];
-
-      return [
-        ...workouts,
-        {
-          id: nextWorkoutId,
-          name: this.getWorkoutName(),
-          exerciseId: firstExercise.id,
-          thumbnailUrl: firstExercise.thumbnailUrl,
-          exercises: selectedExercises,
-          date: parseDateKey(this.selectedDate()),
-          targetMuscle: this.getWorkoutTargetMuscle(selectedExercises),
-          isWeeklyPlan: this.isWeeklyPlan(),
-          completionStatus: 'pending',
-          sets: [{ id: 1, repeat: 0, weight: 0 }],
-        },
-      ];
-    });
-  }
-
-  private updateWorkout(selectedExercises: WorkoutExerciseSummary[]) {
-    const editingWorkoutId = this.editingWorkoutId();
-
-    if (editingWorkoutId === undefined) {
-      return;
-    }
-
-    const firstExercise = selectedExercises[0];
-
-    this.workouts.update((workouts) =>
-      workouts.map((workout) =>
-        workout.id === editingWorkoutId
-          ? {
-              ...workout,
-              name: this.getWorkoutName(),
-              exerciseId: firstExercise.id,
-              thumbnailUrl: firstExercise.thumbnailUrl,
-              exercises: selectedExercises,
-              date: parseDateKey(this.selectedDate()),
-              targetMuscle: this.getWorkoutTargetMuscle(selectedExercises),
-              isWeeklyPlan: this.isWeeklyPlan(),
-            }
-          : workout,
-      ),
-    );
-  }
-
   private loadExercisesPage(offset: number, requestId: number) {
     this.isExerciseSearchLoading.set(true);
     this.exerciseSearchError.set(undefined);
 
-    this.exerciseDbApi
-      .search(
+    this.addWorkoutService
+      .searchExercises(
         this.exerciseSearchQuery(),
         offset,
         this.pageSize,
@@ -474,7 +472,7 @@ export class AddWorkoutComponent {
   }
 
   private loadTargetMuscles() {
-    this.exerciseDbApi
+    this.addWorkoutService
       .getTargetMuscles()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -519,165 +517,6 @@ export class AddWorkoutComponent {
     const editId = Number(this.route.snapshot.queryParamMap.get('editId'));
 
     return Number.isInteger(editId) && editId > 0 ? editId : undefined;
-  }
-
-  private loadWorkouts(): Workout[] {
-    if (!this.isBrowser) {
-      return [];
-    }
-
-    try {
-      const storedWorkouts = localStorage.getItem(this.storageKey);
-      const workouts = storedWorkouts ? (JSON.parse(storedWorkouts) as Workout[]) : [];
-
-      return Array.isArray(workouts)
-        ? workouts.map((workout) => ({
-            ...workout,
-            date: new Date(workout.date),
-            exercises: this.normalizeWorkoutExercises(workout),
-            sets: Array.isArray(workout.sets) ? workout.sets : [],
-            completionStatus: this.normalizeCompletionStatus(workout.completionStatus),
-          }))
-        : [];
-    } catch {
-      return [];
-    }
-  }
-
-  private saveWorkouts() {
-    if (this.isBrowser) {
-      localStorage.setItem(this.storageKey, JSON.stringify(this.workouts()));
-    }
-  }
-
-  private loadRestDayKeys(): string[] {
-    if (!this.isBrowser) {
-      return [];
-    }
-
-    try {
-      const storedRestDays = localStorage.getItem(this.restDaysStorageKey);
-      const restDays = storedRestDays ? (JSON.parse(storedRestDays) as unknown) : [];
-
-      return Array.isArray(restDays)
-        ? restDays.filter((dateKey): dateKey is string => typeof dateKey === 'string')
-        : [];
-    } catch {
-      return [];
-    }
-  }
-
-  private saveRestDayKeys() {
-    if (this.isBrowser) {
-      localStorage.setItem(this.restDaysStorageKey, JSON.stringify(this.restDayKeys()));
-    }
-  }
-
-  private normalizeCompletionStatus(
-    completionStatus: WorkoutCompletionStatus | undefined,
-  ): WorkoutCompletionStatus {
-    return completionStatus === 'pending' ||
-      completionStatus === 'completed' ||
-      completionStatus === 'rejected'
-      ? completionStatus
-      : 'pending';
-  }
-
-  private normalizeWorkoutExercises(workout: Workout): WorkoutExerciseSummary[] {
-    if (Array.isArray(workout.exercises)) {
-      return workout.exercises.map((exercise) => ({
-        ...exercise,
-        nameEn: exercise.nameEn ?? exercise.name,
-        nameFa: exercise.nameFa ?? exercise.name,
-        targetMuscle: exercise.targetMuscle ?? workout.targetMuscle,
-        name:
-          this.i18n.language() === 'fa'
-            ? (exercise.nameFa ?? exercise.name)
-            : (exercise.nameEn ?? exercise.name),
-        sets: this.normalizeWorkoutSets(exercise.sets),
-        section: this.getExerciseSection(exercise),
-      }));
-    }
-
-    return workout.exerciseId
-      ? [
-          {
-            id: workout.exerciseId,
-            name: workout.name,
-            nameEn: workout.name,
-            nameFa: workout.name,
-            targetMuscle: workout.targetMuscle,
-            thumbnailUrl: workout.thumbnailUrl,
-            sets: this.normalizeWorkoutSets(workout.sets),
-            section: 'main',
-          },
-        ]
-      : [];
-  }
-
-  private toWorkoutExerciseSummary(exercise: ExerciseDbExercise): WorkoutExerciseSummary {
-    return {
-      id: exercise.id,
-      name: exercise.name,
-      nameEn: exercise.nameEn,
-      nameFa: exercise.nameFa,
-      targetMuscle: exercise.targetMuscle,
-      thumbnailUrl: this.getExerciseMediaUrl(exercise) ?? undefined,
-      sets: [{ id: 1, repeat: 0, weight: 0 }],
-      section: exercise.section,
-    };
-  }
-
-  private getExerciseSection(exercise: WorkoutExerciseSummary): WorkoutExerciseSection {
-    return exercise.section === 'warmup' || exercise.section === 'cooldown'
-      ? exercise.section
-      : 'main';
-  }
-
-  private normalizeWorkoutSets(sets: WorkoutSet[] | undefined): WorkoutSet[] {
-    if (!Array.isArray(sets)) {
-      return [{ id: 1, repeat: 0, weight: 0 }];
-    }
-
-    const normalizedSets = sets.filter(
-      (set): set is WorkoutSet =>
-        typeof set?.id === 'number' &&
-        typeof set.repeat === 'number' &&
-        typeof set.weight === 'number',
-    );
-
-    return normalizedSets.length ? normalizedSets : [{ id: 1, repeat: 0, weight: 0 }];
-  }
-
-  private resizeWorkoutSets(sets: WorkoutSet[] | undefined, setCount: number): WorkoutSet[] {
-    const normalizedSets = this.normalizeWorkoutSets(sets);
-
-    if (normalizedSets.length >= setCount) {
-      return normalizedSets.slice(0, setCount);
-    }
-
-    const nextSets = [...normalizedSets];
-
-    while (nextSets.length < setCount) {
-      const nextSetId = Math.max(...nextSets.map((set) => set.id), 0) + 1;
-      nextSets.push({ id: nextSetId, repeat: 0, weight: 0 });
-    }
-
-    return nextSets;
-  }
-
-  private getWorkoutName(): string {
-    return this.workoutTitle().trim() || this.defaultWorkoutTitle();
-  }
-
-  private getWorkoutTargetMuscle(selectedExercises: WorkoutExerciseSummary[]): string {
-    return [
-      ...new Set(
-        selectedExercises
-          .map((exercise) => exercise.targetMuscle)
-          .filter((targetMuscle): targetMuscle is string => Boolean(targetMuscle)),
-      ),
-    ].join(', ');
   }
 
   private getDateLocale(): string | undefined {

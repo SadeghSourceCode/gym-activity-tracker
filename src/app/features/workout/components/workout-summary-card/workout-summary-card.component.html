@@ -18,18 +18,14 @@
     </div>
 
     <div class="flex shrink-0 flex-col items-end gap-4">
-      <div class="relative" (click)="$event.stopPropagation()">
-        <button
-          class="flex size-8 items-center justify-center rounded-full border border-[#E3E5E5] transition focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
-          type="button"
+      <details #actionsMenu class="group relative" (toggle)="onActionsMenuToggle(actionsMenu)">
+        <summary
+          class="relative z-30 flex size-8 cursor-pointer list-none items-center justify-center rounded-full border border-[#E3E5E5] transition marker:content-none focus:outline-none focus:ring-2 focus:ring-[#0070F0] [&::-webkit-details-marker]:hidden"
           [class.bg-[#EBF4FF]]="isCopied()"
           [class.text-[#0070F0]]="isCopied()"
           [class.bg-[#F2F4F5]]="!isCopied()"
           [class.text-[#72777A]]="!isCopied()"
           [attr.aria-label]="openLabel() + ' / ' + copyLabel() + ' ' + workout().title"
-          [attr.aria-expanded]="isActionsMenuOpen()"
-          aria-haspopup="menu"
-          (click)="toggleActionsMenu($event)"
         >
           @if (isCopied()) {
             <svg
@@ -60,55 +56,63 @@
               <circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" />
             </svg>
           }
-        </button>
+        </summary>
 
-        @if (isActionsMenuOpen()) {
-          <div
-            class="absolute inset-end-0 top-10 z-20 min-w-36 overflow-hidden rounded-xl border border-[#E3E5E5] bg-white p-1 shadow-lg"
-            role="menu"
+        <button
+          class="fixed inset-0 z-10 hidden cursor-default group-open:block"
+          type="button"
+          tabindex="-1"
+          aria-label="Close menu"
+          (click)="actionsMenu.removeAttribute('open')"
+        ></button>
+
+        <div
+          class="absolute top-10 z-20 hidden min-w-36 overflow-hidden rounded-xl border border-[#E3E5E5] bg-white p-1 shadow-lg group-open:block"
+          [class.left-0]="actionsMenuAlignment() === 'left'"
+          [class.right-0]="actionsMenuAlignment() === 'right'"
+          role="menu"
+        >
+          <button
+            class="flex w-full items-center rounded-lg px-3 py-2 text-start text-sm font-semibold text-[#202325] hover:bg-[#F2F4F5] focus:bg-[#F2F4F5] focus:outline-none"
+            type="button"
+            role="menuitem"
+            (click)="onOpen(actionsMenu)"
           >
+            {{ openLabel() }}
+          </button>
+
+          <button
+            class="flex w-full items-center rounded-lg px-3 py-2 text-start text-sm font-semibold text-[#202325] hover:bg-[#F2F4F5] focus:bg-[#F2F4F5] focus:outline-none"
+            type="button"
+            role="menuitem"
+            (click)="onCopy(actionsMenu)"
+          >
+            {{ isCopied() ? copiedLabel() : copyLabel() }}
+          </button>
+
+          @if (canManage()) {
+            <div class="my-1 border-t border-[#E3E5E5]" aria-hidden="true"></div>
+
             <button
-              class="flex w-full items-center rounded-lg px-3 py-2 text-start text-sm font-semibold text-[#202325] hover:bg-[#F2F4F5] focus:bg-[#F2F4F5] focus:outline-none"
+              class="flex w-full items-center rounded-lg px-3 py-2 text-start text-sm font-semibold text-[#0070F0] hover:bg-[#EBF4FF] focus:bg-[#EBF4FF] focus:outline-none"
               type="button"
               role="menuitem"
-              (click)="onOpen()"
+              (click)="onEdit(actionsMenu)"
             >
-              {{ openLabel() }}
+              {{ editLabel() }}
             </button>
 
             <button
-              class="flex w-full items-center rounded-lg px-3 py-2 text-start text-sm font-semibold text-[#202325] hover:bg-[#F2F4F5] focus:bg-[#F2F4F5] focus:outline-none"
+              class="flex w-full items-center rounded-lg px-3 py-2 text-start text-sm font-semibold text-[#C93636] hover:bg-[#FFF0F0] focus:bg-[#FFF0F0] focus:outline-none"
               type="button"
               role="menuitem"
-              (click)="onCopy()"
+              (click)="onDelete(actionsMenu)"
             >
-              {{ isCopied() ? copiedLabel() : copyLabel() }}
+              {{ deleteLabel() }}
             </button>
-
-            @if (canManage()) {
-              <div class="my-1 border-t border-[#E3E5E5]" aria-hidden="true"></div>
-
-              <button
-                class="flex w-full items-center rounded-lg px-3 py-2 text-start text-sm font-semibold text-[#0070F0] hover:bg-[#EBF4FF] focus:bg-[#EBF4FF] focus:outline-none"
-                type="button"
-                role="menuitem"
-                (click)="onEdit()"
-              >
-                {{ editLabel() }}
-              </button>
-
-              <button
-                class="flex w-full items-center rounded-lg px-3 py-2 text-start text-sm font-semibold text-[#C93636] hover:bg-[#FFF0F0] focus:bg-[#FFF0F0] focus:outline-none"
-                type="button"
-                role="menuitem"
-                (click)="onDelete()"
-              >
-                {{ deleteLabel() }}
-              </button>
-            }
-          </div>
-        }
-      </div>
+          }
+        </div>
+      </details>
 
       @if (canManage()) {
         <app-button
