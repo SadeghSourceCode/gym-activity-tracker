@@ -1,0 +1,44 @@
+<header class="flex flex-col gap-4">
+  <div class="flex items-center justify-between gap-3">
+    <app-button
+      variant="outline"
+      mode="section"
+      size="small"
+      customClass="rounded-full bg-[#F2F4F5] px-4 py-2 text-sm font-semibold text-[#202325]"
+      type="button"
+      (buttonClicked)="backRequested.emit()"
+    >
+      {{ config().backLabel }}
+    </app-button>
+
+    <div class="min-w-0 text-center">
+      <h1 class="truncate text-xl font-bold text-[#202325]">{{ config().title }}</h1>
+      <p class="text-sm text-[#72777A]">{{ config().selectedDateLabel }}</p>
+    </div>
+
+    <app-button
+      variant="fill"
+      mode="section"
+      size="small"
+      customClass="rounded-full bg-[#202325] px-4 py-2 text-sm font-semibold text-white disabled:bg-[#C7CBCC]"
+      type="button"
+      [disabled]="config().nextDisabled ?? false"
+      (buttonClicked)="nextRequested.emit()"
+    >
+      {{ config().nextLabel }}
+    </app-button>
+  </div>
+
+  <div class="grid grid-cols-2 gap-2" aria-hidden="true">
+    <div
+      class="h-2 rounded-full"
+      [class.bg-[#0070F0]]="config().step === 'exercises'"
+      [class.bg-[#DDEBFF]]="config().step !== 'exercises'"
+    ></div>
+    <div
+      class="h-2 rounded-full"
+      [class.bg-[#0070F0]]="config().step === 'planning'"
+      [class.bg-[#DDEBFF]]="config().step !== 'planning'"
+    ></div>
+  </div>
+</header>

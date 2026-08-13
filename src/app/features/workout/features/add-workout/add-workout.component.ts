@@ -4,6 +4,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppButton } from '../../../../components/app-button/app-button';
 import { I18nService } from '../../../../core/i18n/i18n.service';
+import { AddWorkoutHeaderComponent } from '../../components/add-workout-header/add-workout-header.component';
+import {
+  AddWorkoutHeaderConfig,
+  AddWorkoutStep,
+} from '../../components/add-workout-header/add-workout-header-config.interface';
+import { WorkoutPlanningStepComponent } from '../../components/workout-planning-step/workout-planning-step.component';
+import { WorkoutPlanningStepConfig } from '../../components/workout-planning-step/workout-planning-step-config.interface';
+import { WorkoutPlanningChangedOutput } from '../../components/workout-planning-step/workout-planning-step-output.interface';
 import { WorkoutCompletionStatus } from '../../models/workout-planner.models';
 import {
   CopiedWorkoutClipboard,
@@ -30,12 +38,10 @@ import {
   readCopiedWorkoutFromSystemClipboard,
 } from '../../utils/workout-clipboard.util';
 
-export type WorkoutEditorStep = 'exercises' | 'planning';
-
 @Component({
   selector: 'app-add-workout',
   standalone: true,
-  imports: [AppButton],
+  imports: [AppButton, AddWorkoutHeaderComponent, WorkoutPlanningStepComponent],
   templateUrl: './add-workout.component.html',
   styles: `
     .selected {
@@ -70,7 +76,7 @@ export class AddWorkoutComponent {
   readonly exerciseSearchError = signal<string | undefined>(undefined);
   readonly targetMuscles = signal<TargetMuscleOption[]>([]);
   readonly selectedTargetMuscle = signal<string | undefined>('chest');
-  readonly step = signal<WorkoutEditorStep>('exercises');
+  readonly step = signal<AddWorkoutStep>('exercises');
   readonly isWeeklyPlan = signal(false);
   readonly editingWorkoutId = signal<number | undefined>(this.getInitialEditingWorkoutId());
   readonly copiedWorkoutState = signal(loadCopiedWorkout());
@@ -95,6 +101,14 @@ export class AddWorkoutComponent {
   readonly saveButtonLabel = computed(() =>
     this.editingWorkoutId() === undefined ? this.i18n.t('addWorkout') : this.i18n.t('saveWorkout'),
   );
+  readonly headerConfig = computed<AddWorkoutHeaderConfig>(() => ({
+    title: this.title(),
+    selectedDateLabel: this.selectedDateLabel(),
+    step: this.step(),
+    backLabel: this.text().backLabel,
+    nextLabel: this.step() === 'planning' ? this.saveButtonLabel() : this.text().continueLabel,
+    nextDisabled: !this.canContinueFromCurrentStep(),
+  }));
   readonly defaultWorkoutTitle = computed(() => {
     const selectedDate = parseDateKey(this.selectedDate());
     const saturdayFirstDayIndexes = [6, 0, 1, 2, 3, 4, 5];
@@ -142,6 +156,23 @@ export class AddWorkoutComponent {
     weeklyPlanHelpLabel: this.i18n.t('weeklyPlanHelpLabel'),
     isPersian: this.i18n.language() === 'fa',
   }));
+  readonly planningConfig = computed<WorkoutPlanningStepConfig>(() => ({
+    workoutTitle: this.workoutTitle(),
+    defaultWorkoutTitle: this.defaultWorkoutTitle(),
+    selectedDate: this.selectedDate(),
+    isWeeklyPlan: this.isWeeklyPlan(),
+    exercises: this.selectedExercises().map((exercise) => ({
+      id: exercise.id,
+      name: this.getWorkoutExerciseName(exercise),
+      setCount: this.getSelectedExerciseSetCount(exercise),
+    })),
+    workoutTitleLabel: this.text().workoutTitleLabel,
+    leaveEmptyToUseLabel: this.text().leaveEmptyToUseLabel,
+    workingDayLabel: this.text().workingDayLabel,
+    weeklyPlanLabel: this.text().weeklyPlanLabel,
+    weeklyPlanHelpLabel: this.text().weeklyPlanHelpLabel,
+    selectedExercisesLabel: this.text().selectedExercisesLabel,
+  }));
 
   constructor() {
     this.loadTargetMuscles();
@@ -175,6 +206,18 @@ export class AddWorkoutComponent {
   selectDate(dateKey: string) {
     if (isDateKey(dateKey)) {
       this.selectedDate.set(dateKey);
+    }
+  }
+
+  handlePlanningChanged(change: WorkoutPlanningChangedOutput) {
+    if (change.workoutTitle !== undefined) {
+      this.workoutTitle.set(change.workoutTitle);
+    }
+    if (change.selectedDate !== undefined) {
+      this.selectDate(change.selectedDate);
+    }
+    if (change.isWeeklyPlan !== undefined) {
+      this.isWeeklyPlan.set(change.isWeeklyPlan);
     }
   }
 
