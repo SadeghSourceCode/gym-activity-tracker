@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
-import { WorkoutPlanningStepConfig } from './workout-planning-step-config.interface';
-import { WorkoutPlanningChangedOutput } from './workout-planning-step-output.interface';
+import { WorkoutPlanningChangedOutput } from '../../data-access/models/workout-planning-changed-output.interface';
+import { WorkoutPlanningStepConfig } from '../../data-access/models/workout-planning-step-config.interface';
 
 @Component({
   selector: 'app-workout-planning-step',

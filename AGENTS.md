@@ -327,81 +327,442 @@ result
 
 ---
 
-# Component Contract Location
+# Service Layer Rules
 
-Interfaces and types that exist exclusively for a component should remain close to that component.
+Feature business logic should be separated from UI components and placed in the feature's `data-access` layer when appropriate.
 
-Prefer:
-
-```text
-features/
-└── workout/
-    └── components/
-        └── workout-card/
-            ├── workout-card.component.ts
-            ├── workout-card.component.html
-            ├── workout-card.component.scss
-            ├── workout-card-config.interface.ts
-            └── workout-card-output.interface.ts
-```
-
-Do not automatically move component-specific contracts into:
+A feature may contain up to two service layers depending on its responsibilities:
 
 ```text
-data-access/models/
+<feature>.api.service.ts
+<feature>.service.ts
 ```
 
-`data-access/models` should primarily contain domain/application/data-access models rather than purely presentational component contracts.
+Both services must be located inside the feature's own `data-access` directory.
+
+Example:
+
+```text
+src/app/features/workout/
+├── components/
+├── data-access/
+│   ├── workout.api.service.ts
+│   ├── workout.service.ts
+│   └── models/
+└── features/
+```
+
+## `<feature>.api.service.ts`
+
+Use this service only when the feature communicates with an external API.
+
+Its responsibility should be limited primarily to API communication.
+
+Examples:
+
+* HTTP requests
+* API endpoint interaction
+* API request/response handling
+* mapping low-level API transport concerns when necessary
+
+Example:
+
+```ts
+@Injectable()
+export class WorkoutApiService {
+  private readonly http = inject(HttpClient);
+
+  getWorkouts() {
+    return this.http.get<WorkoutResponse[]>('/api/workouts');
+  }
+}
+```
+
+Do not place UI behavior or component-specific logic inside the API service.
 
 ---
 
-# Example Component Architecture
+## `<feature>.service.ts`
 
-A presentational component may expose:
+Use this service for feature-level logic and orchestration that should not live inside components.
+
+Typical responsibilities include:
+
+* business logic
+* feature orchestration
+* data transformation
+* state-related operations
+* preparing or processing component data
+* combining multiple data sources
+* manipulating feature models
+* coordinating API service calls
+* reusable feature logic
+* non-trivial decision logic
+
+Example:
+
+```ts
+@Injectable()
+export class WorkoutService {
+  private readonly workoutApiService = inject(WorkoutApiService);
+
+  getActiveWorkouts() {
+    return this.workoutApiService
+      .getWorkouts()
+      .pipe(
+        map(workouts => workouts.filter(workout => workout.active))
+      );
+  }
+}
+```
+
+The API service handles communication.
+
+The feature service handles feature behavior and logic.
+
+---
+
+# Service Extraction During Refactoring
+
+These service extraction rules are especially important when using:
+
+```text
+Refactor feature: <path>
+```
+
+When refactoring an existing feature, inspect the component classes carefully for logic that should not remain inside UI components.
+
+Move appropriate logic into:
+
+```text
+<feature>.service.ts
+```
+
+This applies especially to logic such as:
+
+* data transformation
+* filtering
+* mapping
+* sorting
+* business decisions
+* calculations
+* orchestration
+* reusable feature operations
+* complex state manipulation
+* API workflow coordination
+* logic that does not directly belong to rendering or UI interaction
+
+For example, avoid leaving code like this inside a component:
+
+```ts
+readonly visibleWorkouts = computed(() => {
+  return this.workouts()
+    .filter(workout => workout.active)
+    .sort((a, b) => a.order - b.order)
+    .map(workout => ({
+      ...workout,
+      title: workout.title.trim(),
+    }));
+});
+```
+
+When this represents feature logic rather than presentation behavior, prefer moving it into the feature service:
+
+```ts
+@Injectable()
+export class WorkoutService {
+  prepareVisibleWorkouts(workouts: Workout[]): Workout[] {
+    return workouts
+      .filter(workout => workout.active)
+      .sort((a, b) => a.order - b.order)
+      .map(workout => ({
+        ...workout,
+        title: workout.title.trim(),
+      }));
+  }
+}
+```
+
+The component should then primarily coordinate the UI:
+
+```ts
+readonly visibleWorkouts = computed(() =>
+  this.workoutService.prepareVisibleWorkouts(this.workouts())
+);
+```
+
+---
+
+# What Can Stay Inside Components
+
+Do not move every function into a service blindly.
+
+Component functions may remain inside the component when they are directly related to presentation or local UI behavior.
+
+Examples:
+
+* opening or closing a local UI section
+* toggling a UI-only state
+* handling a DOM-related interaction
+* formatting purely presentational state
+* emitting a component output
+* handling local component interaction
+* simple event forwarding
+
+Example:
+
+```ts
+onWorkoutClick(workoutId: string): void {
+  this.workoutSelected.emit({ workoutId });
+}
+```
+
+This belongs to the component.
+
+However:
+
+```ts
+calculateWorkoutProgress(...)
+determineWorkoutStatus(...)
+prepareWorkoutRequest(...)
+filterAvailableExercises(...)
+mapWorkoutResponse(...)
+```
+
+should generally be considered candidates for the feature service.
+
+---
+
+# Refactor Service Decision
+
+During `Refactor feature`, inspect every non-trivial component method and determine whether it belongs to:
+
+1. presentation/component responsibility
+2. feature service responsibility
+3. API service responsibility
+
+Use the following rule:
+
+```text
+UI behavior
+→ component
+
+Feature/business logic
+→ <feature>.service.ts
+
+HTTP/API communication
+→ <feature>.api.service.ts
+```
+
+Do not create `<feature>.api.service.ts` if the feature has no API communication.
+
+Do not create services solely to satisfy a directory structure.
+
+---
+
+# Service Rules During Feature Creation
+
+The strict service-extraction rule applies primarily to refactoring existing features.
+
+When using:
+
+```text
+Create feature: <path>
+```
+
+do not over-engineer the initial implementation by automatically extracting every small piece of logic into a service.
+
+A new feature may start with logic inside its container when that logic is:
+
+* small
+* straightforward
+* feature-local
+* not reusable
+* unlikely to make the component difficult to understand
+
+However, API communication should still remain outside UI components when practical.
+
+As the feature grows or is later refactored, move meaningful feature logic into `<feature>.service.ts`.
+
+Prefer architectural simplicity during initial feature creation and stronger separation during dedicated refactoring.
+
+---
+
+# Component Contract Location
+
+Component contracts must not be stored beside the component implementation.
+
+Interfaces, types, and other contracts associated with a feature component must be placed inside the feature's `data-access` layer.
+
+Do not use:
+
+```text
+features/workout/components/workout-card/
+├── workout-card.component.ts
+├── workout-card.component.html
+├── workout-card.component.scss
+├── workout-card-config.interface.ts
+└── workout-card-output.interface.ts
+```
+
+Instead prefer:
+
+```text
+features/workout/
+├── components/
+│   └── workout-card/
+│       ├── workout-card.component.ts
+│       ├── workout-card.component.html
+│       └── workout-card.component.scss
+│
+└── data-access/
+    └── models/
+        ├── workout-card-config.interface.ts
+        └── workout-card-output.interface.ts
+```
+
+Component-related interfaces belong to:
+
+```text
+<feature>/data-access/models/
+```
+
+This includes:
+
+* component config interfaces
+* component output interfaces
+* feature models
+* feature data contracts
+
+Example:
+
+```text
+src/app/features/workout/
+├── components/
+│   └── workout-card/
+│
+└── data-access/
+    └── models/
+        ├── workout-card-config.interface.ts
+        ├── workout-card-selected-output.interface.ts
+        ├── workout.interface.ts
+        └── workout-status.type.ts
+```
+
+Do not place TypeScript contract files directly beside component files.
+
+---
+
+# Component Config Rule
+
+Presentational components should still receive their input through an explicit config contract.
+
+Example:
+
+```ts
+import { WorkoutCardConfig } from '../../data-access/models/workout-card-config.interface';
+
+export class WorkoutCardComponent {
+  readonly config = input.required<WorkoutCardConfig>();
+}
+```
+
+The config interface itself must live inside the feature's `data-access/models` directory.
+
+Example:
 
 ```ts
 export interface WorkoutCardConfig {
+  workoutId: string;
   title?: string;
   exerciseCount?: number;
-  status?: WorkoutStatus;
   disabled?: boolean;
 }
+```
 
+The same rule applies to structured outputs:
+
+```ts
 export interface WorkoutCardSelectedOutput {
   workoutId: string;
 }
 ```
 
-The component:
+---
 
-```ts
-export class WorkoutCardComponent {
-  readonly config = input.required<WorkoutCardConfig>();
+# Updated Refactor Feature Behavior
 
-  readonly selected = output<WorkoutCardSelectedOutput>();
-}
+When the command
+
+```text
+Refactor feature: <path>
 ```
 
-The parent/container prepares the config:
+is used, perform all existing refactoring rules plus the following steps:
 
-```ts
-readonly workoutCardConfig = computed<WorkoutCardConfig>(() => ({
-  title: this.workout().title,
-  exerciseCount: this.workout().exercises.length,
-  status: this.workout().status,
-}));
+1. Read `AGENTS.md`.
+2. Inspect the entire feature.
+3. Identify meaningful presentational component boundaries.
+4. Extract appropriate dummy/presentational components.
+5. Inspect component methods and logic.
+6. Classify logic into:
+
+   * UI logic
+   * feature/business logic
+   * API communication
+7. Keep UI logic inside components.
+8. Move feature/business logic into `<feature>.service.ts`.
+9. Move API communication into `<feature>.api.service.ts` when the feature uses an API.
+10. Create these services inside the feature's `data-access` directory.
+11. Do not create an API service when no API communication exists.
+12. Move component config/output interfaces into the feature's `data-access/models` directory.
+13. Do not keep component contract files beside components.
+14. Update all imports after moving contracts.
+15. Preserve existing behavior.
+16. Avoid unnecessary service extraction and over-componentization.
+17. Remove obsolete logic and imports from components.
+18. Run the relevant lint, type-check, tests, and build commands.
+19. Summarize component extraction, service extraction, and moved contracts after completion.
+
+---
+
+# Refactor Responsibility Matrix
+
+Use this responsibility model during feature refactoring:
+
+| Responsibility             | Location                    |
+| -------------------------- | --------------------------- |
+| Rendering                  | Component                   |
+| Local UI interaction       | Component                   |
+| Emit user actions          | Component                   |
+| Component configuration    | `data-access/models`        |
+| Component output contracts | `data-access/models`        |
+| Feature models             | `data-access/models`        |
+| Business logic             | `<feature>.service.ts`      |
+| Data transformation        | `<feature>.service.ts`      |
+| Feature orchestration      | `<feature>.service.ts`      |
+| API workflow coordination  | `<feature>.service.ts`      |
+| HTTP/API requests          | `<feature>.api.service.ts`  |
+| Shared application logic   | Appropriate app-level layer |
+
+The desired dependency direction is conceptually:
+
+```text
+Container / Feature
+        │
+        ├── Feature Service
+        │       │
+        │       └── API Service
+        │
+        └── Presentational Components
+                │
+                ├── Config
+                └── Outputs
 ```
 
-And handles the output:
+Presentational components should not directly depend on the API service.
 
-```html
-<app-workout-card
-  [config]="workoutCardConfig()"
-  (selected)="handleWorkoutSelected($event)"
-/>
-```
-
-The presentational component should not retrieve or orchestrate the workout itself.
+Prefer that API workflows pass through the feature service when feature-level behavior or transformation is involved.
 
 ---
 
