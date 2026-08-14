@@ -1,0 +1,21 @@
+<header class="grid min-h-12 grid-cols-[3rem_minmax(0,1fr)_3rem] items-center gap-3">
+  <app-button
+    class="justify-self-start"
+    [config]="config().leftButton"
+    (buttonClicked)="leftButtonClicked.emit($event)"
+  >
+    <ng-content select="[appHeaderLeftButton]" />
+  </app-button>
+
+  <h1 class="truncate text-center text-xl font-bold text-[#202325]">
+    {{ config().title }}
+  </h1>
+
+  <app-button
+    class="justify-self-end"
+    [config]="config().rightButton"
+    (buttonClicked)="rightButtonClicked.emit($event)"
+  >
+    <ng-content select="[appHeaderRightButton]" />
+  </app-button>
+</header>
