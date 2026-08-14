@@ -1,5 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { AppButton } from '../app-button/app-button';
+import { AppBarConfig } from '../../data-access/models/app-bar-config.interface';
 
 @Component({
   selector: 'app-bar',
@@ -8,13 +9,8 @@ import { AppButton } from '../app-button/app-button';
   styleUrl: './app-bar.scss',
 })
 export class AppBar {
+  readonly config = input.required<AppBarConfig>();
 
-  config = input.required<{
-    rightIcon: string;
-    title: string;
-    leftIcon: string;
-  }>();
-
-  onRightIconClicked = output()
-  onLeftIconClicked = output()
+  readonly rightIconClicked = output<void>();
+  readonly leftIconClicked = output<void>();
 }

@@ -4,10 +4,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { AppButton } from '../../../../components/app-button/app-button';
 import { I18nService } from '../../../../core/i18n/i18n.service';
-import { WorkoutCompletionStatus } from '../../models/workout-planner.models';
-import { Workout, WorkoutExerciseSummary, WorkoutSet } from '../../models/workout-storage.models';
-import { WorkoutDetailTextConfig } from '../../models/workout-ui.models';
-import { ExerciseDbApiService, ExerciseDbExercise } from '../../services/exercise-db-api.service';
+import { WorkoutCompletionStatus } from '../../data-access/models/workout-planner.models';
+import { Workout, WorkoutExerciseSummary, WorkoutSet } from '../../data-access/models/workout-storage.models';
+import { WorkoutDetailConfig } from '../../data-access/models/workout-detail-config.interface';
+import { ExerciseDbApiService, ExerciseDbExercise } from '../../data-access/services/exercise-db-api.service';
 import { getDateKey, getTodayDateKey } from '../../utils/calendar-date.util';
 import { WorkoutDetailComponent } from '../../components/workout-detail/workout-detail.component';
 
@@ -44,30 +44,46 @@ export class WorkoutDetailPage {
 
   readonly exerciseImageBaseUrl = this.exerciseDbApi.imageBaseUrl;
 
-  readonly workoutDetailText = computed<WorkoutDetailTextConfig>(() => ({
-    workoutDetailsLabel: this.i18n.t('workoutDetails'),
-    closeWorkoutDetailsLabel: this.i18n.t('closeWorkoutDetails'),
-    warmupLabel: this.i18n.t('warmup'),
-    mainWorkoutLabel: this.i18n.t('mainWorkout'),
-    cooldownLabel: this.i18n.t('cooldown'),
-    startRestLabel: this.i18n.t('startRest'),
-    restTimerLabel: this.i18n.t('restTimer'),
-    restCompleteLabel: this.i18n.t('restComplete'),
-    closeRestTimerLabel: this.i18n.t('closeRestTimer'),
-    addFifteenSecondsLabel: this.i18n.t('addFifteenSeconds'),
-    removeFifteenSecondsLabel: this.i18n.t('removeFifteenSeconds'),
-    repeatLabel: this.i18n.t('repeat'),
-    weightLabel: this.i18n.t('weight'),
-    addSetLabel: this.i18n.t('addSet'),
-    changeExerciseLabel: this.i18n.t('changeExercise'),
-    removeExerciseLabel: this.i18n.t('removeExercise'),
-    chooseReplacementLabel: this.i18n.t('chooseReplacement'),
-    noSimilarExercisesLabel: this.i18n.t('noSimilarExercises'),
-    loadingExercisesLabel: this.i18n.t('loadingExercises'),
-    markAsDoneLabel: this.i18n.t('markAsDone'),
-    rejectWorkoutLabel: this.i18n.t('rejectWorkout'),
-    isPersian: this.i18n.language() === 'fa',
-  }));
+  readonly workoutDetailConfig = computed<WorkoutDetailConfig | null>(() => {
+    const workout = this.workout();
+
+    if (!workout) {
+      return null;
+    }
+
+    return {
+      workout,
+      canManage: this.canManage(),
+      replacingExerciseId: this.replacingExerciseId(),
+      replacementExercises: this.replacementExercises(),
+      replacementExercisesLoading: this.replacementExercisesLoading(),
+      imageBaseUrl: this.exerciseImageBaseUrl,
+      text: {
+        workoutDetailsLabel: this.i18n.t('workoutDetails'),
+        closeWorkoutDetailsLabel: this.i18n.t('closeWorkoutDetails'),
+        warmupLabel: this.i18n.t('warmup'),
+        mainWorkoutLabel: this.i18n.t('mainWorkout'),
+        cooldownLabel: this.i18n.t('cooldown'),
+        startRestLabel: this.i18n.t('startRest'),
+        restTimerLabel: this.i18n.t('restTimer'),
+        restCompleteLabel: this.i18n.t('restComplete'),
+        closeRestTimerLabel: this.i18n.t('closeRestTimer'),
+        addFifteenSecondsLabel: this.i18n.t('addFifteenSeconds'),
+        removeFifteenSecondsLabel: this.i18n.t('removeFifteenSeconds'),
+        repeatLabel: this.i18n.t('repeat'),
+        weightLabel: this.i18n.t('weight'),
+        addSetLabel: this.i18n.t('addSet'),
+        changeExerciseLabel: this.i18n.t('changeExercise'),
+        removeExerciseLabel: this.i18n.t('removeExercise'),
+        chooseReplacementLabel: this.i18n.t('chooseReplacement'),
+        noSimilarExercisesLabel: this.i18n.t('noSimilarExercises'),
+        loadingExercisesLabel: this.i18n.t('loadingExercises'),
+        markAsDoneLabel: this.i18n.t('markAsDone'),
+        rejectWorkoutLabel: this.i18n.t('rejectWorkout'),
+        isPersian: this.i18n.language() === 'fa',
+      },
+    };
+  });
 
   constructor() {
     if (!this.workout()) {

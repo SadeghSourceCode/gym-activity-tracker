@@ -2,24 +2,20 @@
   <div class="flex min-h-dvh flex-col items-center justify-center gap-4 p-4 text-center">
     <p class="text-lg font-semibold text-[#202325]">{{ workoutError() }}</p>
     <app-button
-      variant="fill"
-      mode="section"
-      customClass="rounded-full bg-[#0070F0] px-6 py-3 font-semibold text-white"
-      type="button"
+      [config]="{
+        variant: 'fill',
+        mode: 'section',
+        type: 'button',
+        customClass: 'rounded-full bg-[#0070F0] px-6 py-3 font-semibold text-white',
+      }"
       (buttonClicked)="goBack()"
     >
       {{ i18n.t('back') }}
     </app-button>
   </div>
-} @else if (workout(); as workout) {
+} @else if (workoutDetailConfig(); as workoutDetailConfig) {
   <app-workout-detail
-    [text]="workoutDetailText()"
-    [workout]="workout"
-    [canManage]="canManage()"
-    [replacingExerciseId]="replacingExerciseId()"
-    [replacementExercises]="replacementExercises()"
-    [replacementExercisesLoading]="replacementExercisesLoading()"
-    [imageBaseUrl]="exerciseImageBaseUrl"
+    [config]="workoutDetailConfig"
     (close)="goBack()"
     (addSet)="addSet($event.workoutId, $event.exerciseId)"
     (removeExercise)="removeExercise($event.workoutId, $event.exerciseId)"

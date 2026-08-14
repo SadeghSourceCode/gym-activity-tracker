@@ -1,11 +1,13 @@
 <header class="flex flex-col gap-4">
   <div class="flex items-center justify-between gap-3">
     <app-button
-      variant="outline"
-      mode="section"
-      size="small"
-      customClass="rounded-full bg-[#F2F4F5] px-4 py-2 text-sm font-semibold text-[#202325]"
-      type="button"
+      [config]="{
+        size: 'small',
+        variant: 'outline',
+        mode: 'section',
+        type: 'button',
+        customClass: 'rounded-full bg-[#F2F4F5] px-4 py-2 text-sm font-semibold text-[#202325]',
+      }"
       (buttonClicked)="backRequested.emit()"
     >
       {{ config().backLabel }}
@@ -17,12 +19,15 @@
     </div>
 
     <app-button
-      variant="fill"
-      mode="section"
-      size="small"
-      customClass="rounded-full bg-[#202325] px-4 py-2 text-sm font-semibold text-white disabled:bg-[#C7CBCC]"
-      type="button"
-      [disabled]="config().nextDisabled ?? false"
+      [config]="{
+        size: 'small',
+        variant: 'fill',
+        mode: 'section',
+        disabled: config().nextDisabled ?? false,
+        type: 'button',
+        customClass:
+          'rounded-full bg-[#202325] px-4 py-2 text-sm font-semibold text-white disabled:bg-[#C7CBCC]',
+      }"
       (buttonClicked)="nextRequested.emit()"
     >
       {{ config().nextLabel }}

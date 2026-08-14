@@ -13,7 +13,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { getDateKey, getTodayDateKey, parseDateKey } from '../../utils/calendar-date.util';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { AppButton } from '../../../../components/app-button/app-button';
-import { Workout } from '../../models/workout-storage.models';
+import { Workout } from '../../data-access/models/workout-storage.models';
+import { WorkoutCalendarConfig } from '../../data-access/models/workout-calendar-config.interface';
 import { getWeeklyRecurrenceEnd, isWorkoutOnDate } from '../../utils/weekly-recurrence.util';
 
 interface CalendarDay {
@@ -38,8 +39,9 @@ export class WorkoutCalendarComponent implements AfterViewInit {
   readonly i18n = inject(I18nService);
   private readonly today = getTodayDateKey();
 
-  readonly selectedDate = input<string>(this.today);
-  readonly workouts = input<Workout[]>([]);
+  readonly config = input.required<WorkoutCalendarConfig>();
+  readonly selectedDate = computed(() => this.config().selectedDate ?? this.today);
+  readonly workouts = computed<readonly Workout[]>(() => this.config().workouts ?? []);
 
   readonly dateSelected = output<string>();
 

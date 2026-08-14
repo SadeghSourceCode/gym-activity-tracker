@@ -1,20 +1,11 @@
 <div class="flex w-full min-w-0 max-w-full flex-col overflow-hidden">
   <div class="flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden rounded-2xl">
-    <app-workout-calendar
-      [selectedDate]="selectedDate()"
-      [workouts]="workouts()"
-      (dateSelected)="selectDate($event)"
-    />
+    <app-workout-calendar [config]="workoutCalendarConfig()" (dateSelected)="selectDate($event)" />
 
     <app-selected-day-panel
-      [text]="selectedDayPanelText()"
-      [selectedDateLabel]="selectedDateLabel()"
-      [selectedDayViewModel]="selectedDayViewModel()"
-      [selectedDayWorkoutStatus]="selectedDayWorkoutStatus()"
-      [selectedDayError]="selectedDayError()"
+      [config]="selectedDayPanelConfig()"
       (retry)="retrySelectedDay()"
       (openWorkoutDetails)="openWorkoutDetails($event)"
-      (rejectWorkout)="setWorkoutCompletionStatus(+$event, 'rejected')"
       (editWorkout)="openEditWorkoutSheet($event)"
       (deleteWorkout)="removeWorkout(+$event)"
       (copyWorkout)="copyWorkout($event)"
@@ -28,8 +19,6 @@
     <app-daily-progress [config]="dailyProgressConfig()" />
 
     <app-weekly-calories [config]="weeklyCaloriesConfig()" />
-
-
   </div>
 </div>
 
@@ -39,12 +28,9 @@
   </p>
 }
 
-@if (selectedExercise(); as exercise) {
+@if (exerciseDetailsConfig(); as exerciseDetailsConfig) {
   <app-exercise-details-dialog
-    [text]="exerciseDetailsText()"
-    [exercise]="exercise"
-    [similarExercises]="similarExercises()"
-    [imageBaseUrl]="exerciseImageBaseUrl"
+    [config]="exerciseDetailsConfig"
     (close)="closeExerciseDetails()"
     (showExercise)="showExerciseDetails($event)"
   />

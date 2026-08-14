@@ -1,6 +1,6 @@
 import { Component, input, output, signal } from '@angular/core';
-import { WorkoutCardViewModel } from '../../models/workout-planner.models';
 import { AppButton } from '../../../../components/app-button/app-button';
+import { WorkoutSummaryCardConfig } from '../../data-access/models/workout-summary-card-config.interface';
 
 @Component({
   selector: 'app-workout-summary-card',
@@ -10,18 +10,9 @@ import { AppButton } from '../../../../components/app-button/app-button';
 })
 export class WorkoutSummaryCardComponent {
   private readonly actionsMenuWidth = 144;
-  readonly workout = input.required<WorkoutCardViewModel>();
-  readonly exerciseCountLabel = input.required<string>();
-  readonly openLabel = input.required<string>();
-  readonly rejectLabel = input.required<string>();
-  readonly editLabel = input.required<string>();
-  readonly deleteLabel = input.required<string>();
-  readonly copyLabel = input.required<string>();
-  readonly copiedLabel = input.required<string>();
-  readonly canManage = input.required<boolean>();
+  readonly config = input.required<WorkoutSummaryCardConfig>();
 
   readonly open = output<string>();
-  readonly reject = output<string>();
   readonly edit = output<string>();
   readonly deleteWorkout = output<string>();
   readonly copy = output<string>();
@@ -32,15 +23,18 @@ export class WorkoutSummaryCardComponent {
   readonly actionsMenuAlignment = signal<'left' | 'right'>('right');
 
   visibleExercises() {
-    return this.workout().exercises.slice(0, this.visibleExerciseLimit);
+    return this.config().workout.exercises.slice(0, this.visibleExerciseLimit);
   }
 
   hiddenExerciseCount(): number {
-    return Math.max(this.workout().exerciseCount - this.visibleExerciseLimit, 0);
+    return Math.max(this.config().workout.exerciseCount - this.visibleExerciseLimit, 0);
   }
 
   getEstimatedDurationLabel(): string {
-    return `est. ${this.workout().estimatedMinutes} min`;
+    const estimatedLabel = this.config().estimatedLabel ?? 'est.';
+    const minutesLabel = this.config().minutesLabel ?? 'min';
+
+    return `${estimatedLabel} ${this.config().workout.estimatedMinutes} ${minutesLabel}`;
   }
 
   onActionsMenuToggle(actionsMenu: HTMLDetailsElement) {
@@ -66,23 +60,23 @@ export class WorkoutSummaryCardComponent {
 
   onCopy(actionsMenu: HTMLDetailsElement) {
     actionsMenu.removeAttribute('open');
-    this.copy.emit(this.workout().id);
+    this.copy.emit(this.config().workout.id);
     this.isCopied.set(true);
     setTimeout(() => this.isCopied.set(false), 2000);
   }
 
   onOpen(actionsMenu: HTMLDetailsElement) {
     actionsMenu.removeAttribute('open');
-    this.open.emit(this.workout().id);
+    this.open.emit(this.config().workout.id);
   }
 
   onEdit(actionsMenu: HTMLDetailsElement) {
     actionsMenu.removeAttribute('open');
-    this.edit.emit(this.workout().id);
+    this.edit.emit(this.config().workout.id);
   }
 
   onDelete(actionsMenu: HTMLDetailsElement) {
     actionsMenu.removeAttribute('open');
-    this.deleteWorkout.emit(this.workout().id);
+    this.deleteWorkout.emit(this.config().workout.id);
   }
 }

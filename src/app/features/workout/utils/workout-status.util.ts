@@ -1,7 +1,7 @@
 import {
   WorkoutCompletionStatus,
   WorkoutDisplayStatus,
-} from '../models/workout-planner.models';
+} from '../data-access/models/workout-planner.models';
 import { compareDateKeys } from './calendar-date.util';
 
 export const WORKOUT_STATUS_LABELS = {
@@ -32,4 +32,3 @@ export function resolveWorkoutStatus(
 
   return dateComparison === 0 ? 'in-progress' : 'rejected';
 }
-

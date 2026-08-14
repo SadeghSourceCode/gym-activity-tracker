@@ -1,4 +1,4 @@
-import { CopiedWorkoutClipboard } from '../models/workout-storage.models';
+import { CopiedWorkoutClipboard } from '../data-access/models/workout-storage.models';
 import {
   clearCopiedWorkout,
   copiedWorkoutStorageKey,

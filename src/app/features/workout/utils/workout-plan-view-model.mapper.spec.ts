@@ -1,4 +1,4 @@
-import { DailyWorkoutPlan } from '../models/workout-planner.models';
+import { DailyWorkoutPlan } from '../data-access/models/workout-planner.models';
 import { mapDailyPlanToViewModel } from './workout-plan-view-model.mapper';
 
 describe('mapDailyPlanToViewModel', () => {
@@ -97,4 +97,3 @@ describe('mapDailyPlanToViewModel', () => {
     });
   });
 });
-

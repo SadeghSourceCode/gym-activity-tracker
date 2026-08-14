@@ -1,14 +1,13 @@
 <span
   class="shrink-0 rounded-full px-3 py-1 text-xs font-bold"
-  [class.bg-[#EBF4FF]]="status() === 'in-progress'"
-  [class.text-[#0070F0]]="status() === 'in-progress'"
-  [class.bg-[#E7F8EF]]="status() === 'done'"
-  [class.text-[#168A4A]]="status() === 'done'"
-  [class.bg-[#FFD6D6]]="status() === 'rejected'"
-  [class.text-[#C93636]]="status() === 'rejected'"
-  [class.bg-[#F2F4F5]]="status() === 'upcoming'"
-  [class.text-[#404446]]="status() === 'upcoming'"
+  [class.bg-[#EBF4FF]]="config().status === 'in-progress'"
+  [class.text-[#0070F0]]="config().status === 'in-progress'"
+  [class.bg-[#E7F8EF]]="config().status === 'done'"
+  [class.text-[#168A4A]]="config().status === 'done'"
+  [class.bg-[#FFD6D6]]="config().status === 'rejected'"
+  [class.text-[#C93636]]="config().status === 'rejected'"
+  [class.bg-[#F2F4F5]]="config().status === 'upcoming'"
+  [class.text-[#404446]]="config().status === 'upcoming'"
 >
-  {{ label() }}
+  {{ config().label }}
 </span>
-

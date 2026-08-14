@@ -12,7 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ExerciseDbApiService,
   ExerciseDbExercise,
-} from '../../../workout/services/exercise-db-api.service';
+} from '../../../workout/data-access/services/exercise-db-api.service';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { AppButton } from '../../../../components/app-button/app-button';
 

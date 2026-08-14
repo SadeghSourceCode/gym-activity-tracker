@@ -1,4 +1,5 @@
-import { CopiedWorkoutClipboard, WorkoutExerciseSummary } from '../models/workout-storage.models';
+import { CopiedWorkoutClipboard, WorkoutExerciseSummary } from "../data-access/models/workout-storage.models";
+
 
 export const copiedWorkoutStorageKey = 'gym-activity-tracker.copied-workout';
 export const copiedWorkoutTextHeader = 'GAT-WORKOUT:1';

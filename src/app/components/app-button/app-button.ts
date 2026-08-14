@@ -1,9 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
-
-export type AppButtonSize = 'small' | 'medium' | 'large';
-export type AppButtonVariant = 'fill' | 'outline' | 'link';
-export type AppButtonMode = 'section' | 'form' | 'iconOnly';
-export type AppButtonType = 'button' | 'submit' | 'reset';
+import { AppButtonConfig } from '../../data-access/models/app-button-config.interface';
 
 @Component({
   selector: 'app-button',
@@ -12,30 +8,23 @@ export type AppButtonType = 'button' | 'submit' | 'reset';
   styleUrl: './app-button.scss',
 })
 export class AppButton {
-  readonly size = input<AppButtonSize>('medium');
-  readonly variant = input<AppButtonVariant>('fill');
-  readonly mode = input<AppButtonMode>('section');
-  readonly disabled = input(false);
-  readonly loading = input(false);
-  readonly active = input(false);
-  readonly type = input<AppButtonType>('button');
-  readonly ariaLabel = input<string | null>(null);
-  readonly ariaCurrent = input<string | null>(null);
-  readonly customClass = input('');
+  readonly config = input<AppButtonConfig>({});
 
   readonly buttonClicked = output<MouseEvent>();
 
-  readonly isInteractionDisabled = computed(() => this.disabled() || this.loading());
+  readonly isInteractionDisabled = computed(
+    () => (this.config().disabled ?? false) || (this.config().loading ?? false),
+  );
 
   readonly classes = computed(() =>
     [
       'app-button',
-      `app-button--${this.size()}`,
-      `app-button--${this.variant()}`,
-      `app-button--${this.mode()}`,
-      this.active() ? 'app-button--active' : '',
-      this.loading() ? 'app-button--loading' : '',
-      this.customClass(),
+      `app-button--${this.config().size ?? 'medium'}`,
+      `app-button--${this.config().variant ?? 'fill'}`,
+      `app-button--${this.config().mode ?? 'section'}`,
+      this.config().active ? 'app-button--active' : '',
+      this.config().loading ? 'app-button--loading' : '',
+      this.config().customClass ?? '',
     ]
       .filter(Boolean)
       .join(' '),

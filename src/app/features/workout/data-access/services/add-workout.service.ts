@@ -13,9 +13,9 @@ import {
   ExerciseDbExercise,
   ExerciseSearchResult,
   TargetMuscleOption,
-} from '../services/exercise-db-api.service';
-import { parseDateKey } from '../utils/calendar-date.util';
-import { AddWorkoutSaveConfig } from './models/add-workout-save-config.interface';
+} from './exercise-db-api.service';
+import { parseDateKey } from '../../utils/calendar-date.util';
+import { AddWorkoutSaveConfig } from '../models/add-workout-save-config.interface';
 
 @Injectable({ providedIn: 'root' })
 export class AddWorkoutService {

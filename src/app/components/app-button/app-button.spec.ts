@@ -31,10 +31,12 @@ describe('AppButton', () => {
   });
 
   it('should apply configured size, variant, mode, and active state', () => {
-    fixture.componentRef.setInput('size', 'large');
-    fixture.componentRef.setInput('variant', 'outline');
-    fixture.componentRef.setInput('mode', 'form');
-    fixture.componentRef.setInput('active', true);
+    fixture.componentRef.setInput('config', {
+      size: 'large',
+      variant: 'outline',
+      mode: 'form',
+      active: true,
+    });
     fixture.detectChanges();
 
     const button = getButton();
@@ -47,11 +49,11 @@ describe('AppButton', () => {
   });
 
   it('should change font size from the size input', () => {
-    fixture.componentRef.setInput('size', 'small');
+    fixture.componentRef.setInput('config', { size: 'small' });
     fixture.detectChanges();
     const smallFontSize = getComputedStyle(getButton()).fontSize;
 
-    fixture.componentRef.setInput('size', 'large');
+    fixture.componentRef.setInput('config', { size: 'large' });
     fixture.detectChanges();
     const largeFontSize = getComputedStyle(getButton()).fontSize;
 
@@ -60,7 +62,7 @@ describe('AppButton', () => {
   });
 
   it('should render loading spinner instead of projected content', () => {
-    fixture.componentRef.setInput('loading', true);
+    fixture.componentRef.setInput('config', { loading: true });
     fixture.detectChanges();
 
     const button = getButton();
@@ -84,12 +86,11 @@ describe('AppButton', () => {
     const emittedEvents: MouseEvent[] = [];
     component.buttonClicked.subscribe((event) => emittedEvents.push(event));
 
-    fixture.componentRef.setInput('disabled', true);
+    fixture.componentRef.setInput('config', { disabled: true });
     fixture.detectChanges();
     getButton().click();
 
-    fixture.componentRef.setInput('disabled', false);
-    fixture.componentRef.setInput('loading', true);
+    fixture.componentRef.setInput('config', { loading: true });
     fixture.detectChanges();
     getButton().click();
 

@@ -1,0 +1,31 @@
+export interface WorkoutEditorTextConfig {
+  addWorkoutLabel: string;
+  closeExerciseSearchLabel: string;
+  selectExerciseForDateLabel: string;
+  workoutTitleLabel: string;
+  leaveEmptyToUseLabel: string;
+  searchExercisesLabel: string;
+  searchByNameMuscleEquipmentLabel: string;
+  selectedExercisesLabel: string;
+  removeLabel: string;
+  selectedLabel: string;
+  loadingExercisesLabel: string;
+  loadMoreLabel: string;
+  noExercisesFoundLabel: string;
+  backLabel: string;
+  continueLabel: string;
+  closeLabel: string;
+  pasteLabel: string;
+  pasteCopiedWorkoutLabel: string;
+  pasteFromClipboardLabel: string;
+  invalidCopiedWorkoutLabel: string;
+  targetMuscleLabel: string;
+  chooseTargetMuscleLabel: string;
+  chooseTargetMuscleMessage: string;
+  chooseExercisesMessage: string;
+  workoutPlanningLabel: string;
+  workingDayLabel: string;
+  weeklyPlanLabel: string;
+  weeklyPlanHelpLabel: string;
+  isPersian: boolean;
+}

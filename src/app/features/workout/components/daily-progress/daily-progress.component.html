@@ -1,7 +1,7 @@
 <section class="rounded-3xl bg-white p-5 shadow-sm" [attr.aria-label]="config().title">
   <h2 class="text-lg font-bold text-[#202325]">{{ config().title }}</h2>
 
-  <div class="mt-5 flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
+  <div class="mt-5 flex items-center gap-6 sm:flex-row sm:justify-between">
     <svg class="size-40 shrink-0 -rotate-90" viewBox="0 0 160 160" aria-hidden="true">
       @for (metric of config().metrics; track metric.label; let index = $index) {
         <circle

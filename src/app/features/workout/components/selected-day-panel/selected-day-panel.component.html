@@ -1,47 +1,40 @@
 <section
   class="flex w-full min-w-0 flex-col gap-4 rounded-3xl"
   aria-live="polite"
-  [attr.aria-label]="text().selectedDayWorkoutsLabel"
+  [attr.aria-label]="config().text.selectedDayWorkoutsLabel"
 >
   <div class="flex items-center justify-between gap-3">
-    <h2 class="text-xl font-bold text-[#202325]">{{ selectedDateLabel() }}</h2>
+    <h2 class="text-xl font-bold text-[#202325]">{{ config().selectedDateLabel }}</h2>
 
-    @if (selectedDayWorkoutStatus(); as status) {
-      <app-status-badge [status]="status" [label]="statusLabel()" />
+    @if (statusBadgeConfig(); as statusConfig) {
+      <app-status-badge [config]="statusConfig" />
     }
   </div>
 
-  @if (selectedDayError()) {
+  @if (config().error; as error) {
     <div class="rounded-2xl bg-[#FFD6D6] p-3 text-[#C93636]" role="alert">
-      <p>{{ selectedDayError() }}</p>
+      <p>{{ error }}</p>
       <app-button
-        variant="outline"
-        mode="section"
-        size="small"
-        customClass="mt-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#C93636]"
-        type="button"
+        [config]="{
+          size: 'small',
+          variant: 'outline',
+          mode: 'section',
+          type: 'button',
+          customClass: 'mt-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#C93636]',
+        }"
         (buttonClicked)="retry.emit()"
       >
-        {{ text().retryLabel }}
+        {{ config().text.retryLabel }}
       </app-button>
     </div>
   } @else {
-    @switch (selectedDayViewModel().type) {
+    @switch (config().selectedDayViewModel.type) {
       @case ('workout') {
         <div class="grid gap-3">
-          @for (workout of selectedDayViewModel().workouts; track workout.id) {
+          @for (workout of config().selectedDayViewModel.workouts; track workout.id) {
             <app-workout-summary-card
-              [workout]="workout"
-              [exerciseCountLabel]="getExerciseCountLabel(workout.exerciseCount)"
-              [openLabel]="text().openLabel"
-              [rejectLabel]="text().rejectLabel"
-              [editLabel]="text().editLabel"
-              [deleteLabel]="text().deleteLabel"
-              [copyLabel]="text().copyLabel"
-              [copiedLabel]="text().copiedLabel"
-              [canManage]="selectedDayViewModel().canManageWorkouts"
+              [config]="getWorkoutSummaryCardConfig(workout)"
               (open)="openWorkoutDetails.emit($event)"
-              (reject)="rejectWorkout.emit($event)"
               (edit)="editWorkout.emit($event)"
               (deleteWorkout)="deleteWorkout.emit($event)"
               (copy)="copyWorkout.emit($event)"
@@ -51,21 +44,16 @@
       }
 
       @case ('rest') {
-        <app-rest-day-state
-          [title]="text().restDayTitle"
-          [message]="text().recoveryMessage"
-          [removeLabel]="text().removeRestDayLabel"
-          (remove)="removeRestDay.emit()"
-        />
+        <app-rest-day-state [config]="restDayStateConfig()" (remove)="removeRestDay.emit()" />
       }
 
       @case ('empty') {
-        @if (selectedDayViewModel().canAddWorkout || selectedDayViewModel().canMarkAsRestDay) {
+        @if (
+          config().selectedDayViewModel.canAddWorkout ||
+          config().selectedDayViewModel.canMarkAsRestDay
+        ) {
           <app-empty-day-state
-            [title]="text().noWorkoutPlannedTitle"
-            [message]="text().setWorkoutOrRestMessage"
-            [setWorkoutLabel]="text().setWorkoutLabel"
-            [markAsRestDayLabel]="text().markAsRestDayLabel"
+            [config]="emptyDayStateConfig()"
             (setWorkout)="setWorkout.emit()"
             (markAsRestDay)="markAsRestDay.emit()"
           />
@@ -73,7 +61,9 @@
           <div
             class="rounded-2xl border border-dashed border-[#C7CBCC] bg-[#F7F9FA] p-4 text-center"
           >
-            <h3 class="text-lg font-bold text-[#202325]">{{ text().noWorkoutPlannedTitle }}</h3>
+            <h3 class="text-lg font-bold text-[#202325]">
+              {{ config().text.noWorkoutPlannedTitle }}
+            </h3>
           </div>
         }
       }

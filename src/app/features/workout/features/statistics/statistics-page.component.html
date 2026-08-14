@@ -1,0 +1,11 @@
+<div class="mx-auto flex w-full max-w-xl flex-col gap-8 pb-4">
+  <header>
+    <h1 class="text-3xl font-bold text-[#303437]">
+      {{ i18n.language() === 'fa' ? 'آمار' : 'Statistics' }}
+    </h1>
+  </header>
+  <app-workout-calendar [config]="calendarConfig()" (dateSelected)="selectedDate.set($event)" />
+  <app-workout-overview [config]="overviewConfig()" />
+  <app-daily-progress [config]="progressConfig()" />
+  <app-weekly-calories [config]="caloriesConfig()" />
+</div>

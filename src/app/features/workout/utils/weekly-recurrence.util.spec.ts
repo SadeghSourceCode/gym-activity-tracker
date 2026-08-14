@@ -1,4 +1,4 @@
-import { Workout } from '../models/workout-storage.models';
+import { Workout } from '../data-access/models/workout-storage.models';
 import {
   getWeeklyRecurrenceEnd,
   isWorkoutOnDate,

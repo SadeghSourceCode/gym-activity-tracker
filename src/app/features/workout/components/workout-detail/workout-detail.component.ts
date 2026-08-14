@@ -1,14 +1,18 @@
-import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, input, output, signal } from '@angular/core';
 import {
   Workout,
   WorkoutExerciseSection,
   WorkoutExerciseSummary,
-  WorkoutSet,
-} from '../../models/workout-storage.models';
-import { WorkoutCompletionStatus } from '../../models/workout-planner.models';
-import { WorkoutDetailTextConfig } from '../../models/workout-ui.models';
+} from '../../data-access/models/workout-storage.models';
 import { AppButton } from '../../../../components/app-button/app-button';
-import { ExerciseDbExercise } from '../../services/exercise-db-api.service';
+import { ExerciseDbExercise } from '../../data-access/services/exercise-db-api.service';
+import { WorkoutDetailConfig } from '../../data-access/models/workout-detail-config.interface';
+import {
+  WorkoutCompletedOutput,
+  WorkoutExerciseOutput,
+  WorkoutExerciseReplacedOutput,
+  WorkoutSetUpdatedOutput,
+} from '../../data-access/models/workout-detail-output.interface';
 
 @Component({
   selector: 'app-workout-detail',
@@ -24,34 +28,27 @@ export class WorkoutDetailComponent {
   private restTimerEndsAt = 0;
 
   readonly exerciseSections: readonly WorkoutExerciseSection[] = ['warmup', 'main', 'cooldown'];
-  readonly text = input.required<WorkoutDetailTextConfig>();
-  readonly workout = input.required<Workout>();
-  readonly canManage = input.required<boolean>();
-  readonly replacingExerciseId = input<string | null>(null);
-  readonly replacementExercises = input<ExerciseDbExercise[]>([]);
-  readonly replacementExercisesLoading = input(false);
-  readonly imageBaseUrl = input.required<string>();
+  readonly config = input.required<WorkoutDetailConfig>();
+  readonly text = computed(() => this.config().text);
+  readonly workout = computed<Workout>(() => this.config().workout);
+  readonly canManage = computed(() => this.config().canManage ?? false);
+  readonly replacingExerciseId = computed(() => this.config().replacingExerciseId ?? null);
+  readonly replacementExercises = computed<readonly ExerciseDbExercise[]>(
+    () => this.config().replacementExercises ?? [],
+  );
+  readonly replacementExercisesLoading = computed(
+    () => this.config().replacementExercisesLoading ?? false,
+  );
+  readonly imageBaseUrl = computed(() => this.config().imageBaseUrl);
 
   readonly close = output<void>();
-  readonly addSet = output<{ workoutId: number; exerciseId: string }>();
-  readonly removeExercise = output<{ workoutId: number; exerciseId: string }>();
+  readonly addSet = output<WorkoutExerciseOutput>();
+  readonly removeExercise = output<WorkoutExerciseOutput>();
   readonly requestExerciseReplacement = output<WorkoutExerciseSummary>();
   readonly cancelExerciseReplacement = output<void>();
-  readonly replaceExercise = output<{
-    workoutId: number;
-    exerciseId: string;
-    replacement: ExerciseDbExercise;
-  }>();
-  readonly updateSet = output<{
-    workoutId: number;
-    exerciseId: string;
-    setId: number;
-    changes: Partial<Pick<WorkoutSet, 'repeat' | 'weight'>>;
-  }>();
-  readonly complete = output<{
-    workoutId: number;
-    completionStatus: Extract<WorkoutCompletionStatus, 'completed' | 'rejected'>;
-  }>();
+  readonly replaceExercise = output<WorkoutExerciseReplacedOutput>();
+  readonly updateSet = output<WorkoutSetUpdatedOutput>();
+  readonly complete = output<WorkoutCompletedOutput>();
 
   readonly expandedExerciseId = signal<string | null | undefined>(undefined);
   readonly restTimerSeconds = signal(0);

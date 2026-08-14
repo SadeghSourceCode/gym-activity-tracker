@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
-import { ExerciseDbExercise } from '../../services/exercise-db-api.service';
-import { ExerciseDetailsTextConfig } from '../../models/workout-ui.models';
+import { ExerciseDbExercise } from '../../data-access/services/exercise-db-api.service';
 import { AppButton } from '../../../../components/app-button/app-button';
+import { ExerciseDetailsDialogConfig } from '../../data-access/models/exercise-details-dialog-config.interface';
 
 @Component({
   selector: 'app-exercise-details-dialog',
@@ -10,10 +10,7 @@ import { AppButton } from '../../../../components/app-button/app-button';
   templateUrl: './exercise-details-dialog.component.html',
 })
 export class ExerciseDetailsDialogComponent {
-  readonly text = input.required<ExerciseDetailsTextConfig>();
-  readonly exercise = input.required<ExerciseDbExercise>();
-  readonly similarExercises = input<ExerciseDbExercise[]>([]);
-  readonly imageBaseUrl = input.required<string>();
+  readonly config = input.required<ExerciseDetailsDialogConfig>();
 
   readonly close = output<void>();
   readonly showExercise = output<ExerciseDbExercise>();
@@ -21,6 +18,6 @@ export class ExerciseDetailsDialogComponent {
   getExerciseMediaUrl(exercise: ExerciseDbExercise): string | null {
     const mediaPath = exercise.gifUrl ?? exercise.images[0];
 
-    return mediaPath ? this.imageBaseUrl() + mediaPath : null;
+    return mediaPath ? this.config().imageBaseUrl + mediaPath : null;
   }
 }

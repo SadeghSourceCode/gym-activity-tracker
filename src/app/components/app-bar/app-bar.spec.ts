@@ -12,6 +12,7 @@ describe('AppBar', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppBar);
+    fixture.componentRef.setInput('config', { title: 'Test bar' });
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
