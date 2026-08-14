@@ -22,6 +22,14 @@
       (markAsRestDay)="markSelectedDayAsRestDay()"
       (removeRestDay)="removeSelectedRestDay()"
     />
+
+    <app-workout-overview [config]="workoutOverviewConfig()" />
+
+    <app-daily-progress [config]="dailyProgressConfig()" />
+
+    <app-weekly-calories [config]="weeklyCaloriesConfig()" />
+
+
   </div>
 </div>
 
