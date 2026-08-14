@@ -14,104 +14,112 @@
     >
       <div class="grid w-85 grid-cols-5 items-center justify-items-center">
         @for (item of bottomNavItems; track item.id) {
-        <app-button
-          variant="link"
-          mode="section"
-          customClass="flex h-11 items-center justify-center overflow-visible rounded-[48px] transition-colors duration-300 ease-out"
-          [class.col-span-2]="isBottomNavItemSelected(item.id)"
-          [class.col-auto]="!isBottomNavItemSelected(item.id)"
-          type="button"
-          [ariaLabel]="getBottomNavLabel(item.labelKey)"
-          [ariaCurrent]="isBottomNavItemSelected(item.id) ? 'page' : null"
-          (buttonClicked)="selectBottomNavItem(item.id, item.route)"
-        >
-          <span
-            class="flex h-11 items-center justify-center rounded-[48px] transition-all duration-300 ease-out"
-            [class.w-[124px]]="isBottomNavItemSelected(item.id)"
-            [class.w-9]="!isBottomNavItemSelected(item.id)"
-            [class.gap-2]="isBottomNavItemSelected(item.id)"
-            [class.bg-[#303437]]="isBottomNavItemSelected(item.id)"
-            [class.text-[#F2F4F5]]="isBottomNavItemSelected(item.id)"
-            [class.text-[#72777A]]="!isBottomNavItemSelected(item.id)"
+          <app-button
+            [config]="{
+              variant: 'link',
+              mode: 'section',
+              type: 'button',
+              ariaLabel: getBottomNavLabel(item.labelKey),
+              ariaCurrent: isBottomNavItemSelected(item.id) ? 'page' : null,
+              customClass:
+                'flex h-11 items-center justify-center overflow-visible rounded-[48px] transition-colors duration-300 ease-out',
+            }"
+            [class.col-span-2]="isBottomNavItemSelected(item.id)"
+            [class.col-auto]="!isBottomNavItemSelected(item.id)"
+            (buttonClicked)="selectBottomNavItem(item.id, item.route)"
           >
-            @switch (item.id) { @case ('home') {
-            <svg
-              class="size-6 shrink-0 transition-transform duration-300 ease-out"
-              [class.scale-100]="isBottomNavItemSelected(item.id)"
-              [class.scale-95]="!isBottomNavItemSelected(item.id)"
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path
-                d="M4.5 10.8c0-1.1.5-2.1 1.4-2.8l4-3.1a3.5 3.5 0 0 1 4.2 0l4 3.1a3.5 3.5 0 0 1 1.4 2.8v5.7a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3v-5.7Zm5.5 3.7a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2h-4Z"
-              />
-            </svg>
-            } @case ('search') {
-            <svg
-              class="size-6 shrink-0 transition-transform duration-300 ease-out"
-              [class.scale-100]="isBottomNavItemSelected(item.id)"
-              [class.scale-95]="!isBottomNavItemSelected(item.id)"
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="11" cy="11" r="7" />
-              <path d="m16.5 16.5 3.5 3.5" />
-            </svg>
-            } @case ('progress') {
-            <svg
-              class="size-6 shrink-0 transition-transform duration-300 ease-out"
-              [class.scale-100]="isBottomNavItemSelected(item.id)"
-              [class.scale-95]="!isBottomNavItemSelected(item.id)"
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M5 19V9" />
-              <path d="M12 19V5" />
-              <path d="M19 19v-7" />
-              <path d="M4 19h16" />
-            </svg>
-            } @case ('profile') {
-            <svg
-              class="size-6 shrink-0 transition-transform duration-300 ease-out"
-              [class.scale-100]="isBottomNavItemSelected(item.id)"
-              [class.scale-95]="!isBottomNavItemSelected(item.id)"
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="12" cy="8" r="3.5" />
-              <path d="M5.5 20a6.5 6.5 0 0 1 13 0" />
-            </svg>
-            } }
-
             <span
-              class="overflow-hidden whitespace-nowrap text-sm font-medium leading-5 transition-all duration-300 ease-out"
-              [class.max-w-16]="isBottomNavItemSelected(item.id)"
-              [class.opacity-100]="isBottomNavItemSelected(item.id)"
-              [class.translate-x-0]="isBottomNavItemSelected(item.id)"
-              [class.max-w-0]="!isBottomNavItemSelected(item.id)"
-              [class.opacity-0]="!isBottomNavItemSelected(item.id)"
-              [class.-translate-x-1]="!isBottomNavItemSelected(item.id)"
+              class="flex h-11 items-center justify-center rounded-[48px] transition-all duration-300 ease-out"
+              [class.w-[124px]]="isBottomNavItemSelected(item.id)"
+              [class.w-9]="!isBottomNavItemSelected(item.id)"
+              [class.gap-2]="isBottomNavItemSelected(item.id)"
+              [class.bg-[#303437]]="isBottomNavItemSelected(item.id)"
+              [class.text-[#F2F4F5]]="isBottomNavItemSelected(item.id)"
+              [class.text-[#72777A]]="!isBottomNavItemSelected(item.id)"
             >
-              {{ getBottomNavLabel(item.labelKey) }}
+              @switch (item.id) {
+                @case ('home') {
+                  <svg
+                    class="size-6 shrink-0 transition-transform duration-300 ease-out"
+                    [class.scale-100]="isBottomNavItemSelected(item.id)"
+                    [class.scale-95]="!isBottomNavItemSelected(item.id)"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M4.5 10.8c0-1.1.5-2.1 1.4-2.8l4-3.1a3.5 3.5 0 0 1 4.2 0l4 3.1a3.5 3.5 0 0 1 1.4 2.8v5.7a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3v-5.7Zm5.5 3.7a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2h-4Z"
+                    />
+                  </svg>
+                }
+                @case ('search') {
+                  <svg
+                    class="size-6 shrink-0 transition-transform duration-300 ease-out"
+                    [class.scale-100]="isBottomNavItemSelected(item.id)"
+                    [class.scale-95]="!isBottomNavItemSelected(item.id)"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="m16.5 16.5 3.5 3.5" />
+                  </svg>
+                }
+                @case ('statistics') {
+                  <svg
+                    class="size-6 shrink-0 transition-transform duration-300 ease-out"
+                    [class.scale-100]="isBottomNavItemSelected(item.id)"
+                    [class.scale-95]="!isBottomNavItemSelected(item.id)"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 19V9" />
+                    <path d="M12 19V5" />
+                    <path d="M19 19v-7" />
+                    <path d="M4 19h16" />
+                  </svg>
+                }
+                @case ('profile') {
+                  <svg
+                    class="size-6 shrink-0 transition-transform duration-300 ease-out"
+                    [class.scale-100]="isBottomNavItemSelected(item.id)"
+                    [class.scale-95]="!isBottomNavItemSelected(item.id)"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="8" r="3.5" />
+                    <path d="M5.5 20a6.5 6.5 0 0 1 13 0" />
+                  </svg>
+                }
+              }
+
+              <span
+                class="overflow-hidden whitespace-nowrap text-sm font-medium leading-5 transition-all duration-300 ease-out"
+                [class.max-w-16]="isBottomNavItemSelected(item.id)"
+                [class.opacity-100]="isBottomNavItemSelected(item.id)"
+                [class.translate-x-0]="isBottomNavItemSelected(item.id)"
+                [class.max-w-0]="!isBottomNavItemSelected(item.id)"
+                [class.opacity-0]="!isBottomNavItemSelected(item.id)"
+                [class.-translate-x-1]="!isBottomNavItemSelected(item.id)"
+              >
+                {{ getBottomNavLabel(item.labelKey) }}
+              </span>
             </span>
-          </span>
-        </app-button>
+          </app-button>
         }
       </div>
     </div>

@@ -8,10 +8,6 @@ import {
   WorkoutDisplayStatus,
 } from '../../models/workout-planner.models';
 import { Workout, WorkoutExerciseSummary, WorkoutSet } from '../../models/workout-storage.models';
-import {
-  ExerciseDetailsTextConfig,
-  SelectedDayPanelTextConfig,
-} from '../../models/workout-ui.models';
 import { ExerciseDbApiService, ExerciseDbExercise } from '../../services/exercise-db-api.service';
 import { getDateKey, getTodayDateKey, parseDateKey } from '../../utils/calendar-date.util';
 import { saveCopiedWorkout } from '../../utils/workout-clipboard.util';
@@ -28,6 +24,9 @@ import { WorkoutDashboardService } from '../../data-access/workout-dashboard.ser
 import { WeeklyCaloriesConfig } from '../../data-access/models/weekly-calories-config.interface';
 import { DailyProgressConfig } from '../../data-access/models/daily-progress-config.interface';
 import { WorkoutOverviewConfig } from '../../data-access/models/workout-overview-config.interface';
+import { SelectedDayPanelConfig } from '../../data-access/models/selected-day-panel-config.interface';
+import { ExerciseDetailsDialogConfig } from '../../data-access/models/exercise-details-dialog-config.interface';
+import { WorkoutCalendarConfig } from '../../data-access/models/workout-calendar-config.interface';
 
 @Component({
   selector: 'app-workout-page',
@@ -61,6 +60,10 @@ export class WorkoutPage {
   exerciseDetailsError = signal<string | null>(null);
 
   readonly exerciseImageBaseUrl = this.exerciseDbApi.imageBaseUrl;
+  readonly workoutCalendarConfig = computed<WorkoutCalendarConfig>(() => ({
+    selectedDate: this.selectedDate(),
+    workouts: this.workouts(),
+  }));
   readonly selectedDayPlan = computed<DailyWorkoutPlan>(() =>
     this.getDailyPlan(this.selectedDate()),
   );
@@ -171,34 +174,58 @@ export class WorkoutPage {
       day: 'numeric',
     }),
   );
-  readonly selectedDayPanelText = computed<SelectedDayPanelTextConfig>(() => ({
-    selectedDayWorkoutsLabel: this.i18n.t('selectedDayWorkouts'),
-    retryLabel: this.i18n.t('retry'),
-    openLabel: this.i18n.t('open'),
-    rejectLabel: this.i18n.t('reject'),
-    editLabel: this.i18n.t('edit'),
-    deleteLabel: this.i18n.t('delete'),
-    copyLabel: this.i18n.t('copy'),
-    copiedLabel: this.i18n.t('copied'),
-    restDayTitle: this.i18n.t('restDay'),
-    recoveryMessage: this.i18n.t('recoveryMessage'),
-    removeRestDayLabel: this.i18n.t('removeRestDay'),
-    noWorkoutPlannedTitle: this.i18n.t('noWorkoutPlanned'),
-    setWorkoutOrRestMessage: this.i18n.t('setWorkoutOrRest'),
-    setWorkoutLabel: this.i18n.t('setWorkout'),
-    markAsRestDayLabel: this.i18n.t('markAsRestDay'),
-    inProgressLabel: this.i18n.t('inProgress'),
-    doneLabel: this.i18n.t('done'),
-    rejectedLabel: this.i18n.t('rejected'),
-    incomingLabel: this.i18n.t('incoming'),
-    isPersian: this.i18n.language() === 'fa',
+  readonly selectedDayPanelConfig = computed<SelectedDayPanelConfig>(() => ({
+    selectedDateLabel: this.selectedDateLabel(),
+    selectedDayViewModel: this.selectedDayViewModel(),
+    workoutStatus: this.selectedDayWorkoutStatus(),
+    error: this.selectedDayError(),
+    text: {
+      selectedDayWorkoutsLabel: this.i18n.t('selectedDayWorkouts'),
+      retryLabel: this.i18n.t('retry'),
+      openLabel: this.i18n.t('open'),
+      editLabel: this.i18n.t('edit'),
+      deleteLabel: this.i18n.t('delete'),
+      copyLabel: this.i18n.t('copy'),
+      copiedLabel: this.i18n.t('copied'),
+      restDayTitle: this.i18n.t('restDay'),
+      recoveryMessage: this.i18n.t('recoveryMessage'),
+      removeRestDayLabel: this.i18n.t('removeRestDay'),
+      noWorkoutPlannedTitle: this.i18n.t('noWorkoutPlanned'),
+      setWorkoutOrRestMessage: this.i18n.t('setWorkoutOrRest'),
+      setWorkoutLabel: this.i18n.t('setWorkout'),
+      markAsRestDayLabel: this.i18n.t('markAsRestDay'),
+      inProgressLabel: this.i18n.t('inProgress'),
+      doneLabel: this.i18n.t('done'),
+      rejectedLabel: this.i18n.t('rejected'),
+      incomingLabel: this.i18n.t('incoming'),
+      workoutSummaryHeadingLabel: this.i18n.language() === 'fa' ? 'تمرین امروز' : "TODAY'S WORKOUT",
+      startWorkoutLabel: this.i18n.language() === 'fa' ? 'شروع' : 'START',
+      closeMenuLabel: this.i18n.language() === 'fa' ? 'بستن منو' : 'Close menu',
+      estimatedLabel: this.i18n.language() === 'fa' ? 'تخمینی' : 'est.',
+      minutesLabel: this.i18n.language() === 'fa' ? 'دقیقه' : 'min',
+      moreExercisesLabel: this.i18n.language() === 'fa' ? 'حرکت دیگر' : 'more exercises',
+      isPersian: this.i18n.language() === 'fa',
+    },
   }));
-  readonly exerciseDetailsText = computed<ExerciseDetailsTextConfig>(() => ({
-    exerciseDetailsLabel: this.i18n.t('exerciseDetails'),
-    closeExerciseDetailsLabel: this.i18n.t('closeExerciseDetails'),
-    noDescriptionAvailableLabel: this.i18n.t('noDescriptionAvailable'),
-    similarExercisesLabel: this.i18n.t('similarExercises'),
-  }));
+  readonly exerciseDetailsConfig = computed<ExerciseDetailsDialogConfig | null>(() => {
+    const exercise = this.selectedExercise();
+
+    if (!exercise) {
+      return null;
+    }
+
+    return {
+      exercise,
+      similarExercises: this.similarExercises(),
+      imageBaseUrl: this.exerciseImageBaseUrl,
+      text: {
+        exerciseDetailsLabel: this.i18n.t('exerciseDetails'),
+        closeExerciseDetailsLabel: this.i18n.t('closeExerciseDetails'),
+        noDescriptionAvailableLabel: this.i18n.t('noDescriptionAvailable'),
+        similarExercisesLabel: this.i18n.t('similarExercises'),
+      },
+    };
+  });
 
   private loadWorkouts(): Workout[] {
     if (!this.isBrowser) {

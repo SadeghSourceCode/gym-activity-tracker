@@ -4,7 +4,7 @@ import { filter } from 'rxjs';
 import { I18nService } from './core/i18n/i18n.service';
 import { AppButton } from './components/app-button/app-button';
 
-type BottomNavItem = 'home' | 'search' | 'progress' | 'profile';
+type BottomNavItem = 'home' | 'search' | 'statistics' | 'profile';
 
 @Component({
   selector: 'app-root',
@@ -18,10 +18,14 @@ export class App {
   protected readonly title = signal('gym-activity-tracker');
   protected readonly selectedBottomNavItem = signal<BottomNavItem | null>(null);
 
-  protected readonly bottomNavItems: { id: BottomNavItem; labelKey: 'home' | 'search' | 'progress' | 'profile'; route: string }[] = [
+  protected readonly bottomNavItems: {
+    id: BottomNavItem;
+    labelKey: 'home' | 'search' | 'statistics' | 'profile';
+    route: string;
+  }[] = [
     { id: 'home', labelKey: 'home', route: '/' },
     { id: 'search', labelKey: 'search', route: '/search' },
-    { id: 'progress', labelKey: 'progress', route: '/' },
+    { id: 'statistics', labelKey: 'statistics', route: '/statistics' },
     { id: 'profile', labelKey: 'profile', route: '/profile' },
   ];
 
@@ -31,7 +35,6 @@ export class App {
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe((event) => this.syncSelectedBottomNavItemWithRoute(event.urlAfterRedirects));
-
   }
 
   protected selectBottomNavItem(item: BottomNavItem, route: string) {
@@ -42,7 +45,7 @@ export class App {
     return this.selectedBottomNavItem() === item;
   }
 
-  protected getBottomNavLabel(labelKey: 'home' | 'search' | 'progress' | 'profile'): string {
+  protected getBottomNavLabel(labelKey: 'home' | 'search' | 'statistics' | 'profile'): string {
     return this.i18n.t(labelKey);
   }
 

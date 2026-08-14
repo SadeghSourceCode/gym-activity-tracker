@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { WorkoutDisplayStatus } from '../../models/workout-planner.models';
+import { StatusBadgeConfig } from '../../data-access/models/status-badge-config.interface';
 
 @Component({
   selector: 'app-status-badge',
@@ -7,7 +7,5 @@ import { WorkoutDisplayStatus } from '../../models/workout-planner.models';
   templateUrl: './status-badge.component.html',
 })
 export class StatusBadgeComponent {
-  readonly status = input.required<WorkoutDisplayStatus>();
-  readonly label = input.required<string>();
+  readonly config = input.required<StatusBadgeConfig>();
 }
-

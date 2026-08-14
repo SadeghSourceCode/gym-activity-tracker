@@ -1,0 +1,47 @@
+<section [attr.aria-label]="config().title">
+  <header class="flex items-center justify-between gap-4">
+    <h2 class="text-xl font-bold text-[#404446]">{{ config().title }}</h2>
+    <span class="rounded-full bg-[#EBF4FF] px-5 py-2 text-sm font-semibold text-[#0070F0]">{{
+      config().periodLabel
+    }}</span>
+  </header>
+  <div class="mt-5 rounded-3xl bg-white p-4 shadow-sm">
+    <svg
+      class="h-40 w-full overflow-visible"
+      viewBox="0 0 320 150"
+      preserveAspectRatio="none"
+      role="img"
+      [attr.aria-label]="config().durationLabel"
+    >
+      <defs>
+        <linearGradient id="activityFill" x1="0" y1="0" x2="0" y2="1">
+          <stop stop-color="#78B7FF" stop-opacity=".35" />
+          <stop offset="1" stop-color="#78B7FF" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <polyline
+        [attr.points]="chartPoints() + ' 310,140 10,140'"
+        fill="url(#activityFill)"
+        stroke="none"
+      />
+      <polyline
+        [attr.points]="chartPoints()"
+        fill="none"
+        stroke="#0070F0"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+    <div class="grid grid-cols-7 gap-1 text-center text-xs">
+      @for (day of config().days; track day.dateKey) {
+        <span
+          [class.font-bold]="day.selected"
+          [class.text-[#0070F0]]="day.selected"
+          [class.text-[#72777A]]="!day.selected"
+          >{{ day.dayLabel }}</span
+        >
+      }
+    </div>
+  </div>
+</section>

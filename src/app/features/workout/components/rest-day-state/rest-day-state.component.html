@@ -1,18 +1,21 @@
 <div class="rounded-2xl border border-[#E3E5E5] bg-[#F7F9FA] p-4 text-center">
-  <h3 class="text-lg font-bold text-[#202325]">{{ title() }}</h3>
+  <h3 class="text-lg font-bold text-[#202325]">{{ config().title }}</h3>
   <p class="mt-1 text-sm text-[#72777A]">
-    {{ message() }}
+    {{ config().message ?? '' }}
   </p>
 
   <app-button
-    variant="outline"
-    mode="section"
-    size="small"
-    customClass="mt-4 rounded-full border border-[#0070F0] px-4 py-2 text-sm font-semibold text-[#0070F0]"
-    type="button"
-    [ariaLabel]="removeLabel()"
+    [config]="{
+      size: 'small',
+      variant: 'outline',
+      mode: 'section',
+      type: 'button',
+      ariaLabel: config().removeLabel,
+      customClass:
+        'mt-4 rounded-full border border-[#0070F0] px-4 py-2 text-sm font-semibold text-[#0070F0]',
+    }"
     (buttonClicked)="remove.emit()"
   >
-    {{ removeLabel() }}
+    {{ config().removeLabel }}
   </app-button>
 </div>

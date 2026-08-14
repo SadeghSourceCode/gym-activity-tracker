@@ -4,6 +4,7 @@ import { Observable, defer, forkJoin, from, map, of, shareReplay, switchMap, tap
 import { ProfilePreferencesService } from '../../profile/data-access/services/profile-preferences.service';
 import { WorkoutExerciseSection } from '../models/workout-storage.models';
 import { translateExerciseNameToPersian } from '../utils/exercise-persian-name.util';
+import { normalizeExerciseSearchText } from '../utils/exercise-search-normalizer.util';
 
 export interface ExerciseDbExercise {
   id: string;
@@ -178,7 +179,7 @@ export class ExerciseDbApiService {
     targetMuscle: string | null = null,
     section: WorkoutExerciseSection | null = null,
   ): Observable<ExerciseSearchResult> {
-    const normalizedQuery = query.trim().toLowerCase();
+    const normalizedQuery = normalizeExerciseSearchText(query);
     const normalizedTargetMuscle = targetMuscle?.trim().toLowerCase() ?? '';
 
     return this.exercises$.pipe(
@@ -365,7 +366,7 @@ export class ExerciseDbApiService {
       exercise.equipment,
       ...exercise.primaryMuscles,
       ...exercise.secondaryMuscles,
-    ].some((value) => value?.toLowerCase().includes(query));
+    ].some((value) => value && normalizeExerciseSearchText(value).includes(query));
   }
 
   private getSimilarityScore(

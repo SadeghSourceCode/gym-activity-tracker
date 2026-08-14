@@ -2,63 +2,73 @@
   class="fixed inset-0 z-50 overflow-y-auto bg-[#F7F9FA]"
   role="dialog"
   aria-modal="true"
-  [attr.aria-label]="text().exerciseDetailsLabel"
+  [attr.aria-label]="config().text.exerciseDetailsLabel"
 >
   <div class="flex min-h-dvh flex-col items-center gap-4 p-4">
     <div class="flex w-full items-center justify-between">
-      <h2 class="min-w-0 truncate text-xl font-semibold text-[#202325]">{{ exercise().name }}</h2>
+      <h2 class="min-w-0 truncate text-xl font-semibold text-[#202325]">
+        {{ config().exercise.name }}
+      </h2>
 
       <app-button
-        variant="link"
-        mode="iconOnly"
-        customClass="flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
-        type="button"
-        [ariaLabel]="text().closeExerciseDetailsLabel"
+        [config]="{
+          variant: 'link',
+          mode: 'iconOnly',
+          type: 'button',
+          ariaLabel: config().text.closeExerciseDetailsLabel,
+          customClass:
+            'flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]',
+        }"
         (buttonClicked)="close.emit()"
       >
         &times;
       </app-button>
     </div>
 
-    @if (getExerciseMediaUrl(exercise()); as exerciseMediaUrl) {
+    @if (getExerciseMediaUrl(config().exercise); as exerciseMediaUrl) {
       <img
         class="w-full rounded-3xl bg-white object-cover"
         [src]="exerciseMediaUrl"
-        [alt]="exercise().name"
+        [alt]="config().exercise.name"
       />
     }
 
     <div class="flex w-full flex-col items-center gap-2 text-center">
       <p class="font-semibold capitalize text-[#404446]">
-        {{ exercise().category }}
-        @if (exercise().equipment) {
-          · {{ exercise().equipment }}
+        {{ config().exercise.category }}
+        @if (config().exercise.equipment) {
+          · {{ config().exercise.equipment }}
         }
       </p>
 
-      @if (exercise().instructions.length) {
+      @if (config().exercise.instructions.length) {
         <p class="max-w-2xl leading-7 text-[#72777A]">
-          {{ exercise().instructions.join(' ') }}
+          {{ config().exercise.instructions.join(' ') }}
         </p>
       } @else {
         <p class="max-w-2xl leading-7 text-[#72777A]">
-          {{ text().noDescriptionAvailableLabel }}
+          {{ config().text.noDescriptionAvailableLabel }}
         </p>
       }
     </div>
 
-    @if (similarExercises().length) {
+    @if (config().similarExercises?.length) {
       <div class="w-full">
-        <p class="mb-2 text-center font-semibold text-[#202325]">{{ text().similarExercisesLabel }}</p>
+        <p class="mb-2 text-center font-semibold text-[#202325]">
+          {{ config().text.similarExercisesLabel }}
+        </p>
 
         <div class="flex items-center gap-3 overflow-x-auto pb-2">
-          @for (similarExercise of similarExercises(); track similarExercise.id) {
+          @for (similarExercise of config().similarExercises ?? []; track similarExercise.id) {
             <app-button
-              variant="outline"
-              mode="section"
-              size="small"
-              customClass="shrink-0 rounded-full border border-[#0070F0] bg-[#EBF4FF] px-4 py-2 text-sm capitalize text-[#0070F0]"
-              type="button"
+              [config]="{
+                size: 'small',
+                variant: 'outline',
+                mode: 'section',
+                type: 'button',
+                customClass:
+                  'shrink-0 rounded-full border border-[#0070F0] bg-[#EBF4FF] px-4 py-2 text-sm capitalize text-[#0070F0]',
+              }"
               (buttonClicked)="showExercise.emit(similarExercise)"
             >
               {{ similarExercise.name }}

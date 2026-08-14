@@ -95,6 +95,7 @@ type TranslationKey =
   | 'seventhDay'
   | 'similarExercises'
   | 'startRest'
+  | 'statistics'
   | 'sixthDay'
   | 'systemTheme'
   | 'tall'
@@ -211,6 +212,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     seventhDay: 'Seventh Day',
     similarExercises: 'Similar exercises',
     startRest: 'Start rest',
+    statistics: 'Statistics',
     sixthDay: 'Sixth Day',
     systemTheme: 'System theme',
     tall: 'Tall',
@@ -327,6 +329,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     seventhDay: 'روز هفتم',
     similarExercises: 'حرکت‌های مشابه',
     startRest: 'شروع استراحت',
+    statistics: 'آمار',
     sixthDay: 'روز ششم',
     systemTheme: 'تم سیستم',
     tall: 'قد',

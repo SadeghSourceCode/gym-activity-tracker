@@ -1,8 +1,10 @@
 <div class="grid grid-cols-5 items-center">
   @if (config().rightIcon) {
     <div class="col-span-1">
-      <app-button variant="link" mode="iconOnly" customClass="size-10">
-
+      <app-button
+        [config]="{ variant: 'link', mode: 'iconOnly', customClass: 'size-10' }"
+        (buttonClicked)="rightIconClicked.emit()"
+      >
       </app-button>
     </div>
   }
@@ -12,8 +14,6 @@
   </p>
 
   @if (config().leftIcon) {
-    <div class="col-span-1">
-
-    </div>
+    <div class="col-span-1"></div>
   }
 </div>

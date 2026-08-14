@@ -16,9 +16,11 @@ describe('App', () => {
 
   it('should render the app shell', async () => {
     const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
     await fixture.whenStable();
+    fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('workout-page')).toBeTruthy();
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
     expect(compiled.querySelector('nav')?.textContent).toContain('Home');
   });
 });

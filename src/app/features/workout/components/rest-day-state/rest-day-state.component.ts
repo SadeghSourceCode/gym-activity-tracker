@@ -1,5 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { AppButton } from '../../../../components/app-button/app-button';
+import { RestDayStateConfig } from '../../data-access/models/rest-day-state-config.interface';
 
 @Component({
   selector: 'app-rest-day-state',
@@ -8,9 +9,7 @@ import { AppButton } from '../../../../components/app-button/app-button';
   templateUrl: './rest-day-state.component.html',
 })
 export class RestDayStateComponent {
-  readonly title = input.required<string>();
-  readonly message = input.required<string>();
-  readonly removeLabel = input.required<string>();
+  readonly config = input.required<RestDayStateConfig>();
 
   readonly remove = output<void>();
 }
