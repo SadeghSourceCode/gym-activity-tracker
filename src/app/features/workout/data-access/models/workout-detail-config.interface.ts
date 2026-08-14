@@ -1,5 +1,5 @@
-import { Workout } from '../../models/workout-storage.models';
-import { ExerciseDbExercise } from '../../services/exercise-db-api.service';
+import { Workout } from './workout-storage.models';
+import { ExerciseDbExercise } from '../services/exercise-db-api.service';
 
 export interface WorkoutDetailTextConfig {
   workoutDetailsLabel: string;

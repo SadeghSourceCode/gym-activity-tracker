@@ -3,9 +3,9 @@ import {
   Workout,
   WorkoutExerciseSection,
   WorkoutExerciseSummary,
-} from '../../models/workout-storage.models';
+} from '../../data-access/models/workout-storage.models';
 import { AppButton } from '../../../../components/app-button/app-button';
-import { ExerciseDbExercise } from '../../services/exercise-db-api.service';
+import { ExerciseDbExercise } from '../../data-access/services/exercise-db-api.service';
 import { WorkoutDetailConfig } from '../../data-access/models/workout-detail-config.interface';
 import {
   WorkoutCompletedOutput,

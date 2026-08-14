@@ -10,7 +10,7 @@ import {
   AddWorkoutStep,
 } from '../../data-access/models/add-workout-header-config.interface';
 import { WorkoutPlanningStepComponent } from '../../components/workout-planning-step/workout-planning-step.component';
-import { AddWorkoutService } from '../../data-access/add-workout.service';
+import { AddWorkoutService } from '../../data-access/services/add-workout.service';
 import { WorkoutPlanningChangedOutput } from '../../data-access/models/workout-planning-changed-output.interface';
 import { AddWorkoutSaveConfig } from '../../data-access/models/add-workout-save-config.interface';
 import { WorkoutPlanningStepConfig } from '../../data-access/models/workout-planning-step-config.interface';
@@ -19,9 +19,9 @@ import {
   Workout,
   WorkoutExerciseSection,
   WorkoutExerciseSummary,
-} from '../../models/workout-storage.models';
-import { WorkoutEditorTextConfig } from '../../models/workout-ui.models';
-import { ExerciseDbExercise, TargetMuscleOption } from '../../services/exercise-db-api.service';
+} from '../../data-access/models/workout-storage.models';
+import { WorkoutEditorTextConfig } from '../../data-access/models/workout-ui.models';
+import { ExerciseDbExercise, TargetMuscleOption } from '../../data-access/services/exercise-db-api.service';
 import {
   getDateKey,
   getTodayDateKey,

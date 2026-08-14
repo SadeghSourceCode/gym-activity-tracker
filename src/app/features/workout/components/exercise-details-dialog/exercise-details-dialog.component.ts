@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { ExerciseDbExercise } from '../../services/exercise-db-api.service';
+import { ExerciseDbExercise } from '../../data-access/services/exercise-db-api.service';
 import { AppButton } from '../../../../components/app-button/app-button';
 import { ExerciseDetailsDialogConfig } from '../../data-access/models/exercise-details-dialog-config.interface';
 

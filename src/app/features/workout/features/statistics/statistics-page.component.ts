@@ -8,8 +8,8 @@ import { DailyProgressConfig } from '../../data-access/models/daily-progress-con
 import { WeeklyCaloriesConfig } from '../../data-access/models/weekly-calories-config.interface';
 import { WorkoutCalendarConfig } from '../../data-access/models/workout-calendar-config.interface';
 import { WorkoutOverviewConfig } from '../../data-access/models/workout-overview-config.interface';
-import { StatisticsService } from '../../data-access/statistics.service';
-import { WorkoutDashboardService } from '../../data-access/workout-dashboard.service';
+import { StatisticsService } from '../../data-access/services/statistics.service';
+import { WorkoutDashboardService } from '../../data-access/services/workout-dashboard.service';
 import { getTodayDateKey, parseDateKey } from '../../utils/calendar-date.util';
 
 @Component({

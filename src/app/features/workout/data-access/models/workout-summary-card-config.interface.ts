@@ -1,4 +1,4 @@
-import { WorkoutCardViewModel } from '../../models/workout-planner.models';
+import { WorkoutCardViewModel } from './workout-planner.models';
 
 export interface WorkoutSummaryCardConfig {
   workout: WorkoutCardViewModel;

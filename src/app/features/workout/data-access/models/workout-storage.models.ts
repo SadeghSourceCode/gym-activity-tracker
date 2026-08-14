@@ -1,4 +1,5 @@
-import { WorkoutCompletionStatus } from './workout-planner.models';
+import { WorkoutCompletionStatus } from "./workout-planner.models";
+
 
 export interface WorkoutSet {
   id: number;

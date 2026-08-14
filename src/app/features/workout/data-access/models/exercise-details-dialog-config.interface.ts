@@ -1,4 +1,4 @@
-import { ExerciseDbExercise } from '../../services/exercise-db-api.service';
+import { ExerciseDbExercise } from '../services/exercise-db-api.service';
 
 export interface ExerciseDetailsDialogTextConfig {
   exerciseDetailsLabel: string;

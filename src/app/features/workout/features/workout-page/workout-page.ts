@@ -6,9 +6,9 @@ import {
   DailyWorkoutPlan,
   WorkoutCompletionStatus,
   WorkoutDisplayStatus,
-} from '../../models/workout-planner.models';
-import { Workout, WorkoutExerciseSummary, WorkoutSet } from '../../models/workout-storage.models';
-import { ExerciseDbApiService, ExerciseDbExercise } from '../../services/exercise-db-api.service';
+} from '../../data-access/models/workout-planner.models';
+import { Workout, WorkoutExerciseSummary, WorkoutSet } from '../../data-access/models/workout-storage.models';
+import { ExerciseDbApiService, ExerciseDbExercise } from '../../data-access/services/exercise-db-api.service';
 import { getDateKey, getTodayDateKey, parseDateKey } from '../../utils/calendar-date.util';
 import { saveCopiedWorkout } from '../../utils/workout-clipboard.util';
 import { isWorkoutOnDate } from '../../utils/weekly-recurrence.util';
@@ -20,7 +20,7 @@ import { ExerciseDetailsDialogComponent } from '../../components/exercise-detail
 import { WeeklyCaloriesComponent } from '../../components/weekly-calories/weekly-calories.component';
 import { DailyProgressComponent } from '../../components/daily-progress/daily-progress.component';
 import { WorkoutOverviewComponent } from '../../components/workout-overview/workout-overview.component';
-import { WorkoutDashboardService } from '../../data-access/workout-dashboard.service';
+import { WorkoutDashboardService } from '../../data-access/services/workout-dashboard.service';
 import { WeeklyCaloriesConfig } from '../../data-access/models/weekly-calories-config.interface';
 import { DailyProgressConfig } from '../../data-access/models/daily-progress-config.interface';
 import { WorkoutOverviewConfig } from '../../data-access/models/workout-overview-config.interface';

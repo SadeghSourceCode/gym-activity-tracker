@@ -1,4 +1,4 @@
-import { SelectedDayViewModel, WorkoutDisplayStatus } from '../../models/workout-planner.models';
+import { SelectedDayViewModel, WorkoutDisplayStatus } from './workout-planner.models';
 
 export interface SelectedDayPanelTextConfig {
   selectedDayWorkoutsLabel: string;

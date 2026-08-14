@@ -1,4 +1,4 @@
-import { Workout } from '../../models/workout-storage.models';
+import { Workout } from './workout-storage.models';
 
 export interface WorkoutCalendarConfig {
   selectedDate?: string;

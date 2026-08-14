@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Workout } from '../models/workout-storage.models';
-import { getDateKey, parseDateKey } from '../utils/calendar-date.util';
-import { isWorkoutOnDate } from '../utils/weekly-recurrence.util';
+import { getDateKey, parseDateKey } from '../../utils/calendar-date.util';
+import { isWorkoutOnDate } from '../../utils/weekly-recurrence.util';
 import {
   WorkoutDashboardDaySummary,
   WorkoutDashboardSummary,
-} from './models/workout-dashboard-summary.interface';
+} from '../models/workout-dashboard-summary.interface';
+import { Workout } from '../models/workout-storage.models';
 
 @Injectable({ providedIn: 'root' })
 export class WorkoutDashboardService {

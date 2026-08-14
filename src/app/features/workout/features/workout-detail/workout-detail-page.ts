@@ -4,10 +4,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { AppButton } from '../../../../components/app-button/app-button';
 import { I18nService } from '../../../../core/i18n/i18n.service';
-import { WorkoutCompletionStatus } from '../../models/workout-planner.models';
-import { Workout, WorkoutExerciseSummary, WorkoutSet } from '../../models/workout-storage.models';
+import { WorkoutCompletionStatus } from '../../data-access/models/workout-planner.models';
+import { Workout, WorkoutExerciseSummary, WorkoutSet } from '../../data-access/models/workout-storage.models';
 import { WorkoutDetailConfig } from '../../data-access/models/workout-detail-config.interface';
-import { ExerciseDbApiService, ExerciseDbExercise } from '../../services/exercise-db-api.service';
+import { ExerciseDbApiService, ExerciseDbExercise } from '../../data-access/services/exercise-db-api.service';
 import { getDateKey, getTodayDateKey } from '../../utils/calendar-date.util';
 import { WorkoutDetailComponent } from '../../components/workout-detail/workout-detail.component';
 

@@ -1,4 +1,4 @@
-import { WorkoutExerciseSummary } from '../../models/workout-storage.models';
+import { WorkoutExerciseSummary } from './workout-storage.models';
 
 export interface AddWorkoutSaveConfig {
   workoutTitle: string;

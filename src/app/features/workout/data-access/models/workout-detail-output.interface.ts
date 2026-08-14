@@ -1,6 +1,6 @@
-import { WorkoutCompletionStatus } from '../../models/workout-planner.models';
-import { WorkoutSet } from '../../models/workout-storage.models';
-import { ExerciseDbExercise } from '../../services/exercise-db-api.service';
+import { WorkoutCompletionStatus } from './workout-planner.models';
+import { WorkoutSet } from './workout-storage.models';
+import { ExerciseDbExercise } from '../services/exercise-db-api.service';
 
 export interface WorkoutExerciseOutput {
   workoutId: number;

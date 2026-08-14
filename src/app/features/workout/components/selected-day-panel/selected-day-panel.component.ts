@@ -1,7 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
 import { SelectedDayPanelConfig } from '../../data-access/models/selected-day-panel-config.interface';
 import { WorkoutSummaryCardConfig } from '../../data-access/models/workout-summary-card-config.interface';
-import { WorkoutCardViewModel } from '../../models/workout-planner.models';
+import { WorkoutCardViewModel } from '../../data-access/models/workout-planner.models';
 import { EmptyDayStateConfig } from '../../data-access/models/empty-day-state-config.interface';
 import { RestDayStateConfig } from '../../data-access/models/rest-day-state-config.interface';
 import { StatusBadgeConfig } from '../../data-access/models/status-badge-config.interface';

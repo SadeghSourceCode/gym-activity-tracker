@@ -1,7 +1,7 @@
 import {
   DailyWorkoutPlan,
   SelectedDayViewModel,
-} from '../models/workout-planner.models';
+} from '../data-access/models/workout-planner.models';
 import { resolveWorkoutStatus } from './workout-status.util';
 
 export function mapDailyPlanToViewModel(
