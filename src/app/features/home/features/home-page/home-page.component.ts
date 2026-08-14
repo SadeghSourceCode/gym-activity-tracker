@@ -8,7 +8,7 @@ import {
   parseDateKey,
 } from '../../../workout/utils/calendar-date.util';
 import { isWorkoutOnDate } from '../../../workout/utils/weekly-recurrence.util';
-import { HomeService } from '../../data-access/home.service';
+import { HomeService } from '../../data-access/services/home.service';
 import { UpcomingWorkoutConfig } from '../../data-access/models/upcoming-workout-config.interface';
 import { NearbyGymsConfig } from '../../data-access/models/nearby-gyms-config.interface';
 import { WeeklyActivityConfig } from '../../data-access/models/weekly-activity-config.interface';
