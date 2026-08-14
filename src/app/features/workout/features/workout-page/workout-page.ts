@@ -1,12 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import {
-  Component,
-  DestroyRef,
-  PLATFORM_ID,
-  computed,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, DestroyRef, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -14,19 +7,12 @@ import {
   WorkoutCompletionStatus,
   WorkoutDisplayStatus,
 } from '../../models/workout-planner.models';
-import {
-  Workout,
-  WorkoutExerciseSummary,
-  WorkoutSet,
-} from '../../models/workout-storage.models';
+import { Workout, WorkoutExerciseSummary, WorkoutSet } from '../../models/workout-storage.models';
 import {
   ExerciseDetailsTextConfig,
   SelectedDayPanelTextConfig,
 } from '../../models/workout-ui.models';
-import {
-  ExerciseDbApiService,
-  ExerciseDbExercise,
-} from '../../services/exercise-db-api.service';
+import { ExerciseDbApiService, ExerciseDbExercise } from '../../services/exercise-db-api.service';
 import { getDateKey, getTodayDateKey, parseDateKey } from '../../utils/calendar-date.util';
 import { saveCopiedWorkout } from '../../utils/workout-clipboard.util';
 import { isWorkoutOnDate } from '../../utils/weekly-recurrence.util';
@@ -35,6 +21,13 @@ import { WorkoutCalendarComponent } from '../../components/workout-calendar/work
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { SelectedDayPanelComponent } from '../../components/selected-day-panel/selected-day-panel.component';
 import { ExerciseDetailsDialogComponent } from '../../components/exercise-details-dialog/exercise-details-dialog.component';
+import { WeeklyCaloriesComponent } from '../../components/weekly-calories/weekly-calories.component';
+import { DailyProgressComponent } from '../../components/daily-progress/daily-progress.component';
+import { WorkoutOverviewComponent } from '../../components/workout-overview/workout-overview.component';
+import { WorkoutDashboardService } from '../../data-access/workout-dashboard.service';
+import { WeeklyCaloriesConfig } from '../../data-access/models/weekly-calories-config.interface';
+import { DailyProgressConfig } from '../../data-access/models/daily-progress-config.interface';
+import { WorkoutOverviewConfig } from '../../data-access/models/workout-overview-config.interface';
 
 @Component({
   selector: 'app-workout-page',
@@ -42,6 +35,9 @@ import { ExerciseDetailsDialogComponent } from '../../components/exercise-detail
     WorkoutCalendarComponent,
     SelectedDayPanelComponent,
     ExerciseDetailsDialogComponent,
+    WeeklyCaloriesComponent,
+    DailyProgressComponent,
+    WorkoutOverviewComponent,
   ],
   templateUrl: './workout-page.html',
 })
@@ -51,6 +47,7 @@ export class WorkoutPage {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly destroyRef = inject(DestroyRef);
   private readonly exerciseDbApi = inject(ExerciseDbApiService);
+  private readonly workoutDashboardService = inject(WorkoutDashboardService);
   private readonly router = inject(Router);
   readonly i18n = inject(I18nService);
   private readonly pageSize = 15;
@@ -64,7 +61,9 @@ export class WorkoutPage {
   exerciseDetailsError = signal<string | null>(null);
 
   readonly exerciseImageBaseUrl = this.exerciseDbApi.imageBaseUrl;
-  readonly selectedDayPlan = computed<DailyWorkoutPlan>(() => this.getDailyPlan(this.selectedDate()));
+  readonly selectedDayPlan = computed<DailyWorkoutPlan>(() =>
+    this.getDailyPlan(this.selectedDate()),
+  );
   readonly selectedDayViewModel = computed(() =>
     mapDailyPlanToViewModel(this.selectedDayPlan(), getTodayDateKey()),
   );
@@ -90,6 +89,80 @@ export class WorkoutPage {
     }
 
     return 'upcoming';
+  });
+  readonly dashboardSummary = computed(() =>
+    this.workoutDashboardService.createSummary(this.workouts(), this.selectedDate()),
+  );
+  readonly weeklyCaloriesConfig = computed<WeeklyCaloriesConfig>(() => {
+    const isPersian = this.i18n.language() === 'fa';
+
+    return {
+      title: isPersian ? 'کالری' : 'Calories',
+      periodLabel: isPersian ? 'هفتگی' : 'Weekly',
+      caloriesUnit: isPersian ? 'کالری تخمینی تمرین' : 'Estimated workout calories',
+      days: this.dashboardSummary().weeklyCalories.map((day) => ({
+        ...day,
+        dayLabel: parseDateKey(day.dateKey).toLocaleDateString(
+          isPersian ? 'fa-IR-u-ca-persian' : undefined,
+          { weekday: 'short' },
+        ),
+        selected: day.dateKey === this.selectedDate(),
+      })),
+    };
+  });
+  readonly dailyProgressConfig = computed<DailyProgressConfig>(() => {
+    const isPersian = this.i18n.language() === 'fa';
+    const calories = this.dashboardSummary().selectedDayCalories;
+
+    return {
+      title: isPersian ? 'پیشرفت روزانه' : 'Daily progress',
+      metrics: [
+        {
+          label: isPersian ? 'خواب' : 'Sleep',
+          goal: 8,
+          valueLabel: isPersian ? 'داده‌ای ثبت نشده' : 'No data recorded',
+          color: '#7DD3FC',
+        },
+        {
+          label: isPersian ? 'کالری' : 'Calories',
+          value: calories,
+          goal: 600,
+          valueLabel: `${calories}/600`,
+          color: '#FB7185',
+        },
+        {
+          label: isPersian ? 'قدم‌ها' : 'Steps',
+          goal: 6000,
+          valueLabel: isPersian ? 'داده‌ای ثبت نشده' : 'No data recorded',
+          color: '#FDBA74',
+        },
+      ],
+    };
+  });
+  readonly workoutOverviewConfig = computed<WorkoutOverviewConfig>(() => {
+    const isPersian = this.i18n.language() === 'fa';
+    const summary = this.dashboardSummary();
+
+    return {
+      title: isPersian ? 'نمای کلی' : 'Overview',
+      items: [
+        {
+          label: isPersian ? 'کالری سوزانده‌شده' : 'Calories burned',
+          value: summary.selectedDayCalories.toLocaleString(isPersian ? 'fa-IR' : undefined),
+          icon: 'calories',
+        },
+        {
+          label: isPersian ? 'زمان کل' : 'Total time',
+          value: this.formatDuration(summary.selectedDayDurationMinutes, isPersian),
+          icon: 'time',
+        },
+        {
+          label: isPersian ? 'تمرین‌ها' : 'Exercises',
+          value: summary.selectedDayExerciseCount.toLocaleString(isPersian ? 'fa-IR' : undefined),
+          icon: 'exercises',
+        },
+      ],
+    };
   });
   readonly selectedDateLabel = computed(() =>
     parseDateKey(this.selectedDate()).toLocaleDateString(this.getDateLocale(), {
@@ -146,12 +219,12 @@ export class WorkoutPage {
       }
 
       return workouts.map((workout) => ({
-          ...workout,
-          date: new Date(workout.date),
-          exercises: this.normalizeWorkoutExercises(workout),
-          sets: Array.isArray(workout.sets) ? workout.sets : [],
-          completionStatus: this.normalizeCompletionStatus(workout.completionStatus),
-        }));
+        ...workout,
+        date: new Date(workout.date),
+        exercises: this.normalizeWorkoutExercises(workout),
+        sets: Array.isArray(workout.sets) ? workout.sets : [],
+        completionStatus: this.normalizeCompletionStatus(workout.completionStatus),
+      }));
     } catch {
       return [];
     }
@@ -316,9 +389,7 @@ export class WorkoutPage {
       return;
     }
 
-    this.workouts.update((workouts) =>
-      workouts.filter((workout) => workout.id !== workoutId),
-    );
+    this.workouts.update((workouts) => workouts.filter((workout) => workout.id !== workoutId));
     this.saveWorkouts();
   }
 
@@ -348,9 +419,7 @@ export class WorkoutPage {
     const selectedDate = this.selectedDate();
 
     this.selectedDayError.set(null);
-    this.restDayKeys.update((dateKeys) =>
-      dateKeys.filter((dateKey) => dateKey !== selectedDate),
-    );
+    this.restDayKeys.update((dateKeys) => dateKeys.filter((dateKey) => dateKey !== selectedDate));
   }
 
   retrySelectedDay() {
@@ -442,9 +511,10 @@ export class WorkoutPage {
           nameEn: exercise.nameEn ?? exercise.name,
           nameFa: exercise.nameFa ?? exercise.name,
           targetMuscle: exercise.targetMuscle ?? workout.targetMuscle,
-          name: this.i18n.language() === 'fa'
-            ? (exercise.nameFa ?? exercise.name)
-            : (exercise.nameEn ?? exercise.name),
+          name:
+            this.i18n.language() === 'fa'
+              ? (exercise.nameFa ?? exercise.name)
+              : (exercise.nameEn ?? exercise.name),
           sets: this.normalizeWorkoutSets(exercise.sets),
         }));
     }
@@ -489,5 +559,21 @@ export class WorkoutPage {
 
   private getDateLocale(): string | undefined {
     return this.i18n.language() === 'fa' ? 'fa-IR' : undefined;
+  }
+
+  private formatDuration(minutes: number, isPersian: boolean): string {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    const locale = isPersian ? 'fa-IR' : undefined;
+    const localizedHours = hours.toLocaleString(locale);
+    const localizedMinutes = remainingMinutes.toLocaleString(locale);
+
+    if (!hours) {
+      return isPersian ? `${localizedMinutes} دقیقه` : `${localizedMinutes} min`;
+    }
+
+    return isPersian
+      ? `${localizedHours} ساعت ${localizedMinutes} دقیقه`
+      : `${localizedHours}h ${localizedMinutes}min`;
   }
 }
