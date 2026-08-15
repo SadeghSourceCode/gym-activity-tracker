@@ -2,7 +2,6 @@
   @if (config().rightIcon) {
     <div class="col-span-1">
       <app-button
-        class="size-10"
         [config]="{ variant: 'link', mode: 'iconOnly' }"
         (buttonClicked)="rightIconClicked.emit()"
       >

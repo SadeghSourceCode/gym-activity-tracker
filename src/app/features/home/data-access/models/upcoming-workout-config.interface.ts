@@ -9,5 +9,6 @@ export interface UpcomingWorkoutItemConfig {
 export interface UpcomingWorkoutConfig {
   title: string;
   emptyLabel: string;
+  addWorkoutLabel: string;
   workouts?: readonly UpcomingWorkoutItemConfig[];
 }

@@ -23,8 +23,20 @@
       </div>
     </div>
   } @empty {
-    <div class="w-full rounded-[28px] bg-[#F0EFFF] p-8 text-center text-[#72777A]">
-      {{ config().emptyLabel }}
+    <div
+      class="flex w-full flex-col items-center gap-4 rounded-[28px] bg-[#F0EFFF] p-8 text-center"
+    >
+      <p class="text-[#72777A]">{{ config().emptyLabel }}</p>
+      <app-button
+        [config]="{
+          variant: 'fill',
+          type: 'button',
+          ariaLabel: config().addWorkoutLabel,
+        }"
+        (buttonClicked)="addWorkoutRequested.emit()"
+      >
+        {{ config().addWorkoutLabel }}
+      </app-button>
     </div>
   }
 </section>

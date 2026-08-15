@@ -12,7 +12,6 @@
       </div>
 
       <app-button
-        class="flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
         [config]="{
           variant: 'link',
           mode: 'iconOnly',
@@ -81,7 +80,6 @@
                   @if (canManage()) {
                     <div class="grid grid-cols-2 gap-2">
                       <app-button
-                        class="rounded-full border border-[#0070F0] px-3 py-2 text-sm font-semibold text-[#0070F0]"
                         [config]="{
                           variant: 'outline',
                           mode: 'section',
@@ -92,7 +90,6 @@
                         {{ text().changeExerciseLabel }}
                       </app-button>
                       <app-button
-                        class="rounded-full border border-[#C93636] px-3 py-2 text-sm font-semibold text-[#C93636]"
                         [config]="{
                           variant: 'outline',
                           mode: 'section',
@@ -114,7 +111,6 @@
                           {{ text().chooseReplacementLabel }}
                         </p>
                         <app-button
-                          class="flex size-8 items-center justify-center rounded-full text-2xl text-[#72777A]"
                           [config]="{
                             variant: 'link',
                             mode: 'iconOnly',
@@ -134,7 +130,6 @@
                         <div class="flex flex-col gap-2">
                           @for (replacement of replacementExercises(); track replacement.id) {
                             <app-button
-                              class="!flex !justify-start items-center gap-2 rounded-2xl border border-[#E3E5E5] bg-white p-2 text-start"
                               [config]="{
                                 variant: 'outline',
                                 mode: 'section',
@@ -215,7 +210,6 @@
                         @if (canManage()) {
                           <div class="col-span-2">
                             <app-button
-                              class="w-full rounded-full border border-[#0070F0] bg-white px-4 py-2.5 text-sm font-bold text-[#0070F0]"
                               [config]="{
                                 variant: 'outline',
                                 mode: 'section',
@@ -233,7 +227,6 @@
 
                   @if (canManage()) {
                     <app-button
-                      class="w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
                       [config]="{
                         variant: 'fill',
                         mode: 'section',
@@ -257,7 +250,6 @@
     @if (canManage()) {
       <div class="grid gap-3 rounded-3xl bg-white p-4 shadow-sm sm:grid-cols-2">
         <app-button
-          class="rounded-full bg-[#168A4A] px-4 py-3 font-semibold text-white"
           [config]="{
             variant: 'fill',
             mode: 'section',
@@ -271,7 +263,6 @@
         </app-button>
 
         <app-button
-          class="rounded-full bg-[#C93636] px-4 py-3 font-semibold text-white"
           [config]="{
             variant: 'fill',
             mode: 'section',
@@ -301,7 +292,6 @@
         </div>
 
         <app-button
-          class="flex size-9 shrink-0 items-center justify-center rounded-full text-2xl text-[#72777A] hover:bg-[#F2F4F5]"
           [config]="{
             variant: 'link',
             mode: 'iconOnly',
@@ -324,7 +314,6 @@
 
       <div class="grid grid-cols-2 gap-3">
         <app-button
-          class="rounded-full border border-[#C7CBCC] bg-white px-4 py-3 text-lg font-bold text-[#202325]"
           [config]="{
             variant: 'outline',
             mode: 'section',
@@ -338,7 +327,6 @@
         </app-button>
 
         <app-button
-          class="rounded-full bg-[#0070F0] px-4 py-3 text-lg font-bold text-white"
           [config]="{
             variant: 'fill',
             mode: 'section',
