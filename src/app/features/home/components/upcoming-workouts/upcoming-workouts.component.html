@@ -1,8 +1,8 @@
-<section [attr.aria-label]="config().title">
+<section [attr.aria-label]="config().title" class="flex flex-col gap-4">
   <h2 class="text-xl font-bold text-[#404446]">{{ config().title }}</h2>
 
-  <div class="scrollbar-none -mx-5 mt-5 flex snap-x gap-4 overflow-x-auto px-5 pb-3">
-    @for (workout of workouts(); track workout.id) {
+  @for (workout of workouts(); track workout.id) {
+    <div class="scrollbar-none -mx-5 mt-5 flex snap-x gap-4 overflow-x-auto px-5 pb-3">
       <div
         class="relative min-h-52 w-[86vw] max-w-96 shrink-0 snap-start overflow-hidden rounded-[28px] bg-[#F0EFFF] p-6 text-left"
         (click)="workoutSelected.emit({ workoutId: workout.id })"
@@ -21,10 +21,10 @@
           </span>
         }
       </div>
-    } @empty {
-      <div class="w-full rounded-[28px] bg-[#F0EFFF] p-8 text-center text-[#72777A]">
-        {{ config().emptyLabel }}
-      </div>
-    }
-  </div>
+    </div>
+  } @empty {
+    <div class="w-full rounded-[28px] bg-[#F0EFFF] p-8 text-center text-[#72777A]">
+      {{ config().emptyLabel }}
+    </div>
+  }
 </section>
