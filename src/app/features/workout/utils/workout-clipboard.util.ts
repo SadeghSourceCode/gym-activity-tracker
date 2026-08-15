@@ -1,13 +1,13 @@
-import { CopiedWorkoutClipboard, WorkoutExerciseSummary } from "../data-access/models/workout-storage.models";
-
+import {
+  CopiedWorkoutClipboard,
+  WorkoutExerciseSummary,
+} from '../data-access/models/workout-storage.models';
 
 export const copiedWorkoutStorageKey = 'gym-activity-tracker.copied-workout';
 export const copiedWorkoutTextHeader = 'GAT-WORKOUT:1';
 
 export type CopiedWorkoutLoadResult =
-  | { status: 'empty' }
-  | { status: 'invalid' }
-  | { status: 'ok'; clipboard: CopiedWorkoutClipboard };
+  { status: 'empty' } | { status: 'invalid' } | { status: 'ok'; clipboard: CopiedWorkoutClipboard };
 
 export function loadCopiedWorkout(): CopiedWorkoutLoadResult {
   if (typeof localStorage === 'undefined') {

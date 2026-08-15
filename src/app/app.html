@@ -15,14 +15,13 @@
       <div class="grid w-85 grid-cols-5 items-center justify-items-center">
         @for (item of bottomNavItems; track item.id) {
           <app-button
+            class="flex h-11 items-center justify-center overflow-visible rounded-[48px] transition-colors duration-300 ease-out"
             [config]="{
               variant: 'link',
               mode: 'section',
               type: 'button',
               ariaLabel: getBottomNavLabel(item.labelKey),
               ariaCurrent: isBottomNavItemSelected(item.id) ? 'page' : null,
-              customClass:
-                'flex h-11 items-center justify-center overflow-visible rounded-[48px] transition-colors duration-300 ease-out',
             }"
             [class.col-span-2]="isBottomNavItemSelected(item.id)"
             [class.col-auto]="!isBottomNavItemSelected(item.id)"

@@ -19,11 +19,7 @@ export function mapDailyPlanToViewModel(
       exerciseCount: workout.exerciseCount,
       estimatedMinutes: workout.estimatedMinutes,
       exercises: workout.exercises,
-      status: resolveWorkoutStatus(
-        workout.scheduledDate,
-        workout.completionStatus,
-        today,
-      ),
+      status: resolveWorkoutStatus(workout.scheduledDate, workout.completionStatus, today),
     })),
     canAddWorkout: plan.type === 'empty' && canManageSelectedDay,
     canManageWorkouts: canManageSelectedDay,

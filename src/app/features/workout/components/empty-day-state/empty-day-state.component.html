@@ -6,12 +6,12 @@
 
   <div class="mt-4 grid gap-2 sm:grid-cols-2">
     <app-button
+      class="rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
       [config]="{
         variant: 'fill',
         mode: 'section',
         type: 'button',
         ariaLabel: config().setWorkoutLabel,
-        customClass: 'rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white',
       }"
       (buttonClicked)="setWorkout.emit()"
     >
@@ -19,13 +19,12 @@
     </app-button>
 
     <app-button
+      class="rounded-full border border-[#0070F0] bg-white px-4 py-3 font-semibold text-[#0070F0]"
       [config]="{
         variant: 'outline',
         mode: 'section',
         type: 'button',
         ariaLabel: config().markAsRestDayLabel,
-        customClass:
-          'rounded-full border border-[#0070F0] bg-white px-4 py-3 font-semibold text-[#0070F0]',
       }"
       (buttonClicked)="markAsRestDay.emit()"
     >

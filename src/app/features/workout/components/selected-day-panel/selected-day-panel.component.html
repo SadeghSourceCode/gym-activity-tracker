@@ -15,12 +15,12 @@
     <div class="rounded-2xl bg-[#FFD6D6] p-3 text-[#C93636]" role="alert">
       <p>{{ error }}</p>
       <app-button
+        class="mt-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#C93636]"
         [config]="{
           size: 'small',
           variant: 'outline',
           mode: 'section',
           type: 'button',
-          customClass: 'mt-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#C93636]',
         }"
         (buttonClicked)="retry.emit()"
       >

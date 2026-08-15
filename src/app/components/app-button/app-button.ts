@@ -9,6 +9,7 @@ import { AppButtonConfig } from '../../data-access/models/app-button-config.inte
 })
 export class AppButton {
   readonly config = input<AppButtonConfig>({});
+  readonly hostClasses = input('', { alias: 'class' });
 
   readonly buttonClicked = output<MouseEvent>();
 
@@ -24,7 +25,7 @@ export class AppButton {
       `app-button--${this.config().mode ?? 'section'}`,
       this.config().active ? 'app-button--active' : '',
       this.config().loading ? 'app-button--loading' : '',
-      this.config().customClass ?? '',
+      this.hostClasses(),
     ]
       .filter(Boolean)
       .join(' '),

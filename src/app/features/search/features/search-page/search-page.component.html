@@ -25,12 +25,11 @@
     <div class="grid gap-3">
       @for (workout of workouts(); track workout.id) {
         <app-button
+          class="flex items-center justify-start w-full gap-3 rounded-2xl border border-[#E3E5E5] bg-white p-3 text-left shadow-sm"
           [config]="{
             variant: 'outline',
             mode: 'form',
             type: 'button',
-            customClass:
-              'flex items-center justify-start w-full gap-3 rounded-2xl border border-[#E3E5E5] bg-white p-3 text-left shadow-sm',
           }"
           (buttonClicked)="showExerciseDetails(workout)"
         >
@@ -89,13 +88,12 @@
         <h2 class="min-w-0 truncate text-xl font-semibold text-[#202325]">{{ exercise.name }}</h2>
 
         <app-button
+          class="flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
           [config]="{
             variant: 'link',
             mode: 'iconOnly',
             type: 'button',
             ariaLabel: i18n.t('closeExerciseDetails'),
-            customClass:
-              'flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]',
           }"
           (buttonClicked)="closeExerciseDetails()"
         >
@@ -139,13 +137,12 @@
           <div class="flex items-center gap-3 overflow-x-auto pb-2">
             @for (similarExercise of similarExercises(); track similarExercise.id) {
               <app-button
+                class="shrink-0 rounded-full border border-[#0070F0] bg-[#EBF4FF] px-4 py-2 text-sm capitalize text-[#0070F0]"
                 [config]="{
                   size: 'small',
                   variant: 'outline',
                   mode: 'section',
                   type: 'button',
-                  customClass:
-                    'shrink-0 rounded-full border border-[#0070F0] bg-[#EBF4FF] px-4 py-2 text-sm capitalize text-[#0070F0]',
                 }"
                 (buttonClicked)="showExerciseDetails(similarExercise)"
               >

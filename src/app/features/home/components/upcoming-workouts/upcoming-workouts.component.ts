@@ -5,7 +5,6 @@ import { UpcomingWorkoutSelectedOutput } from '../../data-access/models/upcoming
 
 @Component({
   selector: 'app-upcoming-workouts',
-  imports: [AppButton],
   templateUrl: './upcoming-workouts.component.html',
 })
 export class UpcomingWorkoutsComponent {
