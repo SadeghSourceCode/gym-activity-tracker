@@ -2,7 +2,6 @@ import { isPlatformBrowser } from '@angular/common';
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { Workout } from '../../../workout/data-access/models/workout-storage.models';
 
-
 @Injectable({ providedIn: 'root' })
 export class HomeService {
   private readonly storageKey = 'gym-activity-tracker.workouts';

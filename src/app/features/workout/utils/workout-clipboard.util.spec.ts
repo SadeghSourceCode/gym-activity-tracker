@@ -115,9 +115,7 @@ describe('workout clipboard utilities', () => {
     expect(parseCopiedWorkoutText('random text')).toBeNull();
     expect(parseCopiedWorkoutText('GAT-WORKOUT:1\nname:')).toBeNull();
     expect(parseCopiedWorkoutText('GAT-WORKOUT:1\nname: Chest Day\nexercise:only-id')).toBeNull();
-    expect(
-      parseCopiedWorkoutText('GAT-WORKOUT:1\nname: Chest Day\nset:1|2'),
-    ).toBeNull();
+    expect(parseCopiedWorkoutText('GAT-WORKOUT:1\nname: Chest Day\nset:1|2')).toBeNull();
     expect(
       parseCopiedWorkoutText(
         'GAT-WORKOUT:1\nname: Chest Day\nexercise:bench-press|Bench Press|پرس سینه|chest|/gifs/bench-press.gif\nset:ten|sixty',

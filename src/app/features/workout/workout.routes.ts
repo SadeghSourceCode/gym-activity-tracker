@@ -5,16 +5,12 @@ export const WorkoutRoutes: Routes = [
   {
     path: 'add-workout',
     loadComponent: () =>
-      import('./features/add-workout/add-workout.component').then(
-        (c) => c.AddWorkoutComponent,
-      ),
+      import('./features/add-workout/add-workout.component').then((c) => c.AddWorkoutComponent),
   },
   {
     path: 'workout-detail/:id',
     loadComponent: () =>
-      import('./features/workout-detail/workout-detail-page').then(
-        (c) => c.WorkoutDetailPage,
-      ),
+      import('./features/workout-detail/workout-detail-page').then((c) => c.WorkoutDetailPage),
   },
   {
     path: '',

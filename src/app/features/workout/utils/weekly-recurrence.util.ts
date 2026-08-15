@@ -1,4 +1,3 @@
-
 import { Workout } from '../data-access/models/workout-storage.models';
 import {
   addMonths,
@@ -22,10 +21,7 @@ export function isWorkoutOnDate(workout: Workout, dateKey: string): boolean {
   const workoutStart = startOfDay(workout.date);
   const targetDate = startOfDay(parseDateKey(dateKey));
 
-  if (
-    targetDate <= workoutStart ||
-    targetDate > addMonths(workoutStart, weeklyRecurrenceMonths)
-  ) {
+  if (targetDate <= workoutStart || targetDate > addMonths(workoutStart, weeklyRecurrenceMonths)) {
     return false;
   }
 

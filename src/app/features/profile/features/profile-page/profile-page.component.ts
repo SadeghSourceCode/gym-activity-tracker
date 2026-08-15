@@ -87,4 +87,3 @@ export class ProfilePageComponent {
     return Number.isFinite(numberValue) ? numberValue : null;
   }
 }
-

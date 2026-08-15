@@ -21,7 +21,10 @@ import {
   WorkoutExerciseSummary,
 } from '../../data-access/models/workout-storage.models';
 import { WorkoutEditorTextConfig } from '../../data-access/models/workout-ui.models';
-import { ExerciseDbExercise, TargetMuscleOption } from '../../data-access/services/exercise-db-api.service';
+import {
+  ExerciseDbExercise,
+  TargetMuscleOption,
+} from '../../data-access/services/exercise-db-api.service';
 import {
   getDateKey,
   getTodayDateKey,

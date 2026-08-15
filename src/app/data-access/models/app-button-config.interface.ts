@@ -10,5 +10,4 @@ export interface AppButtonConfig {
   type?: AppButtonType;
   ariaLabel?: string | null;
   ariaCurrent?: string | null;
-  customClass?: string;
 }

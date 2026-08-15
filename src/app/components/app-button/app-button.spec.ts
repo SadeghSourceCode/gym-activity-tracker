@@ -48,6 +48,16 @@ describe('AppButton', () => {
     expect(button.getAttribute('aria-pressed')).toBe('true');
   });
 
+  it('should forward host classes to the native button', () => {
+    fixture.componentRef.setInput('class', 'w-full rounded-2xl');
+    fixture.detectChanges();
+
+    const button = getButton();
+
+    expect(button.classList.contains('w-full')).toBe(true);
+    expect(button.classList.contains('rounded-2xl')).toBe(true);
+  });
+
   it('should change font size from the size input', () => {
     fixture.componentRef.setInput('config', { size: 'small' });
     fixture.detectChanges();

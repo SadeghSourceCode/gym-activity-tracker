@@ -23,12 +23,12 @@
 
           <div class="flex shrink-0 items-center gap-2">
             <app-button
+              class="rounded-full bg-[#0070F0] px-4 py-2 text-xs font-bold text-white"
               [config]="{
                 size: 'small',
                 variant: 'fill',
                 mode: 'section',
                 type: 'button',
-                customClass: 'rounded-full bg-[#0070F0] px-4 py-2 text-xs font-bold text-white',
               }"
               (buttonClicked)="pasteCopiedWorkout()"
             >
@@ -36,13 +36,13 @@
             </app-button>
 
             <app-button
+              class="size-8 border border-[#C7CBCC] bg-white text-[#72777A]"
               [config]="{
                 size: 'small',
                 variant: 'outline',
                 mode: 'iconOnly',
                 type: 'button',
                 ariaLabel: text().closeLabel,
-                customClass: 'size-8 border border-[#C7CBCC] bg-white text-[#72777A]',
               }"
               (buttonClicked)="dismissCopiedWorkout()"
             >
@@ -74,13 +74,13 @@
           </div>
 
           <app-button
+            class="size-8 border border-[#C7CBCC] bg-white text-[#72777A]"
             [config]="{
               size: 'small',
               variant: 'outline',
               mode: 'iconOnly',
               type: 'button',
               ariaLabel: text().closeLabel,
-              customClass: 'size-8 border border-[#C7CBCC] bg-white text-[#72777A]',
             }"
             (buttonClicked)="dismissCopiedWorkout()"
           >
@@ -106,13 +106,12 @@
       }
 
       <app-button
+        class="rounded-full border border-[#0070F0] bg-white px-4 py-2 text-xs font-bold text-[#0070F0]"
         [config]="{
           size: 'small',
           variant: 'outline',
           mode: 'section',
           type: 'button',
-          customClass:
-            'rounded-full border border-[#0070F0] bg-white px-4 py-2 text-xs font-bold text-[#0070F0]',
         }"
         (buttonClicked)="pasteFromClipboard()"
       >
@@ -238,6 +237,7 @@
                       (click)="$event.stopPropagation()"
                     >
                       <app-button
+                        class="size-8 border border-[#E3E5E5] bg-white text-[#202325]"
                         [config]="{
                           size: 'small',
                           variant: 'outline',
@@ -245,7 +245,6 @@
                           disabled: getSelectedExerciseSetCountById(exercise.id) <= 1,
                           type: 'button',
                           ariaLabel: 'Decrease sets for ' + exercise.name,
-                          customClass: 'size-8 border border-[#E3E5E5] bg-white text-[#202325]',
                         }"
                         (buttonClicked)="
                           updateSelectedExerciseSetCount(
@@ -262,13 +261,13 @@
                       </span>
 
                       <app-button
+                        class="size-8 border border-[#E3E5E5] bg-white text-[#202325]"
                         [config]="{
                           size: 'small',
                           variant: 'outline',
                           mode: 'iconOnly',
                           type: 'button',
                           ariaLabel: 'Increase sets for ' + exercise.name,
-                          customClass: 'size-8 border border-[#E3E5E5] bg-white text-[#202325]',
                         }"
                         (buttonClicked)="
                           updateSelectedExerciseSetCount(
@@ -290,12 +289,11 @@
             <p class="py-4 text-center text-[#72777A]">{{ text().loadingExercisesLabel }}</p>
           } @else if (exerciseSearchResults().length < exerciseSearchTotal()) {
             <app-button
+              class="mt-4 w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
               [config]="{
                 variant: 'fill',
                 mode: 'section',
                 type: 'button',
-                customClass:
-                  'mt-4 w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white',
               }"
               (buttonClicked)="loadMoreExercises()"
             >

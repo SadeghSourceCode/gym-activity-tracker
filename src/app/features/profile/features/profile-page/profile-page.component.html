@@ -15,7 +15,9 @@
           alt=""
         />
       } @else {
-        <span class="flex size-28 items-center justify-center rounded-full bg-[#F7F9FA] text-4xl text-[#979C9E]">
+        <span
+          class="flex size-28 items-center justify-center rounded-full bg-[#F7F9FA] text-4xl text-[#979C9E]"
+        >
           👤
         </span>
       }
@@ -24,12 +26,7 @@
         {{ i18n.t('uploadImage') }}
       </span>
 
-      <input
-        class="sr-only"
-        type="file"
-        accept="image/*"
-        (change)="uploadProfileImage($event)"
-      />
+      <input class="sr-only" type="file" accept="image/*" (change)="uploadProfileImage($event)" />
     </label>
   </div>
 

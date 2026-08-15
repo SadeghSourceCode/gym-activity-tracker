@@ -11,4 +11,3 @@ export interface UserProfile {
   theme: AppTheme;
   language: AppLanguage;
 }
-

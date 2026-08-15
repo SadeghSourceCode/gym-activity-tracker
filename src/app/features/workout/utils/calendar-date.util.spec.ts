@@ -52,4 +52,3 @@ describe('calendar date utilities', () => {
     expect(daysBetweenDates(parseDateKey('2026-08-03'), parseDateKey('2026-08-03'))).toBe(0);
   });
 });
-

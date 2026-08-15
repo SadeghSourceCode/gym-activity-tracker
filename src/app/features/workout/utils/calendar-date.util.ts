@@ -68,4 +68,3 @@ function parseDateKeyParts(dateKey: string): Date {
 
   return new Date(year, month - 1, day);
 }
-

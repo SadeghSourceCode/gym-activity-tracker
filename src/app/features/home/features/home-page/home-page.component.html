@@ -1,13 +1,12 @@
 <div class="mx-auto flex w-full max-w-xl flex-col gap-10 pb-4">
   <header class="flex items-center justify-between">
     <app-button
+      class="flex size-12 items-center justify-center rounded-full border border-[#E3E5E5] bg-white text-[#72777A]"
       [config]="{
         variant: 'outline',
         mode: 'iconOnly',
         type: 'button',
         ariaLabel: i18n.language() === 'fa' ? 'برنامه تمرین' : 'Workout planner',
-        customClass:
-          'flex size-12 items-center justify-center rounded-full border border-[#E3E5E5] bg-white text-[#72777A]',
       }"
       (buttonClicked)="openWorkoutPlanner()"
     >

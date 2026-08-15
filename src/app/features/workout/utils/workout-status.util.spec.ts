@@ -33,4 +33,3 @@ describe('resolveWorkoutStatus', () => {
     expect(resolveWorkoutStatus('2026-08-02', 'rejected', today)).toBe('rejected');
   });
 });
-
