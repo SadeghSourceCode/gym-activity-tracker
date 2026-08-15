@@ -5,10 +5,12 @@ import { UpcomingWorkoutSelectedOutput } from '../../data-access/models/upcoming
 
 @Component({
   selector: 'app-upcoming-workouts',
+  imports: [AppButton],
   templateUrl: './upcoming-workouts.component.html',
 })
 export class UpcomingWorkoutsComponent {
   readonly config = input.required<UpcomingWorkoutConfig>();
   readonly workouts = computed(() => this.config().workouts ?? []);
   readonly workoutSelected = output<UpcomingWorkoutSelectedOutput>();
+  readonly addWorkoutRequested = output<void>();
 }

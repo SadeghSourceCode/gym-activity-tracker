@@ -6,7 +6,6 @@
       </div>
 
       <app-button
-        class="rounded-full bg-[#EBF4FF] px-3 py-1 text-xs font-medium text-[#0070F0]"
         [config]="{
           size: 'small',
           variant: 'outline',
@@ -27,7 +26,6 @@
       <div class="flex items-start gap-4 text-center">
         @for (day of calendarDays(); track day.dateKey) {
           <app-button
-            class="flex w-8 shrink-0 flex-col items-center gap-3 text-sm font-medium"
             [config]="{
               size: 'small',
               variant: 'link',

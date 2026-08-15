@@ -23,7 +23,6 @@
 
           <div class="flex shrink-0 items-center gap-2">
             <app-button
-              class="rounded-full bg-[#0070F0] px-4 py-2 text-xs font-bold text-white"
               [config]="{
                 size: 'small',
                 variant: 'fill',
@@ -36,7 +35,6 @@
             </app-button>
 
             <app-button
-              class="size-8 border border-[#C7CBCC] bg-white text-[#72777A]"
               [config]="{
                 size: 'small',
                 variant: 'outline',
@@ -74,7 +72,6 @@
           </div>
 
           <app-button
-            class="size-8 border border-[#C7CBCC] bg-white text-[#72777A]"
             [config]="{
               size: 'small',
               variant: 'outline',
@@ -106,7 +103,6 @@
       }
 
       <app-button
-        class="rounded-full border border-[#0070F0] bg-white px-4 py-2 text-xs font-bold text-[#0070F0]"
         [config]="{
           size: 'small',
           variant: 'outline',
@@ -237,7 +233,6 @@
                       (click)="$event.stopPropagation()"
                     >
                       <app-button
-                        class="size-8 border border-[#E3E5E5] bg-white text-[#202325]"
                         [config]="{
                           size: 'small',
                           variant: 'outline',
@@ -261,7 +256,6 @@
                       </span>
 
                       <app-button
-                        class="size-8 border border-[#E3E5E5] bg-white text-[#202325]"
                         [config]="{
                           size: 'small',
                           variant: 'outline',
@@ -289,7 +283,6 @@
             <p class="py-4 text-center text-[#72777A]">{{ text().loadingExercisesLabel }}</p>
           } @else if (exerciseSearchResults().length < exerciseSearchTotal()) {
             <app-button
-              class="mt-4 w-full rounded-full bg-[#0070F0] px-4 py-3 font-semibold text-white"
               [config]="{
                 variant: 'fill',
                 mode: 'section',

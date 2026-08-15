@@ -55,6 +55,7 @@ export class HomePageComponent {
       emptyLabel: isPersian
         ? 'تمرینی برای روزهای آینده برنامه‌ریزی نشده است.'
         : 'No upcoming workouts yet.',
+      addWorkoutLabel: this.i18n.t('addWorkout'),
       workouts: upcoming.slice(0, 5),
     };
   });
@@ -109,5 +110,9 @@ export class HomePageComponent {
 
   openWorkoutPlanner(): void {
     void this.router.navigateByUrl('/workouts');
+  }
+
+  addWorkout(): void {
+    void this.router.navigateByUrl('/workouts/add-workout');
   }
 }

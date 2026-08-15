@@ -11,7 +11,6 @@
       </h2>
 
       <app-button
-        class="flex size-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-[#202325] hover:bg-[#F2F4F5] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
         [config]="{
           variant: 'link',
           mode: 'iconOnly',
@@ -60,7 +59,6 @@
         <div class="flex items-center gap-3 overflow-x-auto pb-2">
           @for (similarExercise of config().similarExercises ?? []; track similarExercise.id) {
             <app-button
-              class="shrink-0 rounded-full border border-[#0070F0] bg-[#EBF4FF] px-4 py-2 text-sm capitalize text-[#0070F0]"
               [config]="{
                 size: 'small',
                 variant: 'outline',
