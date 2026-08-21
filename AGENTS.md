@@ -218,6 +218,16 @@ own persistence or session business rules.
 Local persistence failures must be visible to the user. Do not navigate away after a failed
 terminal save because that can hide unsaved workout results.
 
+Workout progress is the percentage of completed sets across every exercise placement. Persist
+it on the active `WorkoutSession` and derive it from set completion when reading legacy data.
+The workout card is the canonical place to show progress and execution status; the detail page
+must not duplicate that progress display.
+
+Starting from a workout card must create and persist the session before navigation. An active
+session may add exercise placements to any section and must remain resumable on the scheduled
+day. Leaving an incomplete active session requires confirmation, while completing the final set
+automatically finishes the session, shows completion feedback, and returns to the workout list.
+
 ---
 
 # Dummy / Presentational Components

@@ -80,8 +80,8 @@
     "semantic_hash": "d4742f325c0e8baf8bce5395e3c8ce0a"
   },
   "src/app/core/i18n/i18n.service.ts": {
-    "mtime": 1787327815.1319718,
-    "ast_hash": "c5be01bcae92b5b34e520357ed85b4b7",
+    "mtime": 1787336877.7214968,
+    "ast_hash": "06cc3116f4c1849cbcd70b7972919f95",
     "semantic_hash": ""
   },
   "src/app/data-access/models/app-bar-config.interface.ts": {
@@ -225,9 +225,9 @@
     "semantic_hash": "2ca08a3b7a837ac23b09bcf50028874a"
   },
   "src/app/features/workout/components/selected-day-panel/selected-day-panel.component.ts": {
-    "mtime": 1787327225.0046597,
-    "ast_hash": "bfd4e695af137bba19324e631e2892ed",
-    "semantic_hash": "bfd4e695af137bba19324e631e2892ed"
+    "mtime": 1787337339.9886348,
+    "ast_hash": "9a8c1394e9c84fce57a1d428c753cda8",
+    "semantic_hash": ""
   },
   "src/app/features/workout/components/status-badge/status-badge.component.ts": {
     "mtime": 1787327225.0052354,
@@ -245,8 +245,8 @@
     "semantic_hash": "93b810e35bfcf8e720ae876eb06e7497"
   },
   "src/app/features/workout/components/workout-detail/workout-detail.component.ts": {
-    "mtime": 1787327759.4439569,
-    "ast_hash": "8ba3a18b873611f5fef82ab8eab472b6",
+    "mtime": 1787336863.608357,
+    "ast_hash": "6e1f8c2151f612209b71283a37cb9e5b",
     "semantic_hash": ""
   },
   "src/app/features/workout/components/workout-overview/workout-overview.component.ts": {
@@ -260,9 +260,9 @@
     "semantic_hash": ""
   },
   "src/app/features/workout/components/workout-summary-card/workout-summary-card.component.ts": {
-    "mtime": 1787327225.0065937,
-    "ast_hash": "1b9324d9fc340ca023cf7f084694ea2d",
-    "semantic_hash": "1b9324d9fc340ca023cf7f084694ea2d"
+    "mtime": 1787336776.0534902,
+    "ast_hash": "d03195cd764de427dcf679580291b2e8",
+    "semantic_hash": ""
   },
   "src/app/features/workout/data-access/models/add-workout-header-config.interface.ts": {
     "mtime": 1787327225.006643,
@@ -295,9 +295,9 @@
     "semantic_hash": "026b5ee764e25bd58bb8791a4a5fd985"
   },
   "src/app/features/workout/data-access/models/selected-day-panel-config.interface.ts": {
-    "mtime": 1787327225.007456,
-    "ast_hash": "eb03b25a21abe547062f39498730c3df",
-    "semantic_hash": "eb03b25a21abe547062f39498730c3df"
+    "mtime": 1787336775.5804853,
+    "ast_hash": "fd32553e0d9bc9771acf855573a92fd2",
+    "semantic_hash": ""
   },
   "src/app/features/workout/data-access/models/status-badge-config.interface.ts": {
     "mtime": 1787327225.0076296,
@@ -320,13 +320,13 @@
     "semantic_hash": "e22f8b7c92f0155975319bff0d6c16df"
   },
   "src/app/features/workout/data-access/models/workout-detail-config.interface.ts": {
-    "mtime": 1787327759.2599535,
-    "ast_hash": "8e4fe8bb350e44b94d6a5d55d2504894",
+    "mtime": 1787336976.0634706,
+    "ast_hash": "9ca003ecd44df80584d5ecdd94fcfb27",
     "semantic_hash": ""
   },
   "src/app/features/workout/data-access/models/workout-detail-output.interface.ts": {
-    "mtime": 1787327759.349955,
-    "ast_hash": "78c0293117119b93eea366985091cab9",
+    "mtime": 1787336863.501356,
+    "ast_hash": "aa2777059b8dcd7e023f3a905c59a588",
     "semantic_hash": ""
   },
   "src/app/features/workout/data-access/models/workout-overview-config.interface.ts": {
@@ -335,9 +335,9 @@
     "semantic_hash": "92729d49c5f953250360d000a7cd9db6"
   },
   "src/app/features/workout/data-access/models/workout-planner.models.ts": {
-    "mtime": 1787327225.008016,
-    "ast_hash": "a05e724ab729f932a37ed0ab2aafe1f1",
-    "semantic_hash": "a05e724ab729f932a37ed0ab2aafe1f1"
+    "mtime": 1787336295.6107016,
+    "ast_hash": "ee10425685e2695d1ad3bbc454d2dd3b",
+    "semantic_hash": ""
   },
   "src/app/features/workout/data-access/models/workout-planning-changed-output.interface.ts": {
     "mtime": 1787327243.873944,
@@ -350,14 +350,14 @@
     "semantic_hash": ""
   },
   "src/app/features/workout/data-access/models/workout-storage.models.ts": {
-    "mtime": 1787327731.314444,
-    "ast_hash": "219dbaa9201fc1a60f7bead286c73193",
+    "mtime": 1787336295.2956958,
+    "ast_hash": "141601a69b476e801e296297e17267e2",
     "semantic_hash": ""
   },
   "src/app/features/workout/data-access/models/workout-summary-card-config.interface.ts": {
-    "mtime": 1787327225.0083172,
-    "ast_hash": "4ccad0a88db5e09e78f4eed21b32c274",
-    "semantic_hash": "4ccad0a88db5e09e78f4eed21b32c274"
+    "mtime": 1787337070.5084057,
+    "ast_hash": "562e31497f091058beb46368852cec89",
+    "semantic_hash": ""
   },
   "src/app/features/workout/data-access/models/workout-ui.models.ts": {
     "mtime": 1787327225.0085711,
@@ -400,13 +400,13 @@
     "semantic_hash": "0545adc26e6441ccad4a5cd0f1baf13f"
   },
   "src/app/features/workout/features/workout-detail/workout-detail-page.ts": {
-    "mtime": 1787327815.087971,
-    "ast_hash": "769bf793f73d756e63ca34e80420d5ae",
+    "mtime": 1787337086.7655666,
+    "ast_hash": "783fbb64b9376a9d8440d7dc8c07225b",
     "semantic_hash": ""
   },
   "src/app/features/workout/features/workout-page/workout-page.ts": {
-    "mtime": 1787327243.8745484,
-    "ast_hash": "d397e8f5f8d2d7f0ef07c2a795f82f51",
+    "mtime": 1787337344.9137635,
+    "ast_hash": "1aa00ac2541fd911ba958310eaf22a7f",
     "semantic_hash": ""
   },
   "src/app/features/workout/utils/calendar-date.util.spec.ts": {
@@ -455,29 +455,29 @@
     "semantic_hash": ""
   },
   "src/app/features/workout/utils/workout-plan-view-model.mapper.spec.ts": {
-    "mtime": 1787327225.0111551,
-    "ast_hash": "46e8e645f47eb9356fac6b30c4f80be9",
-    "semantic_hash": "46e8e645f47eb9356fac6b30c4f80be9"
+    "mtime": 1787337070.4174047,
+    "ast_hash": "61c4b9a81417dce56af72d34e8a81c2c",
+    "semantic_hash": ""
   },
   "src/app/features/workout/utils/workout-plan-view-model.mapper.ts": {
-    "mtime": 1787327225.0112216,
-    "ast_hash": "ae299789cc60382204e00125ce99e2b6",
-    "semantic_hash": "ae299789cc60382204e00125ce99e2b6"
+    "mtime": 1787337331.344409,
+    "ast_hash": "2d3a2305ebfa94b9fee1b9e6fe7e8d69",
+    "semantic_hash": ""
   },
   "src/app/features/workout/utils/workout-status.util.spec.ts": {
-    "mtime": 1787327225.0112767,
-    "ast_hash": "329e24e5ae36405f599a44568bcbcddb",
-    "semantic_hash": "329e24e5ae36405f599a44568bcbcddb"
+    "mtime": 1787337331.2514064,
+    "ast_hash": "bd8790d13c3964b10bd68ff0c96a51ba",
+    "semantic_hash": ""
   },
   "src/app/features/workout/utils/workout-status.util.ts": {
-    "mtime": 1787327225.0114202,
-    "ast_hash": "11c976a83452519b90bd7e505213ac0f",
-    "semantic_hash": "11c976a83452519b90bd7e505213ac0f"
+    "mtime": 1787337331.159404,
+    "ast_hash": "2e295c9327bdf716b185dfdfc858c2c4",
+    "semantic_hash": ""
   },
   "src/app/features/workout/workout.routes.ts": {
-    "mtime": 1787327225.011485,
-    "ast_hash": "982a2616981fa598221e7776fefa3396",
-    "semantic_hash": "982a2616981fa598221e7776fefa3396"
+    "mtime": 1787337033.4960392,
+    "ast_hash": "2c2063853df61523fc02469d99e875be",
+    "semantic_hash": ""
   },
   "src/assets/exercises/cooldown-exercises.json": {
     "mtime": 1786556506.4891295,
@@ -520,8 +520,8 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1787328568.0633752,
-    "ast_hash": "e7b461be68cb239c7c40a45b8ef1bded",
+    "mtime": 1787337380.8367023,
+    "ast_hash": "d61ca926fe4b1058e0d8ce167d020caa",
     "semantic_hash": ""
   },
   "README.md": {
@@ -560,8 +560,8 @@
     "semantic_hash": ""
   },
   "src/app/features/home/components/upcoming-workouts/upcoming-workouts.component.html": {
-    "mtime": 1787328537.9268422,
-    "ast_hash": "8d1cab0ae742b43500c345ea96199787",
+    "mtime": 1787337039.5790994,
+    "ast_hash": "0966a9165f72ca159ca643b3d45e3ea1",
     "semantic_hash": ""
   },
   "src/app/features/home/components/weekly-activity/weekly-activity.component.html": {
@@ -610,8 +610,8 @@
     "semantic_hash": ""
   },
   "src/app/features/workout/components/selected-day-panel/selected-day-panel.component.html": {
-    "mtime": 1787327225.004465,
-    "ast_hash": "17c84294475cd1771380b1ee4a191d29",
+    "mtime": 1787336775.9364889,
+    "ast_hash": "605d232d3c46c6b776836aec05b2f9b1",
     "semantic_hash": ""
   },
   "src/app/features/workout/components/status-badge/status-badge.component.html": {
@@ -630,8 +630,8 @@
     "semantic_hash": ""
   },
   "src/app/features/workout/components/workout-detail/workout-detail.component.html": {
-    "mtime": 1787328550.696068,
-    "ast_hash": "a31de4f467b92bd7063cc253a2bd49f6",
+    "mtime": 1787337039.940103,
+    "ast_hash": "3a343a61109033e9596efbf093f52424",
     "semantic_hash": ""
   },
   "src/app/features/workout/components/workout-overview/workout-overview.component.html": {
@@ -645,8 +645,8 @@
     "semantic_hash": ""
   },
   "src/app/features/workout/components/workout-summary-card/workout-summary-card.component.html": {
-    "mtime": 1787328506.7202904,
-    "ast_hash": "82cbdc19ce13966380b716b80c1d45ee",
+    "mtime": 1787337070.6944075,
+    "ast_hash": "928d13d642ea62de349a87f7026e15d6",
     "semantic_hash": ""
   },
   "src/app/features/workout/features/add-workout/add-workout.component.html": {
@@ -660,13 +660,13 @@
     "semantic_hash": ""
   },
   "src/app/features/workout/features/workout-detail/workout-detail-page.html": {
-    "mtime": 1787327759.5349584,
-    "ast_hash": "e05bb03cac0e9d158dc36cbe4f6493d8",
+    "mtime": 1787336851.4222364,
+    "ast_hash": "5500355afb39732fc7e69e033fc32c3f",
     "semantic_hash": ""
   },
   "src/app/features/workout/features/workout-page/workout-page.html": {
-    "mtime": 1787327225.0099735,
-    "ast_hash": "736cc81f08d09476e4b3ddb680a6a623",
+    "mtime": 1787336775.4634843,
+    "ast_hash": "e5397d97b878f49baf0a1a6e543320e7",
     "semantic_hash": ""
   },
   "src/index.html": {
@@ -730,13 +730,13 @@
     "semantic_hash": ""
   },
   "src/app/features/workout/utils/workout-session.util.spec.ts": {
-    "mtime": 1787327814.8779051,
-    "ast_hash": "c038814f8b88fbf30f124d28294933d9",
+    "mtime": 1787337040.7061105,
+    "ast_hash": "1c2e34af4f60cce975083e79e18b3992",
     "semantic_hash": ""
   },
   "src/app/features/workout/utils/workout-session.util.ts": {
-    "mtime": 1787327731.4034457,
-    "ast_hash": "42697088fe83f9791dedabd83153732d",
+    "mtime": 1787336775.222482,
+    "ast_hash": "70ddef53b33f61489aa584b0b52c1c85",
     "semantic_hash": ""
   }
 }

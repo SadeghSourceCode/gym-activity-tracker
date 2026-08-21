@@ -21,6 +21,7 @@ export interface WorkoutSession {
   lastUpdatedAt: string;
   completedAt?: string;
   durationSeconds?: number;
+  progressPercent: number;
 }
 
 export type WorkoutExerciseSection = 'warmup' | 'main' | 'cooldown';

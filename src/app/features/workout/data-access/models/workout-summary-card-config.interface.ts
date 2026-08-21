@@ -14,5 +14,8 @@ export interface WorkoutSummaryCardConfig {
   estimatedLabel?: string;
   minutesLabel?: string;
   moreExercisesLabel?: string;
+  progressLabel?: string;
+  resumeLabel?: string;
+  statusLabel?: string;
   canManage?: boolean;
 }

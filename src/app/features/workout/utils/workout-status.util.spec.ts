@@ -9,8 +9,9 @@ describe('resolveWorkoutStatus', () => {
     expect(resolveWorkoutStatus('2026-08-04', 'rejected', today)).toBe('upcoming');
   });
 
-  it('returns in-progress for a pending workout today', () => {
-    expect(resolveWorkoutStatus(today, 'pending', today)).toBe('in-progress');
+  it('returns upcoming until a workout is started today', () => {
+    expect(resolveWorkoutStatus(today, 'pending', today)).toBe('upcoming');
+    expect(resolveWorkoutStatus(today, 'pending', today, true)).toBe('in-progress');
   });
 
   it('returns done for a completed workout today', () => {

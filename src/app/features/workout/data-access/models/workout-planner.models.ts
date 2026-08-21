@@ -12,6 +12,8 @@ export interface WorkoutSummary {
   completionStatus: WorkoutCompletionStatus;
   estimatedMinutes: number;
   exercises: WorkoutExercisePreview[];
+  progressPercent: number;
+  sessionActive: boolean;
 }
 
 export interface WorkoutExercisePreview {
@@ -34,6 +36,8 @@ export interface WorkoutCardViewModel {
   estimatedMinutes: number;
   exercises: WorkoutExercisePreview[];
   status: WorkoutDisplayStatus;
+  progressPercent: number;
+  sessionActive: boolean;
 }
 
 export interface SelectedDayViewModel {

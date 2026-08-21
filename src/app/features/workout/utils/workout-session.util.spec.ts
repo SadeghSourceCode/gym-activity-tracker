@@ -3,8 +3,10 @@ import { Workout } from '../data-access/models/workout-storage.models';
 import {
   finishWorkoutSession,
   getWorkoutSessionProgress,
+  getWorkoutProgressPercent,
   startWorkoutSession,
   touchWorkoutSession,
+  syncWorkoutSessionProgress,
 } from './workout-session.util';
 
 const workout = (): Workout => ({
@@ -42,5 +44,9 @@ describe('workout session', () => {
 
   it('reports completed set progress', () => {
     expect(getWorkoutSessionProgress(workout())).toEqual({ completedSets: 1, totalSets: 2 });
+    expect(getWorkoutProgressPercent(workout())).toBe(50);
+    expect(
+      syncWorkoutSessionProgress(startWorkoutSession(workout())).session?.progressPercent,
+    ).toBe(50);
   });
 });

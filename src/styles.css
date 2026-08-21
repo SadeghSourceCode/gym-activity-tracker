@@ -69,3 +69,37 @@ app-root {
   height: 1em;
   line-height: 1;
 }
+
+@keyframes celebration-confetti-fall {
+  0% {
+    transform: translate3d(0, -15vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(2rem, 110vh, 0) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.celebration-confetti {
+  --confetti-index: 1;
+  position: absolute;
+  top: -1rem;
+  left: calc(var(--confetti-index) * 7.5%);
+  width: 0.65rem;
+  height: 1.1rem;
+  border-radius: 0.2rem;
+  background: hsl(calc(var(--confetti-index) * 31deg) 85% 60%);
+  animation: celebration-confetti-fall 1.8s ease-in infinite;
+  animation-delay: calc(var(--confetti-index) * -0.11s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celebration-confetti {
+    animation: none;
+    display: none;
+  }
+}

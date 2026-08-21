@@ -1,4 +1,4 @@
-import { Workout } from './workout-storage.models';
+import { Workout, WorkoutExerciseSection } from './workout-storage.models';
 import { Exercise } from '../../../exercise-library/data-access/models/exercise.models';
 
 export interface WorkoutDetailTextConfig {
@@ -21,14 +21,16 @@ export interface WorkoutDetailTextConfig {
   chooseReplacementLabel: string;
   noSimilarExercisesLabel: string;
   loadingExercisesLabel: string;
-  markAsDoneLabel: string;
-  rejectWorkoutLabel: string;
   startWorkoutLabel: string;
   resumeWorkoutLabel: string;
   completeSetLabel: string;
   completedSetLabel: string;
-  sessionProgressLabel: string;
   storageErrorLabel: string;
+  addExerciseLabel: string;
+  chooseExerciseLabel: string;
+  noExercisesFoundLabel: string;
+  leaveWorkoutConfirmation: string;
+  workoutCompleteMessage: string;
   isPersian: boolean;
 }
 
@@ -38,10 +40,12 @@ export interface WorkoutDetailConfig {
   imageBaseUrl: string;
   canManage?: boolean;
   isSessionActive?: boolean;
-  completedSets?: number;
-  totalSets?: number;
   persistenceError?: boolean;
   replacingExerciseId?: string | null;
   replacementExercises?: readonly Exercise[];
   replacementExercisesLoading?: boolean;
+  addingExerciseSection?: WorkoutExerciseSection | null;
+  availableExercises?: readonly Exercise[];
+  availableExercisesLoading?: boolean;
+  celebrating?: boolean;
 }

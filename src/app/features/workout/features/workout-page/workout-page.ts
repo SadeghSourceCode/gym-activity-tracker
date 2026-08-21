@@ -32,6 +32,7 @@ import { WorkoutOverviewConfig } from '../../data-access/models/workout-overview
 import { SelectedDayPanelConfig } from '../../data-access/models/selected-day-panel-config.interface';
 import { ExerciseDetailsDialogConfig } from '../../data-access/models/exercise-details-dialog-config.interface';
 import { WorkoutCalendarConfig } from '../../data-access/models/workout-calendar-config.interface';
+import { getWorkoutProgressPercent, startWorkoutSession } from '../../utils/workout-session.util';
 
 @Component({
   selector: 'app-workout-page',
@@ -209,6 +210,8 @@ export class WorkoutPage {
       estimatedLabel: this.i18n.language() === 'fa' ? 'تخمینی' : 'est.',
       minutesLabel: this.i18n.language() === 'fa' ? 'دقیقه' : 'min',
       moreExercisesLabel: this.i18n.language() === 'fa' ? 'حرکت دیگر' : 'more exercises',
+      progressLabel: this.i18n.language() === 'fa' ? 'پیشرفت تمرین' : 'Workout progress',
+      resumeWorkoutLabel: this.i18n.language() === 'fa' ? 'ادامه' : 'RESUME',
       isPersian: this.i18n.language() === 'fa',
     },
   }));
@@ -349,7 +352,28 @@ export class WorkoutPage {
       return;
     }
 
-    void this.router.navigate(['/workout-detail', workout.id]);
+    void this.router.navigate(['/workouts/workout-detail', workout.id]);
+  }
+
+  startWorkout(workoutId: string) {
+    const targetWorkout = this.workouts().find((workout) => workout.id === Number(workoutId));
+    if (
+      !targetWorkout ||
+      targetWorkout.completionStatus === 'completed' ||
+      !this.canManageWorkout(targetWorkout)
+    )
+      return;
+
+    if (targetWorkout.session?.status !== 'active') {
+      this.workouts.update((workouts) =>
+        workouts.map((workout) =>
+          workout.id === targetWorkout.id ? startWorkoutSession(workout) : workout,
+        ),
+      );
+      this.saveWorkouts();
+    }
+
+    void this.router.navigate(['/workouts/workout-detail', targetWorkout.id]);
   }
 
   setWorkoutCompletionStatus(
@@ -486,6 +510,8 @@ export class WorkoutPage {
         };
       }),
       completionStatus: this.normalizeCompletionStatus(workout.completionStatus),
+      progressPercent: workout.session?.progressPercent ?? getWorkoutProgressPercent(workout),
+      sessionActive: workout.session?.status === 'active',
     }));
 
     if (workouts.length) {

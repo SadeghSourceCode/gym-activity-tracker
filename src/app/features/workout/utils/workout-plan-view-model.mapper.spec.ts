@@ -17,6 +17,8 @@ describe('mapDailyPlanToViewModel', () => {
           estimatedMinutes: 15,
           exercises: [],
           completionStatus: 'pending',
+          progressPercent: 35,
+          sessionActive: true,
         },
         {
           id: '2',
@@ -26,6 +28,8 @@ describe('mapDailyPlanToViewModel', () => {
           estimatedMinutes: 15,
           exercises: [],
           completionStatus: 'completed',
+          progressPercent: 100,
+          sessionActive: false,
         },
       ],
     };
@@ -41,6 +45,8 @@ describe('mapDailyPlanToViewModel', () => {
           estimatedMinutes: 15,
           exercises: [],
           status: 'in-progress',
+          progressPercent: 35,
+          sessionActive: true,
         },
         {
           id: '2',
@@ -49,6 +55,8 @@ describe('mapDailyPlanToViewModel', () => {
           estimatedMinutes: 15,
           exercises: [],
           status: 'done',
+          progressPercent: 100,
+          sessionActive: false,
         },
       ],
       canAddWorkout: false,

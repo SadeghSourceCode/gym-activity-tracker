@@ -1,29 +1,33 @@
 <section [attr.aria-label]="config().title" class="flex flex-col gap-4">
   <h2 class="text-xl font-bold text-[#404446]">{{ config().title }}</h2>
 
-  @for (workout of workouts(); track workout.id) {
-    <div class="scrollbar-none -mx-5 mt-5 flex snap-x gap-4 overflow-x-auto px-5 pb-3">
-      <div
-        class="relative min-h-52 w-[86vw] max-w-96 shrink-0 snap-start overflow-hidden rounded-[28px] bg-[#F0EFFF] p-6 text-left"
-        (click)="workoutSelected.emit({ workoutId: workout.id })"
-      >
-        <span class="block max-w-[60%] text-2xl font-bold text-[#202325]">{{ workout.title }}</span>
-        <span class="mt-1 block text-sm text-[#5B5F62]">{{ workout.scheduleLabel }}</span>
-        @if (workout.categoryLabel) {
-          <span
-            class="absolute right-5 top-5 rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#6658D3]"
-            >{{ workout.categoryLabel }}</span
-          >
-        }
-        @if (workout.locationLabel) {
-          <span class="absolute bottom-6 left-6 flex items-center gap-2 text-sm text-[#72777A]">
-            <i class="app-icon fa-solid fa-location-dot" aria-hidden="true"></i>
-            {{ workout.locationLabel }}
-          </span>
-        }
-      </div>
+  @if (workouts().length) {
+    <div class="scrollbar-none -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3">
+      @for (workout of workouts(); track workout.id) {
+        <div
+          class="relative min-h-52 w-[86vw] max-w-96 shrink-0 snap-start overflow-hidden rounded-[28px] bg-[#F0EFFF] p-6 text-left"
+          (click)="workoutSelected.emit({ workoutId: workout.id })"
+        >
+          <span class="block max-w-[60%] text-2xl font-bold text-[#202325]">{{
+            workout.title
+          }}</span>
+          <span class="mt-1 block text-sm text-[#5B5F62]">{{ workout.scheduleLabel }}</span>
+          @if (workout.categoryLabel) {
+            <span
+              class="absolute right-5 top-5 rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#6658D3]"
+              >{{ workout.categoryLabel }}</span
+            >
+          }
+          @if (workout.locationLabel) {
+            <span class="absolute bottom-6 left-6 flex items-center gap-2 text-sm text-[#72777A]">
+              <i class="app-icon fa-solid fa-location-dot" aria-hidden="true"></i>
+              {{ workout.locationLabel }}
+            </span>
+          }
+        </div>
+      }
     </div>
-  } @empty {
+  } @else {
     <div
       class="flex w-full flex-col items-center gap-4 rounded-[28px] bg-[#F0EFFF] p-8 text-center"
     >
