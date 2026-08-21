@@ -22,9 +22,10 @@ import {
 } from '../../data-access/models/workout-storage.models';
 import { WorkoutEditorTextConfig } from '../../data-access/models/workout-ui.models';
 import {
-  ExerciseDbExercise,
+  Exercise,
   TargetMuscleOption,
-} from '../../data-access/services/exercise-db-api.service';
+} from '../../../exercise-library/data-access/models/exercise.models';
+import { ExerciseLibraryService } from '../../../exercise-library/data-access/services/exercise-library.service';
 import {
   getDateKey,
   getTodayDateKey,
@@ -52,6 +53,7 @@ export class AddWorkoutComponent {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly destroyRef = inject(DestroyRef);
   private readonly addWorkoutService = inject(AddWorkoutService);
+  private readonly exerciseLibrary = inject(ExerciseLibraryService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly location = inject(Location);
@@ -69,7 +71,7 @@ export class AddWorkoutComponent {
   readonly selectedExerciseSection = signal<WorkoutExerciseSection | undefined>('warmup');
   readonly exerciseSections: readonly WorkoutExerciseSection[] = ['warmup', 'main', 'cooldown'];
   readonly exerciseSearchQuery = signal('');
-  readonly exerciseSearchResults = signal<ExerciseDbExercise[]>([]);
+  readonly exerciseSearchResults = signal<Exercise[]>([]);
   readonly exerciseSearchTotal = signal(0);
   readonly isExerciseSearchLoading = signal(false);
   readonly exerciseSearchError = signal<string | undefined>(undefined);
@@ -86,7 +88,6 @@ export class AddWorkoutComponent {
     return state.status === 'ok' ? state.clipboard : null;
   });
 
-  readonly imageBaseUrl = this.addWorkoutService.imageBaseUrl;
   readonly selectedDateLabel = computed(() =>
     parseDateKey(this.selectedDate()).toLocaleDateString(this.getDateLocale(), {
       weekday: 'long',
@@ -261,9 +262,12 @@ export class AddWorkoutComponent {
     }
   }
 
-  toggleExercise(exercise: ExerciseDbExercise) {
+  toggleExercise(exercise: Exercise) {
+    const section = this.selectedExerciseSection();
+    if (!section) return;
+
     this.selectedExercises.update((selectedExercises) =>
-      this.addWorkoutService.toggleExercise(selectedExercises, exercise, this.imageBaseUrl),
+      this.addWorkoutService.toggleExercise(selectedExercises, exercise, section),
     );
   }
 
@@ -432,10 +436,8 @@ export class AddWorkoutComponent {
     return this.selectedExercises().some((exercise) => exercise.id === exerciseId);
   }
 
-  getExerciseMediaUrl(exercise: ExerciseDbExercise): string | undefined {
-    const mediaPath = exercise.gifUrl ?? exercise.images[0];
-
-    return mediaPath ? this.imageBaseUrl + mediaPath : undefined;
+  getExerciseMediaUrl(exercise: Exercise): string | undefined {
+    return this.exerciseLibrary.getMediaUrl(exercise) ?? undefined;
   }
 
   private loadExercisesPage(offset: number, requestId: number) {
@@ -448,7 +450,6 @@ export class AddWorkoutComponent {
         offset,
         this.pageSize,
         this.selectedTargetMuscle(),
-        this.selectedExerciseSection(),
       )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

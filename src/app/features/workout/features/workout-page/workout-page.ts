@@ -12,10 +12,8 @@ import {
   WorkoutExerciseSummary,
   WorkoutSet,
 } from '../../data-access/models/workout-storage.models';
-import {
-  ExerciseDbApiService,
-  ExerciseDbExercise,
-} from '../../data-access/services/exercise-db-api.service';
+import { Exercise } from '../../../exercise-library/data-access/models/exercise.models';
+import { ExerciseLibraryService } from '../../../exercise-library/data-access/services/exercise-library.service';
 import { getDateKey, getTodayDateKey, parseDateKey } from '../../utils/calendar-date.util';
 import { saveCopiedWorkout } from '../../utils/workout-clipboard.util';
 import { isWorkoutOnDate } from '../../utils/weekly-recurrence.util';
@@ -52,7 +50,7 @@ export class WorkoutPage {
   private readonly restDaysStorageKey = 'gym-activity-tracker.rest-days';
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly destroyRef = inject(DestroyRef);
-  private readonly exerciseDbApi = inject(ExerciseDbApiService);
+  private readonly exerciseLibrary = inject(ExerciseLibraryService);
   private readonly workoutDashboardService = inject(WorkoutDashboardService);
   private readonly router = inject(Router);
   readonly i18n = inject(I18nService);
@@ -62,11 +60,11 @@ export class WorkoutPage {
   workouts = signal<Workout[]>(this.loadWorkouts());
   restDayKeys = signal<string[]>(this.loadRestDayKeys());
   selectedDayError = signal<string | null>(null);
-  selectedExercise = signal<ExerciseDbExercise | null>(null);
-  similarExercises = signal<ExerciseDbExercise[]>([]);
+  selectedExercise = signal<Exercise | null>(null);
+  similarExercises = signal<Exercise[]>([]);
   exerciseDetailsError = signal<string | null>(null);
 
-  readonly exerciseImageBaseUrl = this.exerciseDbApi.imageBaseUrl;
+  readonly exerciseImageBaseUrl = this.exerciseLibrary.imageBaseUrl;
   readonly workoutCalendarConfig = computed<WorkoutCalendarConfig>(() => ({
     selectedDate: this.selectedDate(),
     workouts: this.workouts(),
@@ -379,7 +377,7 @@ export class WorkoutPage {
 
     this.exerciseDetailsError.set(null);
 
-    this.exerciseDbApi
+    this.exerciseLibrary
       .getById(workout.exerciseId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -397,11 +395,11 @@ export class WorkoutPage {
       });
   }
 
-  showExerciseDetails(exercise: ExerciseDbExercise) {
+  showExerciseDetails(exercise: Exercise) {
     this.selectedExercise.set(exercise);
     this.exerciseDetailsError.set(null);
 
-    this.exerciseDbApi
+    this.exerciseLibrary
       .getSimilar(exercise)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
