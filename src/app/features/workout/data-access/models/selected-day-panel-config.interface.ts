@@ -25,6 +25,8 @@ export interface SelectedDayPanelTextConfig {
   estimatedLabel: string;
   minutesLabel: string;
   moreExercisesLabel: string;
+  progressLabel: string;
+  resumeWorkoutLabel: string;
   isPersian: boolean;
 }
 

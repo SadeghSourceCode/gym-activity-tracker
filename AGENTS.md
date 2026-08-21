@@ -129,6 +129,17 @@ Move it to a shared location only when:
 - it is actually reused across multiple features, or
 - it clearly represents an application-wide concern.
 
+## Interface Icons
+
+Font Awesome Free is the canonical interface icon set and is loaded locally from the npm
+package in `src/styles.css`. Use its `fa-solid` or `fa-regular` font classes together with the
+shared `app-icon` class. Icons that are purely decorative must have `aria-hidden="true"`;
+icon-only controls must keep a localized accessible label through `AppButton` configuration.
+
+Do not introduce handwritten SVGs, Unicode symbols, emoji, or a second icon library for
+ordinary interface actions. SVG remains appropriate for data visualizations such as charts
+and progress rings where the geometry represents application data rather than an icon.
+
 ---
 
 # Exercise Library Domain
@@ -190,6 +201,42 @@ placement's explicit `order`. The review step does not ask for the date again;
 the date comes from the calendar/route context. Empty titles are auto-generated
 from the unique main-workout muscle groups, with a full-body fallback when more
 than two groups are present.
+
+## Workout Session / Train Domain
+
+Training execution state belongs to the persisted `WorkoutPlan.session` contract. A planned
+workout has no session; starting it creates an `active` session with ISO timestamps. Active
+sessions must survive reloads, and every set mutation refreshes `lastUpdatedAt`. Finishing a
+session records its terminal status, completion time, and duration while keeping the legacy
+`completionStatus` synchronized for calendar compatibility.
+
+Only an active session may mutate logged set values. Set completion is explicit and carries a
+`completedAt` timestamp. Keep session transitions in the pure utilities under
+`workout/utils/workout-session.util.ts`; presentational components emit intent and must not
+own persistence or session business rules.
+
+Local persistence failures must be visible to the user. Do not navigate away after a failed
+terminal save because that can hide unsaved workout results.
+
+Workout progress is the percentage of completed sets across every exercise placement. Persist
+it on the active `WorkoutSession` and derive it from set completion when reading legacy data.
+The workout card is the canonical place to show progress and execution status; the detail page
+must not duplicate that progress display.
+
+Starting from a workout card must create and persist the session before navigation. An active
+session may add exercise placements to any section and must remain resumable on the scheduled
+day. Leaving an incomplete active session requires confirmation, while completing the final set
+automatically finishes the session, shows completion feedback, and returns to the workout list.
+
+## Shell Navigation and Workout Calendar
+
+The bottom navigation is a root-page shell and must render only on its four exact destinations:
+home, search, statistics, and profile. Nested flows such as workout planning, workout details, and
+add-workout own their available viewport and must not inherit the bottom navigation.
+
+Calendar day state is derived from persisted workout and rest-day data. Explicit rest days take
+priority, fully completed workout days are completed, and only past incomplete workout days are
+missed. Current and future incomplete workouts remain planned; never style them as missed early.
 
 ---
 

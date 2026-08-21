@@ -11,7 +11,7 @@ import {
 } from '../../../exercise-library/data-access/models/exercise.models';
 import { WorkoutDetailConfig } from '../../data-access/models/workout-detail-config.interface';
 import {
-  WorkoutCompletedOutput,
+  WorkoutExerciseAddedOutput,
   WorkoutExerciseOutput,
   WorkoutExerciseReplacedOutput,
   WorkoutSetUpdatedOutput,
@@ -35,12 +35,18 @@ export class WorkoutDetailComponent {
   readonly text = computed(() => this.config().text);
   readonly workout = computed<Workout>(() => this.config().workout);
   readonly canManage = computed(() => this.config().canManage ?? false);
+  readonly isSessionActive = computed(() => this.config().isSessionActive ?? false);
   readonly replacingExerciseId = computed(() => this.config().replacingExerciseId ?? null);
   readonly replacementExercises = computed<readonly Exercise[]>(
     () => this.config().replacementExercises ?? [],
   );
   readonly replacementExercisesLoading = computed(
     () => this.config().replacementExercisesLoading ?? false,
+  );
+  readonly addingExerciseSection = computed(() => this.config().addingExerciseSection ?? null);
+  readonly availableExercises = computed(() => this.config().availableExercises ?? []);
+  readonly availableExercisesLoading = computed(
+    () => this.config().availableExercisesLoading ?? false,
   );
   readonly imageBaseUrl = computed(() => this.config().imageBaseUrl);
 
@@ -51,7 +57,10 @@ export class WorkoutDetailComponent {
   readonly cancelExerciseReplacement = output<void>();
   readonly replaceExercise = output<WorkoutExerciseReplacedOutput>();
   readonly updateSet = output<WorkoutSetUpdatedOutput>();
-  readonly complete = output<WorkoutCompletedOutput>();
+  readonly startSession = output<number>();
+  readonly requestAddExercise = output<WorkoutExerciseSection>();
+  readonly cancelAddExercise = output<void>();
+  readonly addExercise = output<WorkoutExerciseAddedOutput>();
 
   readonly expandedExerciseId = signal<string | null | undefined>(undefined);
   readonly restTimerSeconds = signal(0);

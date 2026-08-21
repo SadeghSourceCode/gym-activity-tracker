@@ -8,6 +8,20 @@
         {{ config().headingLabel ?? "TODAY'S WORKOUT" }}
       </p>
 
+      <span
+        class="mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-bold"
+        [class.bg-[#EAF8F0]]="config().workout.status === 'done'"
+        [class.text-[#146C3A]]="config().workout.status === 'done'"
+        [class.bg-[#EAF2FF]]="config().workout.status === 'in-progress'"
+        [class.text-[#0070F0]]="config().workout.status === 'in-progress'"
+        [class.bg-[#FFF0F0]]="config().workout.status === 'rejected'"
+        [class.text-[#C93636]]="config().workout.status === 'rejected'"
+        [class.bg-[#F2F4F5]]="config().workout.status === 'upcoming'"
+        [class.text-[#72777A]]="config().workout.status === 'upcoming'"
+      >
+        {{ config().statusLabel }}
+      </span>
+
       <h3 class="mt-4 truncate text-base font-extrabold text-[#202325]">
         {{ config().workout.title }}
       </h3>
@@ -30,33 +44,9 @@
           "
         >
           @if (isCopied()) {
-            <svg
-              class="size-4"
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="m4.5 12.5 5 5 10-11" />
-            </svg>
+            <i class="app-icon fa-solid fa-check size-4" aria-hidden="true"></i>
           } @else {
-            <svg
-              class="size-4"
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="5" cy="12" r="1" fill="currentColor" stroke="none" />
-              <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
-              <circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" />
-            </svg>
+            <i class="app-icon fa-solid fa-ellipsis size-4" aria-hidden="true"></i>
           }
         </summary>
 
@@ -125,11 +115,28 @@
             type: 'button',
             ariaLabel: config().openLabel + ' ' + config().workout.title,
           }"
-          (buttonClicked)="open.emit(config().workout.id)"
+          (buttonClicked)="start.emit(config().workout.id)"
         >
-          {{ config().startLabel ?? 'START' }}
+          {{
+            config().workout.sessionActive
+              ? (config().resumeLabel ?? 'RESUME')
+              : (config().startLabel ?? 'START')
+          }}
         </app-button>
       }
+    </div>
+  </div>
+
+  <div class="mt-5" [attr.aria-label]="config().progressLabel ?? 'Workout progress'">
+    <div class="mb-1 flex items-center justify-between text-xs font-bold text-[#72777A]">
+      <span>{{ config().progressLabel ?? 'Workout progress' }}</span>
+      <span>{{ config().workout.progressPercent }}%</span>
+    </div>
+    <div class="h-2 overflow-hidden rounded-full bg-[#E3E5E5]">
+      <div
+        class="h-full rounded-full bg-[#0070F0] transition-[width] duration-500"
+        [style.width.%]="config().workout.progressPercent"
+      ></div>
     </div>
   </div>
 

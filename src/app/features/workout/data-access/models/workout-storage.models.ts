@@ -10,6 +10,18 @@ export interface WorkoutSet {
   assistanceWeightKg?: number;
   restSeconds?: number;
   completed?: boolean;
+  completedAt?: string;
+}
+
+export type WorkoutSessionStatus = 'active' | 'completed' | 'abandoned';
+
+export interface WorkoutSession {
+  status: WorkoutSessionStatus;
+  startedAt: string;
+  lastUpdatedAt: string;
+  completedAt?: string;
+  durationSeconds?: number;
+  progressPercent: number;
 }
 
 export type WorkoutExerciseSection = 'warmup' | 'main' | 'cooldown';
@@ -51,6 +63,7 @@ export interface WorkoutPlan {
   isWeeklyPlan?: boolean;
   sets: WorkoutSet[];
   completionStatus?: WorkoutCompletionStatus;
+  session?: WorkoutSession;
 }
 
 export type Workout = WorkoutPlan;

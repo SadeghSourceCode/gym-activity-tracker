@@ -28,6 +28,7 @@ export class SelectedDayPanelComponent {
 
   readonly retry = output<void>();
   readonly openWorkoutDetails = output<string>();
+  readonly startWorkout = output<string>();
   readonly editWorkout = output<string>();
   readonly deleteWorkout = output<string>();
   readonly copyWorkout = output<string>();
@@ -94,7 +95,24 @@ export class SelectedDayPanelComponent {
       estimatedLabel: config.text.estimatedLabel,
       minutesLabel: config.text.minutesLabel,
       moreExercisesLabel: config.text.moreExercisesLabel,
-      canManage: config.selectedDayViewModel.canManageWorkouts,
+      progressLabel: config.text.progressLabel,
+      resumeLabel: config.text.resumeWorkoutLabel,
+      statusLabel: this.getWorkoutStatusLabel(workout),
+      canManage: config.selectedDayViewModel.canManageWorkouts && workout.status !== 'done',
     };
+  }
+
+  private getWorkoutStatusLabel(workout: WorkoutCardViewModel): string {
+    const text = this.config().text;
+    switch (workout.status) {
+      case 'done':
+        return text.doneLabel;
+      case 'rejected':
+        return text.rejectedLabel;
+      case 'upcoming':
+        return text.incomingLabel;
+      default:
+        return text.inProgressLabel;
+    }
   }
 }

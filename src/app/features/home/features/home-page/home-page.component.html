@@ -9,22 +9,19 @@
       }"
       (buttonClicked)="openWorkoutPlanner()"
     >
-      <span class="grid grid-cols-2 gap-1" aria-hidden="true">
-        @for (_ of [1, 2, 3, 4]; track _) {
-          <span class="size-2 rounded-sm border border-current"></span>
-        }
-      </span>
+      <i class="app-icon fa-solid fa-calendar-days" aria-hidden="true"></i>
     </app-button>
     <div class="flex gap-3">
       <span
         class="flex size-12 items-center justify-center rounded-full border border-[#E3E5E5] bg-white text-xl text-[#72777A]"
         aria-hidden="true"
-        >•••</span
-      >
+        ><i class="app-icon fa-solid fa-ellipsis"></i
+      ></span>
       <span
         class="relative flex size-12 items-center justify-center rounded-full border border-[#E3E5E5] bg-white text-xl text-[#72777A]"
         aria-hidden="true"
-        >♧<span class="absolute right-2 top-2 size-1.5 rounded-full bg-[#FF7777]"></span
+        ><i class="app-icon fa-regular fa-bell"></i
+        ><span class="absolute right-2 top-2 size-1.5 rounded-full bg-[#FF7777]"></span
       ></span>
     </div>
   </header>
@@ -35,6 +32,5 @@
     (workoutSelected)="openWorkout($event.workoutId)"
     (addWorkoutRequested)="addWorkout()"
   />
-  <app-nearby-gyms [config]="nearbyGymsConfig()" />
   <app-weekly-activity [config]="activityConfig()" />
 </div>

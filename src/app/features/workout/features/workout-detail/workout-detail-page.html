@@ -22,6 +22,9 @@
     (cancelExerciseReplacement)="cancelExerciseReplacement()"
     (replaceExercise)="replaceExercise($event.workoutId, $event.exerciseId, $event.replacement)"
     (updateSet)="updateSet($event.workoutId, $event.exerciseId, $event.setId, $event.changes)"
-    (complete)="complete($event.workoutId, $event.completionStatus)"
+    (startSession)="startSession($event)"
+    (requestAddExercise)="requestAddExercise($event)"
+    (cancelAddExercise)="cancelAddExercise()"
+    (addExercise)="addExercise($event.workoutId, $event.section, $event.exercise)"
   />
 }

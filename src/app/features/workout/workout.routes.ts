@@ -11,6 +11,7 @@ export const WorkoutRoutes: Routes = [
     path: 'workout-detail/:id',
     loadComponent: () =>
       import('./features/workout-detail/workout-detail-page').then((c) => c.WorkoutDetailPage),
+    canDeactivate: [(component: { canLeave: () => boolean }) => component.canLeave()],
   },
   {
     path: '',

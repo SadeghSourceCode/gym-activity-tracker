@@ -15,7 +15,11 @@ import { I18nService } from '../../../../core/i18n/i18n.service';
 import { AppButton } from '../../../../components/app-button/app-button';
 import { Workout } from '../../data-access/models/workout-storage.models';
 import { WorkoutCalendarConfig } from '../../data-access/models/workout-calendar-config.interface';
-import { getWeeklyRecurrenceEnd, isWorkoutOnDate } from '../../utils/weekly-recurrence.util';
+import { getWeeklyRecurrenceEnd } from '../../utils/weekly-recurrence.util';
+import {
+  WorkoutCalendarDayStatus,
+  resolveWorkoutCalendarDayStatus,
+} from '../../utils/workout-calendar-status.util';
 
 interface CalendarDay {
   label: string;
@@ -42,6 +46,7 @@ export class WorkoutCalendarComponent implements AfterViewInit {
   readonly config = input.required<WorkoutCalendarConfig>();
   readonly selectedDate = computed(() => this.config().selectedDate ?? this.today);
   readonly workouts = computed<readonly Workout[]>(() => this.config().workouts ?? []);
+  readonly restDayKeys = computed(() => new Set(this.config().restDayKeys ?? []));
 
   readonly dateSelected = output<string>();
 
@@ -93,20 +98,6 @@ export class WorkoutCalendarComponent implements AfterViewInit {
     });
   });
 
-  readonly workoutDayKeys = computed<Set<string>>(() => {
-    const workoutDateKeys = new Set<string>();
-
-    for (const workout of this.workouts()) {
-      for (const day of this.calendarDays()) {
-        if (isWorkoutOnDate(workout, day.dateKey)) {
-          workoutDateKeys.add(day.dateKey);
-        }
-      }
-    }
-
-    return workoutDateKeys;
-  });
-
   selectDate(dateKey: string) {
     this.dateSelected.emit(dateKey);
   }
@@ -132,8 +123,13 @@ export class WorkoutCalendarComponent implements AfterViewInit {
     return this.today === dateKey;
   }
 
-  isWorkoutDay(dateKey: string): boolean {
-    return this.workoutDayKeys().has(dateKey);
+  getDayStatus(dateKey: string): WorkoutCalendarDayStatus {
+    return resolveWorkoutCalendarDayStatus(
+      dateKey,
+      this.today,
+      this.workouts(),
+      this.restDayKeys(),
+    );
   }
 
   private getWeekStart(date: Date): Date {

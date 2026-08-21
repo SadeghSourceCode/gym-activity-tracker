@@ -1,13 +1,22 @@
 import { isPlatformBrowser, Location } from '@angular/common';
-import { Component, DestroyRef, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  HostListener,
+  PLATFORM_ID,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppButton } from '../../../../components/app-button/app-button';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { WorkoutCompletionStatus } from '../../data-access/models/workout-planner.models';
 import {
   Workout,
   WorkoutExerciseSummary,
+  WorkoutExerciseSection,
   WorkoutSet,
 } from '../../data-access/models/workout-storage.models';
 import { WorkoutDetailConfig } from '../../data-access/models/workout-detail-config.interface';
@@ -15,6 +24,12 @@ import { Exercise } from '../../../exercise-library/data-access/models/exercise.
 import { ExerciseLibraryService } from '../../../exercise-library/data-access/services/exercise-library.service';
 import { getDateKey, getTodayDateKey } from '../../utils/calendar-date.util';
 import { WorkoutDetailComponent } from '../../components/workout-detail/workout-detail.component';
+import {
+  finishWorkoutSession,
+  getWorkoutProgressPercent,
+  startWorkoutSession,
+  syncWorkoutSessionProgress,
+} from '../../utils/workout-session.util';
 
 @Component({
   selector: 'app-workout-detail-page',
@@ -29,6 +44,7 @@ export class WorkoutDetailPage {
   private readonly exerciseLibrary = inject(ExerciseLibraryService);
   private readonly route = inject(ActivatedRoute);
   private readonly location = inject(Location);
+  private readonly router = inject(Router);
   readonly i18n = inject(I18nService);
 
   private readonly workoutId = Number(this.route.snapshot.paramMap.get('id'));
@@ -38,14 +54,23 @@ export class WorkoutDetailPage {
     () => this.workouts().find((candidate) => candidate.id === this.workoutId) ?? null,
   );
   readonly workoutError = signal<string | null>(null);
+  readonly persistenceError = signal(false);
   readonly canManage = computed(() => {
     const workout = this.workout();
 
-    return workout ? getDateKey(workout.date) >= getTodayDateKey() : false;
+    return workout
+      ? workout.completionStatus === 'pending' &&
+          (workout.session?.status === 'active' || getDateKey(workout.date) >= getTodayDateKey())
+      : false;
   });
   readonly replacingExerciseId = signal<string | null>(null);
   readonly replacementExercises = signal<Exercise[]>([]);
   readonly replacementExercisesLoading = signal(false);
+  readonly addingExerciseSection = signal<WorkoutExerciseSection | null>(null);
+  readonly availableExercises = signal<Exercise[]>([]);
+  readonly availableExercisesLoading = signal(false);
+  readonly celebrating = signal(false);
+  private exitConfirmed = false;
 
   readonly exerciseImageBaseUrl = this.exerciseLibrary.imageBaseUrl;
 
@@ -59,9 +84,15 @@ export class WorkoutDetailPage {
     return {
       workout,
       canManage: this.canManage(),
+      isSessionActive: workout.session?.status === 'active',
+      persistenceError: this.persistenceError(),
       replacingExerciseId: this.replacingExerciseId(),
       replacementExercises: this.replacementExercises(),
       replacementExercisesLoading: this.replacementExercisesLoading(),
+      addingExerciseSection: this.addingExerciseSection(),
+      availableExercises: this.availableExercises(),
+      availableExercisesLoading: this.availableExercisesLoading(),
+      celebrating: this.celebrating(),
       imageBaseUrl: this.exerciseImageBaseUrl,
       text: {
         workoutDetailsLabel: this.i18n.t('workoutDetails'),
@@ -83,8 +114,16 @@ export class WorkoutDetailPage {
         chooseReplacementLabel: this.i18n.t('chooseReplacement'),
         noSimilarExercisesLabel: this.i18n.t('noSimilarExercises'),
         loadingExercisesLabel: this.i18n.t('loadingExercises'),
-        markAsDoneLabel: this.i18n.t('markAsDone'),
-        rejectWorkoutLabel: this.i18n.t('rejectWorkout'),
+        startWorkoutLabel: this.i18n.t('startWorkout'),
+        resumeWorkoutLabel: this.i18n.t('resumeWorkout'),
+        completeSetLabel: this.i18n.t('completeSet'),
+        completedSetLabel: this.i18n.t('completedSet'),
+        storageErrorLabel: this.i18n.t('workoutStorageError'),
+        addExerciseLabel: this.i18n.t('addExercise'),
+        chooseExerciseLabel: this.i18n.t('chooseExercise'),
+        noExercisesFoundLabel: this.i18n.t('noExercisesFound'),
+        leaveWorkoutConfirmation: this.i18n.t('leaveWorkoutConfirmation'),
+        workoutCompleteMessage: this.i18n.t('workoutCompleteMessage'),
         isPersian: this.i18n.language() === 'fa',
       },
     };
@@ -97,7 +136,76 @@ export class WorkoutDetailPage {
   }
 
   goBack() {
+    if (!this.canLeave()) return;
+    this.exitConfirmed = true;
     this.location.back();
+  }
+
+  canLeave(): boolean {
+    if (this.exitConfirmed || !this.hasIncompleteActiveSession() || !this.isBrowser) return true;
+    const confirmed = window.confirm(this.i18n.t('leaveWorkoutConfirmation'));
+    if (confirmed) this.saveWorkouts();
+    return confirmed;
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  preventAccidentalUnload(event: BeforeUnloadEvent) {
+    if (this.hasIncompleteActiveSession()) event.preventDefault();
+  }
+
+  requestAddExercise(section: WorkoutExerciseSection) {
+    if (this.workout()?.session?.status !== 'active') return;
+    this.addingExerciseSection.set(section);
+    this.availableExercisesLoading.set(true);
+    this.exerciseLibrary
+      .search({ limit: 40 })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ items }) => {
+          const existingIds = new Set(this.workout()?.exercises.map((item) => item.exerciseId));
+          this.availableExercises.set(items.filter((item) => !existingIds.has(item.id)));
+          this.availableExercisesLoading.set(false);
+        },
+        error: () => {
+          this.availableExercises.set([]);
+          this.availableExercisesLoading.set(false);
+        },
+      });
+  }
+
+  cancelAddExercise() {
+    this.addingExerciseSection.set(null);
+    this.availableExercises.set([]);
+  }
+
+  addExercise(workoutId: number, section: WorkoutExerciseSection, exercise: Exercise) {
+    const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
+    if (!targetWorkout || targetWorkout.session?.status !== 'active') return;
+
+    this.workouts.update((workouts) =>
+      workouts.map((workout) => {
+        if (workout.id !== workoutId) return workout;
+        const placement: WorkoutExerciseSummary = {
+          id: `workout-exercise:${workout.id}:${Date.now()}`,
+          exerciseId: exercise.id,
+          order: workout.exercises.length,
+          section,
+          trackingType: exercise.trackingType,
+          name: exercise.name,
+          nameEn: exercise.nameEn,
+          nameFa: exercise.nameFa,
+          targetMuscle: exercise.targetMuscle,
+          thumbnailUrl: this.getExerciseMediaUrl(exercise) ?? undefined,
+          sets: [{ id: 1, reps: 0, weightKg: 0 }],
+        };
+        return syncWorkoutSessionProgress({
+          ...workout,
+          exercises: [...workout.exercises, placement],
+        });
+      }),
+    );
+    this.cancelAddExercise();
+    this.saveWorkouts();
   }
 
   requestExerciseReplacement(exercise: WorkoutExerciseSummary) {
@@ -167,13 +275,13 @@ export class WorkoutDetailPage {
         const exercises = workout.exercises.filter((exercise) => exercise.id !== exerciseId);
         const firstExercise = exercises[0];
 
-        return {
+        return syncWorkoutSessionProgress({
           ...workout,
           exercises,
           exerciseId: firstExercise.exerciseId,
           thumbnailUrl: firstExercise.thumbnailUrl,
           targetMuscle: firstExercise.targetMuscle,
-        };
+        });
       }),
     );
     this.cancelExerciseReplacement();
@@ -208,13 +316,13 @@ export class WorkoutDetailPage {
         );
         const firstExercise = exercises[0];
 
-        return {
+        return syncWorkoutSessionProgress({
           ...workout,
           exercises,
           exerciseId: firstExercise.exerciseId,
           thumbnailUrl: firstExercise.thumbnailUrl,
           targetMuscle: firstExercise.targetMuscle,
-        };
+        });
       }),
     );
     this.cancelExerciseReplacement();
@@ -224,7 +332,7 @@ export class WorkoutDetailPage {
   addSet(workoutId: number, exerciseId: string) {
     const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
 
-    if (!targetWorkout || !this.canManage()) {
+    if (!targetWorkout || targetWorkout.session?.status !== 'active') {
       return;
     }
 
@@ -234,7 +342,7 @@ export class WorkoutDetailPage {
           return workout;
         }
 
-        return {
+        return syncWorkoutSessionProgress({
           ...workout,
           exercises: workout.exercises.map((exercise) => {
             if (exercise.id !== exerciseId) {
@@ -255,7 +363,7 @@ export class WorkoutDetailPage {
               ],
             };
           }),
-        };
+        });
       }),
     );
     this.saveWorkouts();
@@ -265,13 +373,18 @@ export class WorkoutDetailPage {
     workoutId: number,
     exerciseId: string,
     setId: number,
-    changes: Partial<Pick<WorkoutSet, 'reps' | 'weightKg'>>,
+    changes: Partial<Pick<WorkoutSet, 'reps' | 'weightKg' | 'completed' | 'completedAt'>>,
   ) {
     const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
 
-    if (!targetWorkout || !this.canManage()) {
+    if (!targetWorkout || targetWorkout.session?.status !== 'active') {
       return;
     }
+
+    const normalizedChanges =
+      typeof changes.completed === 'boolean'
+        ? { ...changes, completedAt: changes.completed ? new Date().toISOString() : undefined }
+        : changes;
 
     this.workouts.update((workouts) =>
       workouts.map((workout) => {
@@ -279,46 +392,49 @@ export class WorkoutDetailPage {
           return workout;
         }
 
-        return {
+        return syncWorkoutSessionProgress({
           ...workout,
           exercises: workout.exercises.map((exercise) =>
             exercise.id === exerciseId
               ? {
                   ...exercise,
                   sets: exercise.sets.map((set) =>
-                    set.id === setId ? { ...set, ...changes } : set,
+                    set.id === setId ? { ...set, ...normalizedChanges } : set,
                   ),
                 }
               : exercise,
           ),
-        };
+        });
       }),
     );
-    this.saveWorkouts();
-  }
 
-  complete(
-    workoutId: number,
-    completionStatus: Extract<WorkoutCompletionStatus, 'completed' | 'rejected'>,
-  ) {
-    const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
-
-    if (!targetWorkout || !this.canManage()) {
+    const updatedWorkout = this.workout();
+    if (
+      updatedWorkout?.session?.status === 'active' &&
+      getWorkoutProgressPercent(updatedWorkout) === 100
+    ) {
+      this.workouts.update((workouts) =>
+        workouts.map((workout) =>
+          workout.id === workoutId ? finishWorkoutSession(workout, 'completed') : workout,
+        ),
+      );
+      if (this.saveWorkouts()) this.celebrateAndReturn();
       return;
     }
 
+    this.saveWorkouts();
+  }
+
+  startSession(workoutId: number) {
+    const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
+    if (!targetWorkout || !this.canManage()) return;
+
     this.workouts.update((workouts) =>
       workouts.map((workout) =>
-        workout.id === workoutId
-          ? {
-              ...workout,
-              completionStatus,
-            }
-          : workout,
+        workout.id === workoutId ? startWorkoutSession(workout) : workout,
       ),
     );
     this.saveWorkouts();
-    this.goBack();
   }
 
   private loadWorkouts(): Workout[] {
@@ -357,10 +473,29 @@ export class WorkoutDetailPage {
     }
   }
 
-  private saveWorkouts() {
-    if (this.isBrowser) {
+  private saveWorkouts(): boolean {
+    if (!this.isBrowser) return false;
+    try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.workouts()));
+      this.persistenceError.set(false);
+      return true;
+    } catch {
+      this.persistenceError.set(true);
+      return false;
     }
+  }
+
+  private hasIncompleteActiveSession(): boolean {
+    const workout = this.workout();
+    return Boolean(
+      workout?.session?.status === 'active' && getWorkoutProgressPercent(workout) < 100,
+    );
+  }
+
+  private celebrateAndReturn() {
+    this.celebrating.set(true);
+    this.exitConfirmed = true;
+    setTimeout(() => void this.router.navigateByUrl('/workouts'), 2200);
   }
 
   private normalizeCompletionStatus(

@@ -13,6 +13,7 @@ export class WorkoutSummaryCardComponent {
   readonly config = input.required<WorkoutSummaryCardConfig>();
 
   readonly open = output<string>();
+  readonly start = output<string>();
   readonly edit = output<string>();
   readonly deleteWorkout = output<string>();
   readonly copy = output<string>();

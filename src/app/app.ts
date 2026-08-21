@@ -51,9 +51,7 @@ export class App {
 
   private syncSelectedBottomNavItemWithRoute(url: string) {
     const path = url.split('?')[0].split('#')[0];
-    const matchingItem = this.bottomNavItems.find((item) =>
-      item.route === '/' ? path === '/' : path.startsWith(item.route),
-    );
+    const matchingItem = this.bottomNavItems.find((item) => item.route === path);
 
     this.selectedBottomNavItem.set(matchingItem?.id ?? null);
   }

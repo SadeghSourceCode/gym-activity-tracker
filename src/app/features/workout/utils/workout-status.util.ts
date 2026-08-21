@@ -15,6 +15,7 @@ export function resolveWorkoutStatus(
   workoutDate: string,
   completionStatus: WorkoutCompletionStatus,
   today: string,
+  sessionActive = false,
 ): WorkoutDisplayStatus {
   const dateComparison = compareDateKeys(workoutDate, today);
 
@@ -30,5 +31,5 @@ export function resolveWorkoutStatus(
     return 'rejected';
   }
 
-  return dateComparison === 0 ? 'in-progress' : 'rejected';
+  return dateComparison === 0 ? (sessionActive ? 'in-progress' : 'upcoming') : 'rejected';
 }
