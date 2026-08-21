@@ -129,6 +129,17 @@ Move it to a shared location only when:
 - it is actually reused across multiple features, or
 - it clearly represents an application-wide concern.
 
+## Interface Icons
+
+Font Awesome Free is the canonical interface icon set and is loaded locally from the npm
+package in `src/styles.css`. Use its `fa-solid` or `fa-regular` font classes together with the
+shared `app-icon` class. Icons that are purely decorative must have `aria-hidden="true"`;
+icon-only controls must keep a localized accessible label through `AppButton` configuration.
+
+Do not introduce handwritten SVGs, Unicode symbols, emoji, or a second icon library for
+ordinary interface actions. SVG remains appropriate for data visualizations such as charts
+and progress rings where the geometry represents application data rather than an icon.
+
 ---
 
 # Exercise Library Domain

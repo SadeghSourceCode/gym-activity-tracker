@@ -25,9 +25,9 @@
     "semantic_hash": "67404b8f9ef965605255d19109af46c2"
   },
   "package.json": {
-    "mtime": 1785769807.0465367,
-    "ast_hash": "55d0aaea2e1a752151e73c06010b5851",
-    "semantic_hash": "55d0aaea2e1a752151e73c06010b5851"
+    "mtime": 1787328426.5568726,
+    "ast_hash": "e05f71681bd196374176d39bde120cb1",
+    "semantic_hash": ""
   },
   "src/app/app.config.ts": {
     "mtime": 1787327224.9984121,
@@ -520,8 +520,8 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1787327869.479962,
-    "ast_hash": "40e7b92d2a5fe102b06dd25a49e4359b",
+    "mtime": 1787328568.0633752,
+    "ast_hash": "e7b461be68cb239c7c40a45b8ef1bded",
     "semantic_hash": ""
   },
   "README.md": {
@@ -535,8 +535,8 @@
     "semantic_hash": ""
   },
   "src/app/app.html": {
-    "mtime": 1787327224.9985042,
-    "ast_hash": "58c120a3c458adc816a47dc493e4be40",
+    "mtime": 1787328550.4030628,
+    "ast_hash": "21065ae341ff98e0157e2184e2f0b865",
     "semantic_hash": ""
   },
   "src/app/components/app-bar/app-bar.html": {
@@ -555,13 +555,13 @@
     "semantic_hash": ""
   },
   "src/app/features/home/components/nearby-gyms/nearby-gyms.component.html": {
-    "mtime": 1787327225.0015695,
-    "ast_hash": "5e206db1b6f6c99173b72e2528802c68",
+    "mtime": 1787328538.028844,
+    "ast_hash": "8a68622e4a2e97d02c38d78e4935f686",
     "semantic_hash": ""
   },
   "src/app/features/home/components/upcoming-workouts/upcoming-workouts.component.html": {
-    "mtime": 1787327225.0016198,
-    "ast_hash": "1886ae71cc9150901b98d3df007ccdba",
+    "mtime": 1787328537.9268422,
+    "ast_hash": "8d1cab0ae742b43500c345ea96199787",
     "semantic_hash": ""
   },
   "src/app/features/home/components/weekly-activity/weekly-activity.component.html": {
@@ -570,8 +570,8 @@
     "semantic_hash": ""
   },
   "src/app/features/home/features/home-page/home-page.component.html": {
-    "mtime": 1787327225.0024078,
-    "ast_hash": "ec870087f4c570bef852719762e0c184",
+    "mtime": 1787328550.4430637,
+    "ast_hash": "e8f8d5b6ec298d85064b52e6e1e1c6a0",
     "semantic_hash": ""
   },
   "src/app/features/profile/features/profile-page/profile-page.component.html": {
@@ -580,8 +580,8 @@
     "semantic_hash": ""
   },
   "src/app/features/search/features/search-page/search-page.component.html": {
-    "mtime": 1787327225.0029323,
-    "ast_hash": "381b8afb67a7ff655861e2ab30a3145b",
+    "mtime": 1787328462.536509,
+    "ast_hash": "5f38ab3ea303194ee828d6953a9c8caa",
     "semantic_hash": ""
   },
   "src/app/features/workout/components/add-workout-header/add-workout-header.component.html": {
@@ -600,8 +600,8 @@
     "semantic_hash": ""
   },
   "src/app/features/workout/components/exercise-details-dialog/exercise-details-dialog.component.html": {
-    "mtime": 1787327225.0041337,
-    "ast_hash": "2b586e897f2cd5ee72a8065f1471f81a",
+    "mtime": 1787328462.6415107,
+    "ast_hash": "52a1f53723e11bb33aba8a46e72c83ad",
     "semantic_hash": ""
   },
   "src/app/features/workout/components/rest-day-state/rest-day-state.component.html": {
@@ -630,13 +630,13 @@
     "semantic_hash": ""
   },
   "src/app/features/workout/components/workout-detail/workout-detail.component.html": {
-    "mtime": 1787327815.0445588,
-    "ast_hash": "5d73d81424482d8a29129773f0c1f916",
+    "mtime": 1787328550.696068,
+    "ast_hash": "a31de4f467b92bd7063cc253a2bd49f6",
     "semantic_hash": ""
   },
   "src/app/features/workout/components/workout-overview/workout-overview.component.html": {
-    "mtime": 1787327225.006039,
-    "ast_hash": "f35cdab652fe75ffc0c44f7865c08329",
+    "mtime": 1787328506.6182885,
+    "ast_hash": "644a41c843124117aec18acd66a9d670",
     "semantic_hash": ""
   },
   "src/app/features/workout/components/workout-planning-step/workout-planning-step.component.html": {
@@ -645,13 +645,13 @@
     "semantic_hash": ""
   },
   "src/app/features/workout/components/workout-summary-card/workout-summary-card.component.html": {
-    "mtime": 1787327225.006396,
-    "ast_hash": "a847c80108330a18d05b888846b7fa4b",
+    "mtime": 1787328506.7202904,
+    "ast_hash": "82cbdc19ce13966380b716b80c1d45ee",
     "semantic_hash": ""
   },
   "src/app/features/workout/features/add-workout/add-workout.component.html": {
-    "mtime": 1787327243.8742425,
-    "ast_hash": "a358bd1e2674672544431ab378a246b7",
+    "mtime": 1787328473.2446983,
+    "ast_hash": "8b2d3d1defd2e91087c79f904d644895",
     "semantic_hash": ""
   },
   "src/app/features/workout/features/statistics/statistics-page.component.html": {

@@ -20,7 +20,7 @@
         }"
         (buttonClicked)="close.emit()"
       >
-        &times;
+        <i class="app-icon fa-solid fa-xmark" aria-hidden="true"></i>
       </app-button>
     </div>
 
@@ -76,19 +76,11 @@
                   {{ getWorkoutExerciseName(exercise) }}
                 </h3>
 
-                <svg
-                  class="size-5 shrink-0 text-[#72777A] transition-transform duration-300"
+                <i
+                  class="app-icon fa-solid fa-chevron-down size-5 shrink-0 text-[#72777A] transition-transform duration-300"
                   [class.rotate-180]="isExerciseExpanded(exercise.id)"
                   aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
+                ></i>
               </button>
 
               @if (isExerciseExpanded(exercise.id)) {
@@ -134,8 +126,8 @@
                             ariaLabel: text().closeWorkoutDetailsLabel,
                           }"
                           (buttonClicked)="cancelExerciseReplacement.emit()"
-                          >&times;</app-button
-                        >
+                          ><i class="app-icon fa-solid fa-xmark" aria-hidden="true"></i
+                        ></app-button>
                       </div>
 
                       @if (replacementExercisesLoading()) {
@@ -348,7 +340,7 @@
           }"
           (buttonClicked)="closeRestTimer()"
         >
-          &times;
+          <i class="app-icon fa-solid fa-xmark" aria-hidden="true"></i>
         </app-button>
       </div>
 
@@ -371,7 +363,8 @@
           }"
           (buttonClicked)="adjustRestTimer(-15)"
         >
-          −15s
+          <i class="app-icon fa-solid fa-minus" aria-hidden="true"></i>
+          15s
         </app-button>
 
         <app-button
@@ -383,7 +376,8 @@
           }"
           (buttonClicked)="adjustRestTimer(15)"
         >
-          +15s
+          <i class="app-icon fa-solid fa-plus" aria-hidden="true"></i>
+          15s
         </app-button>
       </div>
     </div>

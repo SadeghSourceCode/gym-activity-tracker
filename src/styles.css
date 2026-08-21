@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+@import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
+@import '@fortawesome/fontawesome-free/css/solid.min.css';
+@import '@fortawesome/fontawesome-free/css/regular.min.css';
 
 /* You can add global styles to this file, and also import other style files */
 *,
@@ -56,4 +59,13 @@ app-root {
 
 .scrollbar-none::-webkit-scrollbar {
   display: none;
+}
+
+.app-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
 }
