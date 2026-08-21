@@ -17,6 +17,11 @@ import {
 import { parseDateKey } from '../../utils/calendar-date.util';
 import { AddWorkoutSaveConfig } from '../models/add-workout-save-config.interface';
 
+interface LegacyWorkoutSet extends Partial<WorkoutSet> {
+  repeat?: number;
+  weight?: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AddWorkoutService {
   private readonly storageKey = 'gym-activity-tracker.workouts';
@@ -50,7 +55,9 @@ export class AddWorkoutService {
             ...workout,
             date: new Date(workout.date),
             exercises: this.normalizeWorkoutExercises(workout, isPersian),
-            sets: Array.isArray(workout.sets) ? workout.sets : [],
+            schemaVersion: 2 as const,
+            recurrence: this.normalizeRecurrence(workout),
+            sets: this.normalizeWorkoutSets(workout.sets),
             completionStatus: this.normalizeCompletionStatus(workout.completionStatus),
           }))
         : [];
@@ -93,13 +100,20 @@ export class AddWorkoutService {
     exercise: Exercise,
     section: WorkoutExerciseSection,
   ): WorkoutExerciseSummary[] {
-    const selectedExercise = selectedExercises.find((candidate) => candidate.id === exercise.id);
+    const selectedExercise = selectedExercises.find(
+      (candidate) => candidate.exerciseId === exercise.id && candidate.section === section,
+    );
 
     if (selectedExercise) {
-      return selectedExercises.filter((candidate) => candidate.id !== exercise.id);
+      return this.reorderExercises(
+        selectedExercises.filter((candidate) => candidate.id !== selectedExercise.id),
+      );
     }
 
-    return [...selectedExercises, this.toWorkoutExerciseSummary(exercise, section)];
+    return this.reorderExercises([
+      ...selectedExercises,
+      this.toWorkoutExerciseSummary(exercise, section, selectedExercises.length),
+    ]);
   }
 
   mergeCopiedWorkout(
@@ -113,12 +127,15 @@ export class AddWorkoutService {
         mergedExercises.push({
           ...copiedExercise,
           sets: copiedExercise.sets.map((set) => ({ ...set })),
+          exerciseId: copiedExercise.exerciseId ?? copiedExercise.id,
+          order: mergedExercises.length,
           section: this.getExerciseSection(copiedExercise),
+          trackingType: copiedExercise.trackingType ?? 'weight-and-repetitions',
         });
       }
     }
 
-    return mergedExercises;
+    return this.reorderExercises(mergedExercises);
   }
 
   updateExerciseSetCount(
@@ -143,15 +160,18 @@ export class AddWorkoutService {
       ...workouts,
       {
         id: nextWorkoutId,
+        schemaVersion: 2,
         name: config.workoutTitle.trim() || config.defaultWorkoutTitle,
-        exerciseId: firstExercise.id,
+        exerciseId: firstExercise.exerciseId,
         thumbnailUrl: firstExercise.thumbnailUrl,
         exercises: config.selectedExercises,
         date: parseDateKey(config.selectedDate),
         targetMuscle: config.targetMuscle,
-        isWeeklyPlan: config.isWeeklyPlan,
+        recurrence: config.isWeeklyPlan
+          ? { frequency: 'weekly', interval: 1, occurrences: 4 }
+          : undefined,
         completionStatus: 'pending',
-        sets: [{ id: 1, repeat: 0, weight: 0 }],
+        sets: [{ id: 1, reps: 0, weightKg: 0 }],
       },
     ];
   }
@@ -168,12 +188,16 @@ export class AddWorkoutService {
         ? {
             ...workout,
             name: config.workoutTitle.trim() || config.defaultWorkoutTitle,
-            exerciseId: firstExercise.id,
+            schemaVersion: 2,
+            exerciseId: firstExercise.exerciseId,
             thumbnailUrl: firstExercise.thumbnailUrl,
             exercises: config.selectedExercises,
             date: parseDateKey(config.selectedDate),
             targetMuscle: config.targetMuscle,
-            isWeeklyPlan: config.isWeeklyPlan,
+            recurrence: config.isWeeklyPlan
+              ? { frequency: 'weekly', interval: 1, occurrences: 4 }
+              : undefined,
+            isWeeklyPlan: undefined,
           }
         : workout,
     );
@@ -210,12 +234,15 @@ export class AddWorkoutService {
     isPersian: boolean,
   ): WorkoutExerciseSummary[] {
     if (Array.isArray(workout.exercises)) {
-      return workout.exercises.map((exercise) => ({
+      return workout.exercises.map((exercise, index) => ({
         ...exercise,
+        exerciseId: exercise.exerciseId ?? exercise.id,
+        order: index,
         nameEn: exercise.nameEn ?? exercise.name,
         nameFa: exercise.nameFa ?? exercise.name,
         targetMuscle: exercise.targetMuscle ?? workout.targetMuscle,
         name: isPersian ? (exercise.nameFa ?? exercise.name) : (exercise.nameEn ?? exercise.name),
+        trackingType: exercise.trackingType ?? 'weight-and-repetitions',
         sets: this.normalizeWorkoutSets(exercise.sets),
         section: this.getExerciseSection(exercise),
       }));
@@ -224,12 +251,15 @@ export class AddWorkoutService {
     return workout.exerciseId
       ? [
           {
-            id: workout.exerciseId,
+            id: `workout-exercise:${workout.id}:0`,
+            exerciseId: workout.exerciseId,
+            order: 0,
             name: workout.name,
             nameEn: workout.name,
             nameFa: workout.name,
             targetMuscle: workout.targetMuscle,
             thumbnailUrl: workout.thumbnailUrl,
+            trackingType: 'weight-and-repetitions',
             sets: this.normalizeWorkoutSets(workout.sets),
             section: 'main',
           },
@@ -240,32 +270,42 @@ export class AddWorkoutService {
   private toWorkoutExerciseSummary(
     exercise: Exercise,
     section: WorkoutExerciseSection,
+    order: number,
   ): WorkoutExerciseSummary {
     return {
-      id: exercise.id,
+      id: `workout-exercise:${exercise.id}:${section}:${order}`,
+      exerciseId: exercise.id,
+      order,
+      section,
+      trackingType: exercise.trackingType,
       name: exercise.name,
       nameEn: exercise.nameEn,
       nameFa: exercise.nameFa,
       targetMuscle: exercise.targetMuscle,
       thumbnailUrl: this.exerciseLibrary.getMediaUrl(exercise) ?? undefined,
-      sets: [{ id: 1, repeat: 0, weight: 0 }],
-      section,
+      sets: [{ id: 1, reps: 0, weightKg: 0 }],
     };
   }
 
-  private normalizeWorkoutSets(sets: WorkoutSet[] | undefined): WorkoutSet[] {
+  private normalizeWorkoutSets(sets: LegacyWorkoutSet[] | undefined): WorkoutSet[] {
     if (!Array.isArray(sets)) {
-      return [{ id: 1, repeat: 0, weight: 0 }];
+      return [{ id: 1, reps: 0, weightKg: 0 }];
     }
 
-    const normalizedSets = sets.filter(
-      (set): set is WorkoutSet =>
-        typeof set?.id === 'number' &&
-        typeof set.repeat === 'number' &&
-        typeof set.weight === 'number',
-    );
+    const normalizedSets = sets
+      .filter((set): set is LegacyWorkoutSet & { id: number } => typeof set?.id === 'number')
+      .map((set) => ({
+        id: set.id,
+        reps: typeof set.reps === 'number' ? set.reps : (set.repeat ?? 0),
+        weightKg: typeof set.weightKg === 'number' ? set.weightKg : (set.weight ?? 0),
+        durationSeconds: set.durationSeconds,
+        distanceMeters: set.distanceMeters,
+        assistanceWeightKg: set.assistanceWeightKg,
+        restSeconds: set.restSeconds,
+        completed: set.completed,
+      }));
 
-    return normalizedSets.length ? normalizedSets : [{ id: 1, repeat: 0, weight: 0 }];
+    return normalizedSets.length ? normalizedSets : [{ id: 1, reps: 0, weightKg: 0 }];
   }
 
   private resizeWorkoutSets(sets: WorkoutSet[] | undefined, setCount: number): WorkoutSet[] {
@@ -279,9 +319,27 @@ export class AddWorkoutService {
 
     while (nextSets.length < setCount) {
       const nextSetId = Math.max(...nextSets.map((set) => set.id), 0) + 1;
-      nextSets.push({ id: nextSetId, repeat: 0, weight: 0 });
+      nextSets.push({ id: nextSetId, reps: 0, weightKg: 0 });
     }
 
     return nextSets;
+  }
+
+  private reorderExercises(exercises: WorkoutExerciseSummary[]): WorkoutExerciseSummary[] {
+    return exercises.map((exercise, order) => ({ ...exercise, order }));
+  }
+
+  private normalizeRecurrence(workout: Workout) {
+    if (workout.recurrence?.frequency === 'weekly') {
+      return {
+        frequency: 'weekly' as const,
+        interval: Math.max(workout.recurrence.interval, 1),
+        occurrences: Math.max(workout.recurrence.occurrences, 1),
+      };
+    }
+
+    return workout.isWeeklyPlan
+      ? { frequency: 'weekly' as const, interval: 1, occurrences: 4 }
+      : undefined;
   }
 }

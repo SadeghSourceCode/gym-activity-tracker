@@ -13,7 +13,7 @@ export interface WorkoutExerciseReplacedOutput extends WorkoutExerciseOutput {
 
 export interface WorkoutSetUpdatedOutput extends WorkoutExerciseOutput {
   setId: number;
-  changes: Partial<Pick<WorkoutSet, 'repeat' | 'weight'>>;
+  changes: Partial<Pick<WorkoutSet, 'reps' | 'weightKg'>>;
 }
 
 export interface WorkoutCompletedOutput {

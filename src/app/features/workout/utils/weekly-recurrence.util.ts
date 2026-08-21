@@ -1,37 +1,43 @@
 import { Workout } from '../data-access/models/workout-storage.models';
-import {
-  addMonths,
-  daysBetweenDates,
-  getDateKey,
-  parseDateKey,
-  startOfDay,
-} from './calendar-date.util';
+import { daysBetweenDates, getDateKey, parseDateKey, startOfDay } from './calendar-date.util';
 
-export const weeklyRecurrenceMonths = 2;
+export const weeklyRecurrenceOccurrences = 4;
 
 export function isWorkoutOnDate(workout: Workout, dateKey: string): boolean {
   if (getDateKey(workout.date) === dateKey) {
     return true;
   }
 
-  if (!workout.isWeeklyPlan) {
+  const recurrence = getWorkoutRecurrence(workout);
+  if (!recurrence) {
     return false;
   }
 
   const workoutStart = startOfDay(workout.date);
   const targetDate = startOfDay(parseDateKey(dateKey));
 
-  if (targetDate <= workoutStart || targetDate > addMonths(workoutStart, weeklyRecurrenceMonths)) {
+  const dayDifference = daysBetweenDates(workoutStart, targetDate);
+  if (dayDifference <= 0 || dayDifference % (7 * recurrence.interval) !== 0) {
     return false;
   }
 
-  return daysBetweenDates(workoutStart, targetDate) % 7 === 0;
+  return dayDifference / (7 * recurrence.interval) < recurrence.occurrences;
 }
 
 export function getWeeklyRecurrenceEnd(workout: Workout): Date | null {
-  if (!workout.isWeeklyPlan) {
+  const recurrence = getWorkoutRecurrence(workout);
+  if (!recurrence) {
     return null;
   }
 
-  return addMonths(startOfDay(workout.date), weeklyRecurrenceMonths);
+  const end = startOfDay(workout.date);
+  end.setDate(end.getDate() + 7 * recurrence.interval * (recurrence.occurrences - 1));
+  return end;
+}
+
+function getWorkoutRecurrence(workout: Workout) {
+  if (workout.recurrence?.frequency === 'weekly') return workout.recurrence;
+  return workout.isWeeklyPlan
+    ? { frequency: 'weekly' as const, interval: 1, occurrences: weeklyRecurrenceOccurrences }
+    : null;
 }

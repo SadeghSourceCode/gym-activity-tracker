@@ -2,12 +2,13 @@ import { Workout } from '../data-access/models/workout-storage.models';
 import {
   getWeeklyRecurrenceEnd,
   isWorkoutOnDate,
-  weeklyRecurrenceMonths,
+  weeklyRecurrenceOccurrences,
 } from './weekly-recurrence.util';
 
 function createWorkout(overrides: Partial<Workout> = {}): Workout {
   return {
     id: 1,
+    schemaVersion: 2,
     name: 'Chest Day',
     date: new Date(2026, 7, 3),
     exercises: [],
@@ -31,37 +32,47 @@ describe('weekly recurrence utilities', () => {
   });
 
   it('matches weekly workouts every 7 days', () => {
-    const workout = createWorkout({ isWeeklyPlan: true });
+    const workout = createWorkout({
+      recurrence: { frequency: 'weekly', interval: 1, occurrences: 4 },
+    });
 
     expect(isWorkoutOnDate(workout, '2026-08-10')).toBe(true);
     expect(isWorkoutOnDate(workout, '2026-08-17')).toBe(true);
   });
 
   it('does not match other weekdays for weekly workouts', () => {
-    const workout = createWorkout({ isWeeklyPlan: true });
+    const workout = createWorkout({
+      recurrence: { frequency: 'weekly', interval: 1, occurrences: 4 },
+    });
 
     expect(isWorkoutOnDate(workout, '2026-08-04')).toBe(false);
     expect(isWorkoutOnDate(workout, '2026-08-11')).toBe(false);
   });
 
   it('does not match weekly workouts before their start date', () => {
-    const workout = createWorkout({ isWeeklyPlan: true });
+    const workout = createWorkout({
+      recurrence: { frequency: 'weekly', interval: 1, occurrences: 4 },
+    });
 
     expect(isWorkoutOnDate(workout, '2026-07-27')).toBe(false);
   });
 
-  it(`limits weekly workouts to ${weeklyRecurrenceMonths} months from the start date`, () => {
-    const workout = createWorkout({ isWeeklyPlan: true });
+  it(`limits weekly workouts to ${weeklyRecurrenceOccurrences} occurrences`, () => {
+    const workout = createWorkout({
+      recurrence: { frequency: 'weekly', interval: 1, occurrences: 4 },
+    });
 
-    expect(isWorkoutOnDate(workout, '2026-09-28')).toBe(true);
-    expect(isWorkoutOnDate(workout, '2026-10-05')).toBe(false);
+    expect(isWorkoutOnDate(workout, '2026-08-24')).toBe(true);
+    expect(isWorkoutOnDate(workout, '2026-08-31')).toBe(false);
   });
 
   it('returns the recurrence end for weekly workouts only', () => {
-    const weeklyWorkout = createWorkout({ isWeeklyPlan: true });
+    const weeklyWorkout = createWorkout({
+      recurrence: { frequency: 'weekly', interval: 1, occurrences: 4 },
+    });
     const regularWorkout = createWorkout();
 
-    expect(getWeeklyRecurrenceEnd(weeklyWorkout)).toEqual(new Date(2026, 9, 3));
+    expect(getWeeklyRecurrenceEnd(weeklyWorkout)).toEqual(new Date(2026, 7, 24));
     expect(getWeeklyRecurrenceEnd(regularWorkout)).toBeNull();
   });
 });

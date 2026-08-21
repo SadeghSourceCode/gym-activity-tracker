@@ -252,6 +252,12 @@ export class WorkoutPage {
 
       return workouts.map((workout) => ({
         ...workout,
+        schemaVersion: 2 as const,
+        recurrence:
+          workout.recurrence ??
+          (workout.isWeeklyPlan
+            ? { frequency: 'weekly' as const, interval: 1, occurrences: 4 }
+            : undefined),
         date: new Date(workout.date),
         exercises: this.normalizeWorkoutExercises(workout),
         sets: Array.isArray(workout.sets) ? workout.sets : [],
@@ -476,7 +482,7 @@ export class WorkoutPage {
           id: exercise.id,
           name: this.getWorkoutExerciseName(exercise),
           setCount: exercise.sets.length,
-          weight: firstSet?.weight ?? 0,
+          weight: firstSet?.weightKg ?? 0,
         };
       }),
       completionStatus: this.normalizeCompletionStatus(workout.completionStatus),
@@ -538,8 +544,15 @@ export class WorkoutPage {
           (exercise): exercise is WorkoutExerciseSummary =>
             typeof exercise?.id === 'string' && typeof exercise.name === 'string',
         )
-        .map((exercise) => ({
+        .map((exercise, order) => ({
           ...exercise,
+          exerciseId: exercise.exerciseId ?? exercise.id,
+          order,
+          section:
+            exercise.section === 'warmup' || exercise.section === 'cooldown'
+              ? exercise.section
+              : 'main',
+          trackingType: exercise.trackingType ?? 'weight-and-repetitions',
           nameEn: exercise.nameEn ?? exercise.name,
           nameFa: exercise.nameFa ?? exercise.name,
           targetMuscle: exercise.targetMuscle ?? workout.targetMuscle,
@@ -554,7 +567,11 @@ export class WorkoutPage {
     if (workout.exerciseId) {
       return [
         {
-          id: workout.exerciseId,
+          id: `workout-exercise:${workout.id}:0`,
+          exerciseId: workout.exerciseId,
+          order: 0,
+          section: 'main',
+          trackingType: 'weight-and-repetitions',
           name: workout.name,
           nameEn: workout.name,
           nameFa: workout.name,
@@ -570,17 +587,21 @@ export class WorkoutPage {
 
   private normalizeWorkoutSets(sets: WorkoutSet[] | undefined): WorkoutSet[] {
     if (!Array.isArray(sets)) {
-      return [{ id: 1, repeat: 0, weight: 0 }];
+      return [{ id: 1, reps: 0, weightKg: 0 }];
     }
 
-    const normalizedSets = sets.filter(
-      (set): set is WorkoutSet =>
-        typeof set?.id === 'number' &&
-        typeof set.repeat === 'number' &&
-        typeof set.weight === 'number',
-    );
+    const normalizedSets = sets
+      .filter((set): set is WorkoutSet => typeof set?.id === 'number')
+      .map((set) => {
+        const legacy = set as WorkoutSet & { repeat?: number; weight?: number };
+        return {
+          ...set,
+          reps: set.reps ?? legacy.repeat ?? 0,
+          weightKg: set.weightKg ?? legacy.weight ?? 0,
+        };
+      });
 
-    return normalizedSets.length ? normalizedSets : [{ id: 1, repeat: 0, weight: 0 }];
+    return normalizedSets.length ? normalizedSets : [{ id: 1, reps: 0, weightKg: 0 }];
   }
 
   private saveWorkouts() {

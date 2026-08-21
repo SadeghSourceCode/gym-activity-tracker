@@ -418,7 +418,7 @@ export class AddWorkoutComponent {
 
   getSelectedExerciseSetCountById(exerciseId: string): number {
     const selectedExercise = this.selectedExercises().find(
-      (exercise) => exercise.id === exerciseId,
+      (exercise) => exercise.exerciseId === exerciseId,
     );
 
     return selectedExercise ? this.getSelectedExerciseSetCount(selectedExercise) : 1;
@@ -433,7 +433,10 @@ export class AddWorkoutComponent {
   }
 
   isExerciseSelected(exerciseId: string): boolean {
-    return this.selectedExercises().some((exercise) => exercise.id === exerciseId);
+    const section = this.selectedExerciseSection();
+    return this.selectedExercises().some(
+      (exercise) => exercise.exerciseId === exerciseId && exercise.section === section,
+    );
   }
 
   getExerciseMediaUrl(exercise: Exercise): string | undefined {
@@ -508,7 +511,7 @@ export class AddWorkoutComponent {
         undefined,
     );
     this.step.set('exercises');
-    this.isWeeklyPlan.set(Boolean(workout.isWeeklyPlan));
+    this.isWeeklyPlan.set(Boolean(workout.recurrence ?? workout.isWeeklyPlan));
   }
 
   private getInitialSelectedDate(): string {

@@ -71,7 +71,7 @@ export function serializeCopiedWorkout(clipboard: CopiedWorkoutClipboard): strin
     );
 
     for (const set of exercise.sets) {
-      lines.push(`set:${set.repeat}|${set.weight}`);
+      lines.push(`set:${set.reps ?? 0}|${set.weightKg ?? 0}`);
     }
   }
 
@@ -126,6 +126,10 @@ export function parseCopiedWorkoutText(text: string): CopiedWorkoutClipboard | n
 
       currentExercise = {
         id: unescapeField(id),
+        exerciseId: unescapeField(id),
+        order: exercises.length,
+        section: 'main',
+        trackingType: 'weight-and-repetitions',
         name: unescapeField(exerciseName),
         nameEn: unescapeField(nameEn),
         nameFa: unescapeField(nameFa),
@@ -148,8 +152,8 @@ export function parseCopiedWorkoutText(text: string): CopiedWorkoutClipboard | n
 
       currentExercise.sets.push({
         id: currentExercise.sets.length + 1,
-        repeat,
-        weight,
+        reps: repeat,
+        weightKg: weight,
       });
       continue;
     }
