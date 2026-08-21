@@ -9,10 +9,8 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  ExerciseDbApiService,
-  ExerciseDbExercise,
-} from '../../../workout/data-access/services/exercise-db-api.service';
+import { Exercise } from '../../../exercise-library/data-access/models/exercise.models';
+import { ExerciseLibraryService } from '../../../exercise-library/data-access/services/exercise-library.service';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { AppButton } from '../../../../components/app-button/app-button';
 
@@ -38,7 +36,7 @@ export class SearchPageComponent {
     this.loadMoreObserver.observe(sentinel.nativeElement);
   }
 
-  private readonly exerciseDbApi = inject(ExerciseDbApiService);
+  private readonly exerciseLibrary = inject(ExerciseLibraryService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   readonly i18n = inject(I18nService);
@@ -47,15 +45,13 @@ export class SearchPageComponent {
   private searchRequestId = 0;
 
   readonly searchQuery = signal('');
-  readonly workouts = signal<ExerciseDbExercise[]>([]);
+  readonly workouts = signal<Exercise[]>([]);
   readonly totalWorkouts = signal(0);
   readonly isLoading = signal(false);
   readonly isLoadingMore = signal(false);
   readonly error = signal<string | null>(null);
-  readonly selectedExercise = signal<ExerciseDbExercise | null>(null);
-  readonly similarExercises = signal<ExerciseDbExercise[]>([]);
-
-  readonly exerciseImageBaseUrl = this.exerciseDbApi.imageBaseUrl;
+  readonly selectedExercise = signal<Exercise | null>(null);
+  readonly similarExercises = signal<Exercise[]>([]);
 
   constructor() {
     this.destroyRef.onDestroy(() => this.loadMoreObserver?.disconnect());
@@ -72,8 +68,8 @@ export class SearchPageComponent {
     this.isLoadingMore.set(false);
     this.error.set(null);
 
-    this.exerciseDbApi
-      .search(query, 0, this.resultLimit)
+    this.exerciseLibrary
+      .search({ text: query, offset: 0, limit: this.resultLimit })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ items, total }) => {
@@ -114,8 +110,8 @@ export class SearchPageComponent {
     this.isLoadingMore.set(true);
     this.error.set(null);
 
-    this.exerciseDbApi
-      .search(query, offset, this.resultLimit)
+    this.exerciseLibrary
+      .search({ text: query, offset, limit: this.resultLimit })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ items, total }) => {
@@ -138,16 +134,14 @@ export class SearchPageComponent {
       });
   }
 
-  getExerciseMediaUrl(exercise: ExerciseDbExercise): string | null {
-    const mediaPath = exercise.gifUrl ?? exercise.images[0];
-
-    return mediaPath ? this.exerciseImageBaseUrl + mediaPath : null;
+  getExerciseMediaUrl(exercise: Exercise): string | null {
+    return this.exerciseLibrary.getMediaUrl(exercise);
   }
 
-  showExerciseDetails(exercise: ExerciseDbExercise) {
+  showExerciseDetails(exercise: Exercise) {
     this.selectedExercise.set(exercise);
 
-    this.exerciseDbApi
+    this.exerciseLibrary
       .getSimilar(exercise)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

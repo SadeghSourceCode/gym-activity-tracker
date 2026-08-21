@@ -131,6 +131,37 @@ Move it to a shared location only when:
 
 ---
 
+# Exercise Library Domain
+
+The canonical exercise catalog is owned by:
+
+```text
+src/app/features/exercise-library/
+```
+
+Use `Exercise` from `exercise-library/data-access/models/exercise.models.ts` and
+access catalog data through `ExerciseLibraryService`. Do not introduce provider-
+specific exercise types into workout, search, or UI code.
+
+`Exercise` is a reusable catalog entity. It must remain independent from workout
+placement. In particular, `warmup`, `main`, and `cooldown` are values of
+`WorkoutExerciseSection` and belong to `WorkoutExerciseSummary`; never add a
+`section` property to `Exercise` or filter the exercise catalog by section.
+
+Every imported exercise must retain stable provenance through `source`,
+`sourceId`, `license`, and `provenance`. Media must use the typed `media` asset
+contract so image, animation, and future video variants can carry role, format,
+dimensions, poster, alt text, and attribution metadata. New sources must be
+adapted into the canonical domain rather than changing consumers to match the
+source schema.
+
+Keep identifiers globally stable by namespacing imported IDs with their source.
+Legacy workout records may still contain the original un-namespaced `sourceId`,
+so catalog lookup must preserve that read compatibility while persisted records
+migrate naturally.
+
+---
+
 # Dummy / Presentational Components
 
 When implementing or refactoring features, prefer extracting meaningful UI responsibilities into dummy/presentational components.

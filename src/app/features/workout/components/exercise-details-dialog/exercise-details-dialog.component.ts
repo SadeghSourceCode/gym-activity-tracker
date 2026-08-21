@@ -1,5 +1,8 @@
 import { Component, input, output } from '@angular/core';
-import { ExerciseDbExercise } from '../../data-access/services/exercise-db-api.service';
+import {
+  Exercise,
+  getExerciseMediaPath,
+} from '../../../exercise-library/data-access/models/exercise.models';
 import { AppButton } from '../../../../components/app-button/app-button';
 import { ExerciseDetailsDialogConfig } from '../../data-access/models/exercise-details-dialog-config.interface';
 
@@ -13,10 +16,10 @@ export class ExerciseDetailsDialogComponent {
   readonly config = input.required<ExerciseDetailsDialogConfig>();
 
   readonly close = output<void>();
-  readonly showExercise = output<ExerciseDbExercise>();
+  readonly showExercise = output<Exercise>();
 
-  getExerciseMediaUrl(exercise: ExerciseDbExercise): string | null {
-    const mediaPath = exercise.gifUrl ?? exercise.images[0];
+  getExerciseMediaUrl(exercise: Exercise): string | null {
+    const mediaPath = getExerciseMediaPath(exercise);
 
     return mediaPath ? this.config().imageBaseUrl + mediaPath : null;
   }

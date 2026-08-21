@@ -11,10 +11,8 @@ import {
   WorkoutSet,
 } from '../../data-access/models/workout-storage.models';
 import { WorkoutDetailConfig } from '../../data-access/models/workout-detail-config.interface';
-import {
-  ExerciseDbApiService,
-  ExerciseDbExercise,
-} from '../../data-access/services/exercise-db-api.service';
+import { Exercise } from '../../../exercise-library/data-access/models/exercise.models';
+import { ExerciseLibraryService } from '../../../exercise-library/data-access/services/exercise-library.service';
 import { getDateKey, getTodayDateKey } from '../../utils/calendar-date.util';
 import { WorkoutDetailComponent } from '../../components/workout-detail/workout-detail.component';
 
@@ -28,7 +26,7 @@ export class WorkoutDetailPage {
   private readonly storageKey = 'gym-activity-tracker.workouts';
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly destroyRef = inject(DestroyRef);
-  private readonly exerciseDbApi = inject(ExerciseDbApiService);
+  private readonly exerciseLibrary = inject(ExerciseLibraryService);
   private readonly route = inject(ActivatedRoute);
   private readonly location = inject(Location);
   readonly i18n = inject(I18nService);
@@ -46,10 +44,10 @@ export class WorkoutDetailPage {
     return workout ? getDateKey(workout.date) >= getTodayDateKey() : false;
   });
   readonly replacingExerciseId = signal<string | null>(null);
-  readonly replacementExercises = signal<ExerciseDbExercise[]>([]);
+  readonly replacementExercises = signal<Exercise[]>([]);
   readonly replacementExercisesLoading = signal(false);
 
-  readonly exerciseImageBaseUrl = this.exerciseDbApi.imageBaseUrl;
+  readonly exerciseImageBaseUrl = this.exerciseLibrary.imageBaseUrl;
 
   readonly workoutDetailConfig = computed<WorkoutDetailConfig | null>(() => {
     const workout = this.workout();
@@ -113,7 +111,7 @@ export class WorkoutDetailPage {
     this.replacementExercises.set([]);
     this.replacementExercisesLoading.set(true);
 
-    this.exerciseDbApi
+    this.exerciseLibrary
       .getById(exercise.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -123,7 +121,7 @@ export class WorkoutDetailPage {
             return;
           }
 
-          this.exerciseDbApi
+          this.exerciseLibrary
             .getSimilar(sourceExercise, 12)
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
@@ -182,7 +180,7 @@ export class WorkoutDetailPage {
     this.saveWorkouts();
   }
 
-  replaceExercise(workoutId: number, exerciseId: string, replacement: ExerciseDbExercise) {
+  replaceExercise(workoutId: number, exerciseId: string, replacement: Exercise) {
     const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
 
     if (!targetWorkout || !this.canManage()) {
@@ -430,10 +428,8 @@ export class WorkoutDetailPage {
     return normalizedSets.length ? normalizedSets : [{ id: 1, repeat: 0, weight: 0 }];
   }
 
-  private getExerciseMediaUrl(exercise: ExerciseDbExercise): string | null {
-    const mediaPath = exercise.gifUrl ?? exercise.images[0];
-
-    return mediaPath ? this.exerciseImageBaseUrl + mediaPath : null;
+  private getExerciseMediaUrl(exercise: Exercise): string | null {
+    return this.exerciseLibrary.getMediaUrl(exercise);
   }
 
   private finishReplacementLoading(exerciseId: string) {

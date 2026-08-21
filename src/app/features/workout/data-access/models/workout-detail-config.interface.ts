@@ -1,5 +1,5 @@
 import { Workout } from './workout-storage.models';
-import { ExerciseDbExercise } from '../services/exercise-db-api.service';
+import { Exercise } from '../../../exercise-library/data-access/models/exercise.models';
 
 export interface WorkoutDetailTextConfig {
   workoutDetailsLabel: string;
@@ -32,6 +32,6 @@ export interface WorkoutDetailConfig {
   imageBaseUrl: string;
   canManage?: boolean;
   replacingExerciseId?: string | null;
-  replacementExercises?: readonly ExerciseDbExercise[];
+  replacementExercises?: readonly Exercise[];
   replacementExercisesLoading?: boolean;
 }

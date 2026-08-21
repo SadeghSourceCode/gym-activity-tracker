@@ -1,4 +1,4 @@
-import { ExerciseDbExercise } from '../services/exercise-db-api.service';
+import { Exercise } from '../../../exercise-library/data-access/models/exercise.models';
 
 export interface ExerciseDetailsDialogTextConfig {
   exerciseDetailsLabel: string;
@@ -9,7 +9,7 @@ export interface ExerciseDetailsDialogTextConfig {
 
 export interface ExerciseDetailsDialogConfig {
   text: ExerciseDetailsDialogTextConfig;
-  exercise: ExerciseDbExercise;
+  exercise: Exercise;
   imageBaseUrl: string;
-  similarExercises?: readonly ExerciseDbExercise[];
+  similarExercises?: readonly Exercise[];
 }

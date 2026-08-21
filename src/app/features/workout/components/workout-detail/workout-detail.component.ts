@@ -5,7 +5,10 @@ import {
   WorkoutExerciseSummary,
 } from '../../data-access/models/workout-storage.models';
 import { AppButton } from '../../../../components/app-button/app-button';
-import { ExerciseDbExercise } from '../../data-access/services/exercise-db-api.service';
+import {
+  Exercise,
+  getExerciseMediaPath,
+} from '../../../exercise-library/data-access/models/exercise.models';
 import { WorkoutDetailConfig } from '../../data-access/models/workout-detail-config.interface';
 import {
   WorkoutCompletedOutput,
@@ -33,7 +36,7 @@ export class WorkoutDetailComponent {
   readonly workout = computed<Workout>(() => this.config().workout);
   readonly canManage = computed(() => this.config().canManage ?? false);
   readonly replacingExerciseId = computed(() => this.config().replacingExerciseId ?? null);
-  readonly replacementExercises = computed<readonly ExerciseDbExercise[]>(
+  readonly replacementExercises = computed<readonly Exercise[]>(
     () => this.config().replacementExercises ?? [],
   );
   readonly replacementExercisesLoading = computed(
@@ -177,8 +180,8 @@ export class WorkoutDetailComponent {
     }
   }
 
-  getExerciseMediaUrl(exercise: ExerciseDbExercise): string | null {
-    const mediaPath = exercise.gifUrl ?? exercise.images[0];
+  getExerciseMediaUrl(exercise: Exercise): string | null {
+    const mediaPath = getExerciseMediaPath(exercise);
 
     return mediaPath ? this.imageBaseUrl() + mediaPath : null;
   }

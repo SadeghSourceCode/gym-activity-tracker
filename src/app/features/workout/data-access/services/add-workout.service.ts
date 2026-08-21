@@ -8,12 +8,12 @@ import {
   WorkoutExerciseSummary,
   WorkoutSet,
 } from '../models/workout-storage.models';
+import { ExerciseLibraryService } from '../../../exercise-library/data-access/services/exercise-library.service';
 import {
-  ExerciseDbApiService,
-  ExerciseDbExercise,
+  Exercise,
   ExerciseSearchResult,
   TargetMuscleOption,
-} from './exercise-db-api.service';
+} from '../../../exercise-library/data-access/models/exercise.models';
 import { parseDateKey } from '../../utils/calendar-date.util';
 import { AddWorkoutSaveConfig } from '../models/add-workout-save-config.interface';
 
@@ -21,22 +21,19 @@ import { AddWorkoutSaveConfig } from '../models/add-workout-save-config.interfac
 export class AddWorkoutService {
   private readonly storageKey = 'gym-activity-tracker.workouts';
   private readonly restDaysStorageKey = 'gym-activity-tracker.rest-days';
-  private readonly exerciseDbApi = inject(ExerciseDbApiService);
-
-  readonly imageBaseUrl = this.exerciseDbApi.imageBaseUrl;
+  private readonly exerciseLibrary = inject(ExerciseLibraryService);
 
   searchExercises(
     query: string,
     offset: number,
     limit: number,
     targetMuscle: string | undefined,
-    section: WorkoutExerciseSection | undefined,
   ): Observable<ExerciseSearchResult> {
-    return this.exerciseDbApi.search(query, offset, limit, targetMuscle, section);
+    return this.exerciseLibrary.search({ text: query, offset, limit, targetMuscle });
   }
 
   getTargetMuscles(): Observable<TargetMuscleOption[]> {
-    return this.exerciseDbApi.getTargetMuscles();
+    return this.exerciseLibrary.getTargetMuscles();
   }
 
   loadWorkouts(isBrowser: boolean, isPersian: boolean): Workout[] {
@@ -93,8 +90,8 @@ export class AddWorkoutService {
 
   toggleExercise(
     selectedExercises: WorkoutExerciseSummary[],
-    exercise: ExerciseDbExercise,
-    imageBaseUrl: string,
+    exercise: Exercise,
+    section: WorkoutExerciseSection,
   ): WorkoutExerciseSummary[] {
     const selectedExercise = selectedExercises.find((candidate) => candidate.id === exercise.id);
 
@@ -102,7 +99,7 @@ export class AddWorkoutService {
       return selectedExercises.filter((candidate) => candidate.id !== exercise.id);
     }
 
-    return [...selectedExercises, this.toWorkoutExerciseSummary(exercise, imageBaseUrl)];
+    return [...selectedExercises, this.toWorkoutExerciseSummary(exercise, section)];
   }
 
   mergeCopiedWorkout(
@@ -241,20 +238,18 @@ export class AddWorkoutService {
   }
 
   private toWorkoutExerciseSummary(
-    exercise: ExerciseDbExercise,
-    imageBaseUrl: string,
+    exercise: Exercise,
+    section: WorkoutExerciseSection,
   ): WorkoutExerciseSummary {
-    const mediaPath = exercise.gifUrl ?? exercise.images[0];
-
     return {
       id: exercise.id,
       name: exercise.name,
       nameEn: exercise.nameEn,
       nameFa: exercise.nameFa,
       targetMuscle: exercise.targetMuscle,
-      thumbnailUrl: mediaPath ? imageBaseUrl + mediaPath : undefined,
+      thumbnailUrl: this.exerciseLibrary.getMediaUrl(exercise) ?? undefined,
       sets: [{ id: 1, repeat: 0, weight: 0 }],
-      section: exercise.section,
+      section,
     };
   }
 
