@@ -10,15 +10,13 @@ import {
 import { isWorkoutOnDate } from '../../../workout/utils/weekly-recurrence.util';
 import { HomeService } from '../../data-access/services/home.service';
 import { UpcomingWorkoutConfig } from '../../data-access/models/upcoming-workout-config.interface';
-import { NearbyGymsConfig } from '../../data-access/models/nearby-gyms-config.interface';
 import { WeeklyActivityConfig } from '../../data-access/models/weekly-activity-config.interface';
 import { UpcomingWorkoutsComponent } from '../../components/upcoming-workouts/upcoming-workouts.component';
-import { NearbyGymsComponent } from '../../components/nearby-gyms/nearby-gyms.component';
 import { WeeklyActivityComponent } from '../../components/weekly-activity/weekly-activity.component';
 
 @Component({
   selector: 'app-home-page',
-  imports: [AppButton, UpcomingWorkoutsComponent, NearbyGymsComponent, WeeklyActivityComponent],
+  imports: [AppButton, UpcomingWorkoutsComponent, WeeklyActivityComponent],
   templateUrl: './home-page.component.html',
 })
 export class HomePageComponent {
@@ -47,6 +45,12 @@ export class HomePageComponent {
             day: 'numeric',
           }),
           categoryLabel: isPersian ? 'تناسب اندام' : 'FITNESS',
+          exercises: workout.exercises.slice(0, 3).map((exercise) => ({
+            id: exercise.id,
+            name: isPersian ? exercise.nameFa || exercise.name : exercise.nameEn || exercise.name,
+            setCount: exercise.sets.length,
+            weightKg: exercise.sets.find((set) => set.weightKg != null)?.weightKg,
+          })),
         })),
     );
 
@@ -57,16 +61,6 @@ export class HomePageComponent {
         : 'No upcoming workouts yet.',
       addWorkoutLabel: this.i18n.t('addWorkout'),
       workouts: upcoming.slice(0, 5),
-    };
-  });
-
-  readonly nearbyGymsConfig = computed<NearbyGymsConfig>(() => {
-    const isPersian = this.i18n.language() === 'fa';
-    return {
-      title: isPersian ? 'باشگاه‌های نزدیک شما' : 'Gyms near you',
-      emptyLabel: isPersian
-        ? 'برای دیدن باشگاه‌های نزدیک، مکان را فعال کنید.'
-        : 'Enable location to discover nearby gyms.',
     };
   });
 

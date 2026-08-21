@@ -228,6 +228,16 @@ session may add exercise placements to any section and must remain resumable on 
 day. Leaving an incomplete active session requires confirmation, while completing the final set
 automatically finishes the session, shows completion feedback, and returns to the workout list.
 
+## Shell Navigation and Workout Calendar
+
+The bottom navigation is a root-page shell and must render only on its four exact destinations:
+home, search, statistics, and profile. Nested flows such as workout planning, workout details, and
+add-workout own their available viewport and must not inherit the bottom navigation.
+
+Calendar day state is derived from persisted workout and rest-day data. Explicit rest days take
+priority, fully completed workout days are completed, and only past incomplete workout days are
+missed. Current and future incomplete workouts remain planned; never style them as missed early.
+
 ---
 
 # Dummy / Presentational Components

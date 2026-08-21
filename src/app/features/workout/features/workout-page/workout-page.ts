@@ -69,6 +69,7 @@ export class WorkoutPage {
   readonly workoutCalendarConfig = computed<WorkoutCalendarConfig>(() => ({
     selectedDate: this.selectedDate(),
     workouts: this.workouts(),
+    restDayKeys: this.restDayKeys(),
   }));
   readonly selectedDayPlan = computed<DailyWorkoutPlan>(() =>
     this.getDailyPlan(this.selectedDate()),
