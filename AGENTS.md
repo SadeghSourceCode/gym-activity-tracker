@@ -177,6 +177,20 @@ recurrence is four occurrences, including the original scheduled workout.
 `isWeeklyPlan` exists only for reading legacy localStorage records and must not be
 written by new flows.
 
+## Plan Builder V2
+
+The Add Workout flow starts in the `main` section with an unfiltered exercise
+search. Search is the primary discovery interaction; muscle choices are optional
+quick filters. Warm-up and cool-down are optional placements selected after or
+alongside the main workout.
+
+Search results only add or remove an exercise. Set configuration and ordering
+belong to the separate selected-exercises area. Reordering must update every
+placement's explicit `order`. The review step does not ask for the date again;
+the date comes from the calendar/route context. Empty titles are auto-generated
+from the unique main-workout muscle groups, with a full-body fallback when more
+than two groups are present.
+
 ---
 
 # Dummy / Presentational Components
