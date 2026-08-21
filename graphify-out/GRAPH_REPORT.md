@@ -1,16 +1,16 @@
 # Graph Report - gym-activity-tracker  (2026-08-21)
 
 ## Corpus Check
-- 107 files · ~1,922,426 words
+- 109 files · ~1,923,235 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 640 nodes · 1293 edges · 26 communities (18 shown, 8 thin omitted)
-- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
+- 652 nodes · 1329 edges · 26 communities (19 shown, 7 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 7 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `500b9616`
+- Built from commit: `0f17f089`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -45,63 +45,67 @@
 ## God Nodes (most connected - your core abstractions)
 1. `AddWorkoutComponent` - 43 edges
 2. `Exercise` - 39 edges
-3. `Workout` - 34 edges
+3. `Workout` - 36 edges
 4. `WorkoutExerciseSummary` - 33 edges
 5. `WorkoutPage` - 30 edges
 6. `ExerciseLibraryService` - 25 edges
 7. `AddWorkoutService` - 25 edges
 8. `AppButton` - 20 edges
 9. `WorkoutDetailComponent` - 20 edges
-10. `WorkoutCalendarComponent` - 19 edges
+10. `WorkoutDetailPage` - 20 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `WorkoutExerciseSummary` --references--> `ExerciseTrackingType`  [EXTRACTED]
   src/app/features/workout/data-access/models/workout-storage.models.ts → src/app/features/exercise-library/data-access/models/exercise.models.ts
 - `ExerciseCacheRecord` --references--> `Exercise`  [EXTRACTED]
   src/app/features/exercise-library/data-access/services/exercise-library.service.ts → src/app/features/exercise-library/data-access/models/exercise.models.ts
-- `ExerciseDetailsDialogConfig` --references--> `Exercise`  [EXTRACTED]
-  src/app/features/workout/data-access/models/exercise-details-dialog-config.interface.ts → src/app/features/exercise-library/data-access/models/exercise.models.ts
 - `WorkoutDetailConfig` --references--> `Exercise`  [EXTRACTED]
   src/app/features/workout/data-access/models/workout-detail-config.interface.ts → src/app/features/exercise-library/data-access/models/exercise.models.ts
 - `WorkoutExerciseReplacedOutput` --references--> `Exercise`  [EXTRACTED]
   src/app/features/workout/data-access/models/workout-detail-output.interface.ts → src/app/features/exercise-library/data-access/models/exercise.models.ts
+- `WorkoutDetailComponent` --references--> `WorkoutExerciseSection`  [EXTRACTED]
+  src/app/features/workout/components/workout-detail/workout-detail.component.ts → src/app/features/workout/data-access/models/workout-storage.models.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (26 total, 8 thin omitted)
+## Communities (26 total, 7 thin omitted)
 
 ### Community 0 - "Exercise"
-Cohesion: 0.08
-Nodes (24): Exercise, ExerciseDifficulty, ExerciseLicense, ExerciseMediaAsset, ExerciseMediaKind, ExerciseMediaRole, ExerciseProvenance, ExerciseSearchQuery (+16 more)
+Cohesion: 0.07
+Nodes (28): Exercise, ExerciseDifficulty, ExerciseLicense, ExerciseMediaAsset, ExerciseMediaKind, ExerciseMediaRole, ExerciseProvenance, ExerciseSearchQuery (+20 more)
 
 ### Community 1 - "selected-day-panel.component.ts"
-Cohesion: 0.05
-Nodes (38): AppBar, Component, AppButton, Component, AppHeader, Component, AppBarConfig, AppButtonConfig (+30 more)
+Cohesion: 0.06
+Nodes (30): AppBar, Component, AppButton, Component, AppBarConfig, EmptyDayStateComponent, Component, RestDayStateComponent (+22 more)
 
 ### Community 3 - "workout-page.ts"
-Cohesion: 0.06
-Nodes (47): NearbyGymsComponent, Component, Component, WeeklyActivityComponent, NearbyGymConfig, NearbyGymsConfig, WeeklyActivityConfig, WeeklyActivityDayConfig (+39 more)
+Cohesion: 0.07
+Nodes (40): I18nService, TranslationKey, translations, Injectable, DailyProgressComponent, Component, Component, WeeklyCaloriesComponent (+32 more)
 
 ### Community 4 - "gym-activity-tracker"
 Cohesion: 0.05
 Nodes (42): build, serve, test, builder, configurations, defaultConfiguration, options, analytics (+34 more)
 
 ### Community 5 - "ProfilePreferencesService"
-Cohesion: 0.10
-Nodes (12): I18nService, TranslationKey, translations, Injectable, AppLanguage, AppTheme, UserProfile, defaultProfile (+4 more)
+Cohesion: 0.13
+Nodes (8): AppLanguage, AppTheme, UserProfile, defaultProfile, ProfilePreferencesService, Injectable, ProfilePageComponent, Component
 
 ### Community 6 - "add-workout.component.ts"
-Cohesion: 0.09
+Cohesion: 0.10
 Nodes (22): AddWorkoutHeaderComponent, Component, Component, WorkoutPlanningStepComponent, AddWorkoutHeaderConfig, AddWorkoutStep, WorkoutPlanningChangedOutput, WorkoutPlanningExerciseConfig (+14 more)
 
 ### Community 7 - "WorkoutPage"
-Cohesion: 0.10
+Cohesion: 0.11
 Nodes (3): Component, WorkoutPage, WorkoutRoutes
 
 ### Community 8 - "HomePageComponent"
 Cohesion: 0.24
 Nodes (3): SearchPageComponent, Component, ViewChild
+
+### Community 9 - "WorkoutDetailPage"
+Cohesion: 0.31
+Nodes (8): AppHeader, Component, AppButtonConfig, AppButtonMode, AppButtonSize, AppButtonType, AppButtonVariant, AppHeaderConfig
 
 ### Community 10 - "devDependencies"
 Cohesion: 0.12
@@ -120,12 +124,12 @@ Cohesion: 0.18
 Nodes (5): App, BottomNavItem, appConfig, routes, Component
 
 ### Community 15 - "app-button.ts"
-Cohesion: 0.32
-Nodes (5): Component, UpcomingWorkoutsComponent, UpcomingWorkoutConfig, UpcomingWorkoutItemConfig, UpcomingWorkoutSelectedOutput
+Cohesion: 0.10
+Nodes (17): NearbyGymsComponent, Component, Component, UpcomingWorkoutsComponent, Component, WeeklyActivityComponent, NearbyGymConfig, NearbyGymsConfig (+9 more)
 
 ### Community 16 - "Workout"
-Cohesion: 0.08
-Nodes (22): HomeService, Injectable, AddWorkoutSaveConfig, WorkoutCalendarConfig, WorkoutDetailConfig, WorkoutDetailTextConfig, WorkoutCompletedOutput, WorkoutExerciseOutput (+14 more)
+Cohesion: 0.07
+Nodes (27): AddWorkoutSaveConfig, WorkoutDetailConfig, WorkoutDetailTextConfig, WorkoutCompletedOutput, WorkoutExerciseOutput, WorkoutExerciseReplacedOutput, WorkoutSetUpdatedOutput, WorkoutCompletionStatus (+19 more)
 
 ### Community 17 - "scripts"
 Cohesion: 0.29
@@ -137,31 +141,31 @@ Nodes (4): name, packageManager, private, version
 
 ### Community 24 - "AGENTS.md"
 Cohesion: 0.05
-Nodes (40): Behavior Preservation, Component Config, Component Config Rule, Component Contract Location, Component Extraction Rules, Component Outputs, Config Optionality, `Create feature: <path>` (+32 more)
+Nodes (41): Behavior Preservation, Component Config, Component Config Rule, Component Contract Location, Component Extraction Rules, Component Outputs, Config Optionality, `Create feature: <path>` (+33 more)
 
 ### Community 25 - "GymActivityTracker"
 Cohesion: 0.25
 Nodes (7): Additional Resources, Building, Code scaffolding, Development server, GymActivityTracker, Running end-to-end tests, Running unit tests
 
 ## Knowledge Gaps
-- **132 isolated node(s):** `$schema`, `version`, `packageManager`, `analytics`, `newProjectRoot` (+127 more)
+- **135 isolated node(s):** `$schema`, `version`, `packageManager`, `analytics`, `newProjectRoot` (+130 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `AddWorkoutComponent` connect `AddWorkoutComponent` to `Workout`, `workout-page.ts`, `add-workout.component.ts`, `WorkoutPage`?**
-  _High betweenness centrality (0.064) - this node is a cross-community bridge._
-- **Why does `Exercise` connect `Exercise` to `selected-day-panel.component.ts`, `AddWorkoutComponent`, `workout-page.ts`, `add-workout.component.ts`, `WorkoutPage`, `HomePageComponent`, `WorkoutDetailPage`, `Workout`?**
+  _High betweenness centrality (0.063) - this node is a cross-community bridge._
+- **Why does `Exercise` connect `Exercise` to `selected-day-panel.component.ts`, `AddWorkoutComponent`, `workout-page.ts`, `add-workout.component.ts`, `WorkoutPage`, `HomePageComponent`, `Workout`?**
   _High betweenness centrality (0.047) - this node is a cross-community bridge._
-- **Why does `AppButton` connect `selected-day-panel.component.ts` to `workout-page.ts`, `add-workout.component.ts`, `App`, `app-button.ts`, `Workout`?**
+- **Why does `AppButton` connect `selected-day-panel.component.ts` to `Exercise`, `workout-page.ts`, `add-workout.component.ts`, `WorkoutDetailPage`, `App`, `app-button.ts`, `Workout`?**
   _High betweenness centrality (0.044) - this node is a cross-community bridge._
 - **What connects `$schema`, `version`, `packageManager` to the rest of the system?**
-  _132 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _135 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Exercise` be split into smaller, more focused modules?**
-  _Cohesion score 0.07616892911010557 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06896551724137931 - nodes in this community are weakly interconnected._
 - **Should `selected-day-panel.component.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.05052631578947368 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.059395801331285206 - nodes in this community are weakly interconnected._
 - **Should `AddWorkoutComponent` be split into smaller, more focused modules?**
-  _Cohesion score 0.08901515151515152 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08412698412698413 - nodes in this community are weakly interconnected._

@@ -23,6 +23,12 @@ export interface WorkoutDetailTextConfig {
   loadingExercisesLabel: string;
   markAsDoneLabel: string;
   rejectWorkoutLabel: string;
+  startWorkoutLabel: string;
+  resumeWorkoutLabel: string;
+  completeSetLabel: string;
+  completedSetLabel: string;
+  sessionProgressLabel: string;
+  storageErrorLabel: string;
   isPersian: boolean;
 }
 
@@ -31,6 +37,10 @@ export interface WorkoutDetailConfig {
   workout: Workout;
   imageBaseUrl: string;
   canManage?: boolean;
+  isSessionActive?: boolean;
+  completedSets?: number;
+  totalSets?: number;
+  persistenceError?: boolean;
   replacingExerciseId?: string | null;
   replacementExercises?: readonly Exercise[];
   replacementExercisesLoading?: boolean;

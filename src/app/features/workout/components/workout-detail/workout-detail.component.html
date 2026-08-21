@@ -24,6 +24,22 @@
       </app-button>
     </div>
 
+    @if (config().persistenceError) {
+      <p
+        class="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700"
+        role="alert"
+      >
+        {{ text().storageErrorLabel }}
+      </p>
+    }
+
+    @if (isSessionActive()) {
+      <div class="rounded-2xl bg-[#EAF2FF] p-3 font-semibold text-[#0070F0]" role="status">
+        {{ text().sessionProgressLabel }}: {{ config().completedSets ?? 0 }} /
+        {{ config().totalSets ?? 0 }}
+      </div>
+    }
+
     <div class="flex flex-col gap-6">
       @for (section of exerciseSections; track section) {
         <section class="flex flex-col gap-3" [attr.aria-labelledby]="'workout-section-' + section">
@@ -175,7 +191,7 @@
                             class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-white px-3 py-2 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
                             type="number"
                             min="0"
-                            [disabled]="!canManage()"
+                            [disabled]="!isSessionActive()"
                             [value]="set.reps ?? 0"
                             (input)="
                               updateSet.emit({
@@ -194,7 +210,7 @@
                             class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-white px-3 py-2 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
                             type="number"
                             min="0"
-                            [disabled]="!canManage()"
+                            [disabled]="!isSessionActive()"
                             [value]="set.weightKg ?? 0"
                             (input)="
                               updateSet.emit({
@@ -207,8 +223,29 @@
                           />
                         </label>
 
-                        @if (canManage()) {
-                          <div class="col-span-2">
+                        @if (isSessionActive()) {
+                          <div class="col-span-2 grid grid-cols-2 gap-2">
+                            <app-button
+                              [config]="{
+                                variant: set.completed ? 'fill' : 'outline',
+                                mode: 'section',
+                                type: 'button',
+                              }"
+                              (buttonClicked)="
+                                updateSet.emit({
+                                  workoutId: workout().id,
+                                  exerciseId: exercise.id,
+                                  setId: set.id,
+                                  changes: {
+                                    completed: !set.completed,
+                                  },
+                                })
+                              "
+                            >
+                              {{
+                                set.completed ? text().completedSetLabel : text().completeSetLabel
+                              }}
+                            </app-button>
                             <app-button
                               [config]="{
                                 variant: 'outline',
@@ -225,7 +262,7 @@
                     }
                   </div>
 
-                  @if (canManage()) {
+                  @if (isSessionActive()) {
                     <app-button
                       [config]="{
                         variant: 'fill',
@@ -249,29 +286,40 @@
 
     @if (canManage()) {
       <div class="grid gap-3 rounded-3xl bg-white p-4 shadow-sm sm:grid-cols-2">
-        <app-button
-          [config]="{
-            variant: 'fill',
-            mode: 'section',
-            type: 'button',
-          }"
-          (buttonClicked)="
-            complete.emit({ workoutId: workout().id, completionStatus: 'completed' })
-          "
-        >
-          {{ text().markAsDoneLabel }}
-        </app-button>
+        @if (!isSessionActive()) {
+          <app-button
+            [config]="{ variant: 'fill', mode: 'section', type: 'button' }"
+            (buttonClicked)="startSession.emit(workout().id)"
+          >
+            {{ workout().session ? text().resumeWorkoutLabel : text().startWorkoutLabel }}
+          </app-button>
+        } @else {
+          <app-button
+            [config]="{
+              variant: 'fill',
+              mode: 'section',
+              type: 'button',
+            }"
+            (buttonClicked)="
+              complete.emit({ workoutId: workout().id, completionStatus: 'completed' })
+            "
+          >
+            {{ text().markAsDoneLabel }}
+          </app-button>
 
-        <app-button
-          [config]="{
-            variant: 'fill',
-            mode: 'section',
-            type: 'button',
-          }"
-          (buttonClicked)="complete.emit({ workoutId: workout().id, completionStatus: 'rejected' })"
-        >
-          {{ text().rejectWorkoutLabel }}
-        </app-button>
+          <app-button
+            [config]="{
+              variant: 'fill',
+              mode: 'section',
+              type: 'button',
+            }"
+            (buttonClicked)="
+              complete.emit({ workoutId: workout().id, completionStatus: 'rejected' })
+            "
+          >
+            {{ text().rejectWorkoutLabel }}
+          </app-button>
+        }
       </div>
     }
   </div>

@@ -16,6 +16,8 @@ type TranslationKey =
   | 'chooseReplacement'
   | 'chooseTargetMuscleLabel'
   | 'chooseTargetMuscleMessage'
+  | 'completeSet'
+  | 'completedSet'
   | 'close'
   | 'closeExerciseDetails'
   | 'closeExerciseSearch'
@@ -94,6 +96,9 @@ type TranslationKey =
   | 'setWorkoutOrRest'
   | 'seventhDay'
   | 'similarExercises'
+  | 'sessionProgress'
+  | 'startWorkout'
+  | 'resumeWorkout'
   | 'startRest'
   | 'statistics'
   | 'sixthDay'
@@ -115,6 +120,7 @@ type TranslationKey =
   | 'workoutDetails'
   | 'workoutPlanningLabel'
   | 'workoutTitle'
+  | 'workoutStorageError'
   | 'warmup';
 
 const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
@@ -133,6 +139,8 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     chooseReplacement: 'Choose a related exercise',
     chooseTargetMuscleLabel: 'Choose target muscle',
     chooseTargetMuscleMessage: 'Start with the body area you want to train.',
+    completeSet: 'Complete set',
+    completedSet: 'Set completed',
     close: 'Close',
     closeExerciseDetails: 'Close exercise details',
     closeExerciseSearch: 'Close exercise search',
@@ -211,6 +219,9 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     setWorkoutOrRest: 'Set a workout or mark this day as rest.',
     seventhDay: 'Seventh Day',
     similarExercises: 'Similar exercises',
+    sessionProgress: 'Session progress',
+    startWorkout: 'Start workout',
+    resumeWorkout: 'Resume workout',
     startRest: 'Start rest',
     statistics: 'Statistics',
     sixthDay: 'Sixth Day',
@@ -232,6 +243,8 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     workoutDetails: 'Workout details',
     workoutPlanningLabel: 'Plan workout',
     workoutTitle: 'Workout title',
+    workoutStorageError:
+      'Your latest changes could not be saved. Keep this page open and try again.',
     warmup: 'Warm-up',
   },
   fa: {
@@ -249,6 +262,8 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     chooseReplacement: 'یک حرکت مرتبط انتخاب کنید',
     chooseTargetMuscleLabel: 'انتخاب عضله هدف',
     chooseTargetMuscleMessage: 'ابتدا بخشی از بدن را که می‌خواهید تمرین دهید انتخاب کنید.',
+    completeSet: 'تکمیل ست',
+    completedSet: 'ست تکمیل شد',
     close: 'بستن',
     closeExerciseDetails: 'بستن جزئیات حرکت',
     closeExerciseSearch: 'بستن جستجوی حرکت',
@@ -328,6 +343,9 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     setWorkoutOrRest: 'یک تمرین ثبت کنید یا این روز را استراحت بزنید.',
     seventhDay: 'روز هفتم',
     similarExercises: 'حرکت‌های مشابه',
+    sessionProgress: 'پیشرفت جلسه',
+    startWorkout: 'شروع تمرین',
+    resumeWorkout: 'ادامه تمرین',
     startRest: 'شروع استراحت',
     statistics: 'آمار',
     sixthDay: 'روز ششم',
@@ -349,6 +367,7 @@ const translations: Record<'en' | 'fa', Record<TranslationKey, string>> = {
     workoutDetails: 'جزئیات تمرین',
     workoutPlanningLabel: 'برنامه‌ریزی تمرین',
     workoutTitle: 'عنوان تمرین',
+    workoutStorageError: 'آخرین تغییرات ذخیره نشد. این صفحه را باز نگه دارید و دوباره تلاش کنید.',
     warmup: 'گرم کردن',
   },
 };

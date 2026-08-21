@@ -35,6 +35,7 @@ export class WorkoutDetailComponent {
   readonly text = computed(() => this.config().text);
   readonly workout = computed<Workout>(() => this.config().workout);
   readonly canManage = computed(() => this.config().canManage ?? false);
+  readonly isSessionActive = computed(() => this.config().isSessionActive ?? false);
   readonly replacingExerciseId = computed(() => this.config().replacingExerciseId ?? null);
   readonly replacementExercises = computed<readonly Exercise[]>(
     () => this.config().replacementExercises ?? [],
@@ -52,6 +53,7 @@ export class WorkoutDetailComponent {
   readonly replaceExercise = output<WorkoutExerciseReplacedOutput>();
   readonly updateSet = output<WorkoutSetUpdatedOutput>();
   readonly complete = output<WorkoutCompletedOutput>();
+  readonly startSession = output<number>();
 
   readonly expandedExerciseId = signal<string | null | undefined>(undefined);
   readonly restTimerSeconds = signal(0);

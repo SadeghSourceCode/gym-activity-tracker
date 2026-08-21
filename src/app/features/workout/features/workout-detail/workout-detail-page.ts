@@ -15,6 +15,12 @@ import { Exercise } from '../../../exercise-library/data-access/models/exercise.
 import { ExerciseLibraryService } from '../../../exercise-library/data-access/services/exercise-library.service';
 import { getDateKey, getTodayDateKey } from '../../utils/calendar-date.util';
 import { WorkoutDetailComponent } from '../../components/workout-detail/workout-detail.component';
+import {
+  finishWorkoutSession,
+  getWorkoutSessionProgress,
+  startWorkoutSession,
+  touchWorkoutSession,
+} from '../../utils/workout-session.util';
 
 @Component({
   selector: 'app-workout-detail-page',
@@ -38,10 +44,14 @@ export class WorkoutDetailPage {
     () => this.workouts().find((candidate) => candidate.id === this.workoutId) ?? null,
   );
   readonly workoutError = signal<string | null>(null);
+  readonly persistenceError = signal(false);
   readonly canManage = computed(() => {
     const workout = this.workout();
 
-    return workout ? getDateKey(workout.date) >= getTodayDateKey() : false;
+    return workout
+      ? workout.completionStatus === 'pending' &&
+          (workout.session?.status === 'active' || getDateKey(workout.date) >= getTodayDateKey())
+      : false;
   });
   readonly replacingExerciseId = signal<string | null>(null);
   readonly replacementExercises = signal<Exercise[]>([]);
@@ -56,9 +66,14 @@ export class WorkoutDetailPage {
       return null;
     }
 
+    const progress = getWorkoutSessionProgress(workout);
     return {
       workout,
       canManage: this.canManage(),
+      isSessionActive: workout.session?.status === 'active',
+      completedSets: progress.completedSets,
+      totalSets: progress.totalSets,
+      persistenceError: this.persistenceError(),
       replacingExerciseId: this.replacingExerciseId(),
       replacementExercises: this.replacementExercises(),
       replacementExercisesLoading: this.replacementExercisesLoading(),
@@ -85,6 +100,12 @@ export class WorkoutDetailPage {
         loadingExercisesLabel: this.i18n.t('loadingExercises'),
         markAsDoneLabel: this.i18n.t('markAsDone'),
         rejectWorkoutLabel: this.i18n.t('rejectWorkout'),
+        startWorkoutLabel: this.i18n.t('startWorkout'),
+        resumeWorkoutLabel: this.i18n.t('resumeWorkout'),
+        completeSetLabel: this.i18n.t('completeSet'),
+        completedSetLabel: this.i18n.t('completedSet'),
+        sessionProgressLabel: this.i18n.t('sessionProgress'),
+        storageErrorLabel: this.i18n.t('workoutStorageError'),
         isPersian: this.i18n.language() === 'fa',
       },
     };
@@ -224,7 +245,7 @@ export class WorkoutDetailPage {
   addSet(workoutId: number, exerciseId: string) {
     const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
 
-    if (!targetWorkout || !this.canManage()) {
+    if (!targetWorkout || targetWorkout.session?.status !== 'active') {
       return;
     }
 
@@ -265,13 +286,18 @@ export class WorkoutDetailPage {
     workoutId: number,
     exerciseId: string,
     setId: number,
-    changes: Partial<Pick<WorkoutSet, 'reps' | 'weightKg'>>,
+    changes: Partial<Pick<WorkoutSet, 'reps' | 'weightKg' | 'completed' | 'completedAt'>>,
   ) {
     const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
 
-    if (!targetWorkout || !this.canManage()) {
+    if (!targetWorkout || targetWorkout.session?.status !== 'active') {
       return;
     }
+
+    const normalizedChanges =
+      typeof changes.completed === 'boolean'
+        ? { ...changes, completedAt: changes.completed ? new Date().toISOString() : undefined }
+        : changes;
 
     this.workouts.update((workouts) =>
       workouts.map((workout) => {
@@ -279,19 +305,19 @@ export class WorkoutDetailPage {
           return workout;
         }
 
-        return {
+        return touchWorkoutSession({
           ...workout,
           exercises: workout.exercises.map((exercise) =>
             exercise.id === exerciseId
               ? {
                   ...exercise,
                   sets: exercise.sets.map((set) =>
-                    set.id === setId ? { ...set, ...changes } : set,
+                    set.id === setId ? { ...set, ...normalizedChanges } : set,
                   ),
                 }
               : exercise,
           ),
-        };
+        });
       }),
     );
     this.saveWorkouts();
@@ -303,22 +329,35 @@ export class WorkoutDetailPage {
   ) {
     const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
 
-    if (!targetWorkout || !this.canManage()) {
+    if (!targetWorkout || targetWorkout.session?.status !== 'active') {
       return;
     }
 
     this.workouts.update((workouts) =>
       workouts.map((workout) =>
         workout.id === workoutId
-          ? {
-              ...workout,
-              completionStatus,
-            }
+          ? finishWorkoutSession(
+              workout,
+              completionStatus === 'completed' ? 'completed' : 'abandoned',
+            )
           : workout,
       ),
     );
+    if (this.saveWorkouts()) {
+      this.goBack();
+    }
+  }
+
+  startSession(workoutId: number) {
+    const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
+    if (!targetWorkout || !this.canManage()) return;
+
+    this.workouts.update((workouts) =>
+      workouts.map((workout) =>
+        workout.id === workoutId ? startWorkoutSession(workout) : workout,
+      ),
+    );
     this.saveWorkouts();
-    this.goBack();
   }
 
   private loadWorkouts(): Workout[] {
@@ -357,9 +396,15 @@ export class WorkoutDetailPage {
     }
   }
 
-  private saveWorkouts() {
-    if (this.isBrowser) {
+  private saveWorkouts(): boolean {
+    if (!this.isBrowser) return false;
+    try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.workouts()));
+      this.persistenceError.set(false);
+      return true;
+    } catch {
+      this.persistenceError.set(true);
+      return false;
     }
   }
 

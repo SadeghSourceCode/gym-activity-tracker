@@ -191,6 +191,22 @@ the date comes from the calendar/route context. Empty titles are auto-generated
 from the unique main-workout muscle groups, with a full-body fallback when more
 than two groups are present.
 
+## Workout Session / Train Domain
+
+Training execution state belongs to the persisted `WorkoutPlan.session` contract. A planned
+workout has no session; starting it creates an `active` session with ISO timestamps. Active
+sessions must survive reloads, and every set mutation refreshes `lastUpdatedAt`. Finishing a
+session records its terminal status, completion time, and duration while keeping the legacy
+`completionStatus` synchronized for calendar compatibility.
+
+Only an active session may mutate logged set values. Set completion is explicit and carries a
+`completedAt` timestamp. Keep session transitions in the pure utilities under
+`workout/utils/workout-session.util.ts`; presentational components emit intent and must not
+own persistence or session business rules.
+
+Local persistence failures must be visible to the user. Do not navigate away after a failed
+terminal save because that can hide unsaved workout results.
+
 ---
 
 # Dummy / Presentational Components
