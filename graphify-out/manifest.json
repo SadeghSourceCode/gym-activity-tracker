@@ -255,9 +255,9 @@
     "semantic_hash": "5024f234a9cc5dd27edc1fb0fda10587"
   },
   "src/app/features/workout/components/workout-planning-step/workout-planning-step.component.ts": {
-    "mtime": 1786650998.925129,
-    "ast_hash": "d0e072a6b2f973924c8e669b145dc94c",
-    "semantic_hash": "d0e072a6b2f973924c8e669b145dc94c"
+    "mtime": 1787313699.4803305,
+    "ast_hash": "306a7711e128676d2426f98fa507c778",
+    "semantic_hash": ""
   },
   "src/app/features/workout/components/workout-summary-card/workout-summary-card.component.ts": {
     "mtime": 1786695005.3726258,
@@ -340,14 +340,14 @@
     "semantic_hash": "a05e724ab729f932a37ed0ab2aafe1f1"
   },
   "src/app/features/workout/data-access/models/workout-planning-changed-output.interface.ts": {
-    "mtime": 1786650998.4811192,
-    "ast_hash": "6cb29c4282935257e1791dea879830b2",
-    "semantic_hash": "6cb29c4282935257e1791dea879830b2"
+    "mtime": 1787313699.6653345,
+    "ast_hash": "a545c6ad63e1270658ed325cf44aa24b",
+    "semantic_hash": ""
   },
   "src/app/features/workout/data-access/models/workout-planning-step-config.interface.ts": {
-    "mtime": 1786650998.4061174,
-    "ast_hash": "a86d98e3afba854f92746895e3df260b",
-    "semantic_hash": "a86d98e3afba854f92746895e3df260b"
+    "mtime": 1787313699.5753326,
+    "ast_hash": "d7ba2ddba27d10c7b5cd537a9dedd5d6",
+    "semantic_hash": ""
   },
   "src/app/features/workout/data-access/models/workout-storage.models.ts": {
     "mtime": 1787313341.109431,
@@ -365,13 +365,13 @@
     "semantic_hash": "1f5f72a156fdc71c62a7826e1c449d7f"
   },
   "src/app/features/workout/data-access/services/add-workout.service.spec.ts": {
-    "mtime": 1787313563.9852808,
-    "ast_hash": "966a7b36956718652ff873c6fa97cea4",
+    "mtime": 1787313751.0228276,
+    "ast_hash": "373f22a5a0d3bd6bb6f7715d4f09b8cb",
     "semantic_hash": ""
   },
   "src/app/features/workout/data-access/services/add-workout.service.ts": {
-    "mtime": 1787313538.2847023,
-    "ast_hash": "316583c963b01a80e4038af9b2b31e34",
+    "mtime": 1787313654.450317,
+    "ast_hash": "da5308a81b2510b7827aecde5b691823",
     "semantic_hash": ""
   },
   "src/app/features/workout/data-access/services/statistics.service.ts": {
@@ -385,8 +385,8 @@
     "semantic_hash": "286ffd15a254cf2f3d1dc57291a94d28"
   },
   "src/app/features/workout/features/add-workout/add-workout.component.ts": {
-    "mtime": 1787313494.9040449,
-    "ast_hash": "7ac1c707075641f7b43d729269933925",
+    "mtime": 1787313731.7432241,
+    "ast_hash": "21b054748202e651ce68512f38cb2ad9",
     "semantic_hash": ""
   },
   "src/app/features/workout/features/index.ts": {
@@ -520,8 +520,8 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1787313577.2795799,
-    "ast_hash": "2f675b4878b44cb5c780ff7af481b018",
+    "mtime": 1787313751.1148305,
+    "ast_hash": "d4476d7a105693712fe35236816ceda1",
     "semantic_hash": ""
   },
   "README.md": {
@@ -640,8 +640,8 @@
     "semantic_hash": ""
   },
   "src/app/features/workout/components/workout-planning-step/workout-planning-step.component.html": {
-    "mtime": 1786563064.1652079,
-    "ast_hash": "e594b70102c0976bda95ae0a801b6f4c",
+    "mtime": 1787313699.3853283,
+    "ast_hash": "b0517645921ff1efeddd2804cd5eec68",
     "semantic_hash": ""
   },
   "src/app/features/workout/components/workout-summary-card/workout-summary-card.component.html": {
@@ -650,8 +650,8 @@
     "semantic_hash": ""
   },
   "src/app/features/workout/features/add-workout/add-workout.component.html": {
-    "mtime": 1786819097.1629763,
-    "ast_hash": "3bcbc1983693ccf445f828ced75ec296",
+    "mtime": 1787313731.8812284,
+    "ast_hash": "a358bd1e2674672544431ab378a246b7",
     "semantic_hash": ""
   },
   "src/app/features/workout/features/statistics/statistics-page.component.html": {
@@ -717,6 +717,16 @@
   "src/assets/images/muscle-groups/tricept.png": {
     "mtime": 1785998448.0277898,
     "ast_hash": "3cbd5746ce14463176d12af1673bc8b7",
+    "semantic_hash": ""
+  },
+  "src/app/features/workout/utils/workout-plan-name.util.spec.ts": {
+    "mtime": 1787313725.2740216,
+    "ast_hash": "c1e4b486d36681e988070e8992d5d194",
+    "semantic_hash": ""
+  },
+  "src/app/features/workout/utils/workout-plan-name.util.ts": {
+    "mtime": 1787313725.1750185,
+    "ast_hash": "110e2a3b12a5fc285e33a4f770e95267",
     "semantic_hash": ""
   }
 }

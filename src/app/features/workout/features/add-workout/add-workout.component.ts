@@ -37,6 +37,7 @@ import {
   loadCopiedWorkout,
   readCopiedWorkoutFromSystemClipboard,
 } from '../../utils/workout-clipboard.util';
+import { getSuggestedWorkoutName } from '../../utils/workout-plan-name.util';
 
 @Component({
   selector: 'app-add-workout',
@@ -68,15 +69,15 @@ export class AddWorkoutComponent {
   readonly selectedDate = signal(this.getInitialSelectedDate());
   readonly workoutTitle = signal('');
   readonly selectedExercises = signal<WorkoutExerciseSummary[]>([]);
-  readonly selectedExerciseSection = signal<WorkoutExerciseSection | undefined>('warmup');
-  readonly exerciseSections: readonly WorkoutExerciseSection[] = ['warmup', 'main', 'cooldown'];
+  readonly selectedExerciseSection = signal<WorkoutExerciseSection | undefined>('main');
+  readonly exerciseSections: readonly WorkoutExerciseSection[] = ['main', 'warmup', 'cooldown'];
   readonly exerciseSearchQuery = signal('');
   readonly exerciseSearchResults = signal<Exercise[]>([]);
   readonly exerciseSearchTotal = signal(0);
   readonly isExerciseSearchLoading = signal(false);
   readonly exerciseSearchError = signal<string | undefined>(undefined);
   readonly targetMuscles = signal<TargetMuscleOption[]>([]);
-  readonly selectedTargetMuscle = signal<string | undefined>('chest');
+  readonly selectedTargetMuscle = signal<string | undefined>(undefined);
   readonly step = signal<AddWorkoutStep>('exercises');
   readonly isWeeklyPlan = signal(false);
   readonly editingWorkoutId = signal<number | undefined>(this.getInitialEditingWorkoutId());
@@ -110,20 +111,13 @@ export class AddWorkoutComponent {
     nextDisabled: !this.canContinueFromCurrentStep(),
   }));
   readonly defaultWorkoutTitle = computed(() => {
-    const selectedDate = parseDateKey(this.selectedDate());
-    const saturdayFirstDayIndexes = [6, 0, 1, 2, 3, 4, 5];
-    const dayIndex = saturdayFirstDayIndexes.indexOf(selectedDate.getDay());
-    const dayLabels = [
-      this.i18n.t('firstDay'),
-      this.i18n.t('secondDay'),
-      this.i18n.t('thirdDay'),
-      this.i18n.t('fourthDay'),
-      this.i18n.t('fifthDay'),
-      this.i18n.t('sixthDay'),
-      this.i18n.t('seventhDay'),
-    ];
-
-    return dayLabels[dayIndex] ?? this.i18n.t('workoutDay');
+    return getSuggestedWorkoutName(
+      this.selectedExercises(),
+      (muscle) => this.getTargetMuscleLabel(muscle),
+      this.i18n.t('workoutDay'),
+      this.i18n.language() === 'fa' ? 'تمرین' : 'Workout',
+      this.i18n.language() === 'fa' ? 'تمرین تمام بدن' : 'Full Body Workout',
+    );
   });
   readonly text = computed<WorkoutEditorTextConfig>(() => ({
     addWorkoutLabel: this.i18n.t('addWorkout'),
@@ -159,7 +153,6 @@ export class AddWorkoutComponent {
   readonly planningConfig = computed<WorkoutPlanningStepConfig>(() => ({
     workoutTitle: this.workoutTitle(),
     defaultWorkoutTitle: this.defaultWorkoutTitle(),
-    selectedDate: this.selectedDate(),
     isWeeklyPlan: this.isWeeklyPlan(),
     exercises: this.selectedExercises().map((exercise) => ({
       id: exercise.id,
@@ -168,7 +161,6 @@ export class AddWorkoutComponent {
     })),
     workoutTitleLabel: this.text().workoutTitleLabel,
     leaveEmptyToUseLabel: this.text().leaveEmptyToUseLabel,
-    workingDayLabel: this.text().workingDayLabel,
     weeklyPlanLabel: this.text().weeklyPlanLabel,
     weeklyPlanHelpLabel: this.text().weeklyPlanHelpLabel,
     selectedExercisesLabel: this.text().selectedExercisesLabel,
@@ -177,6 +169,7 @@ export class AddWorkoutComponent {
   constructor() {
     this.loadTargetMuscles();
     this.initializeEditState();
+    this.searchExercises('');
   }
 
   goBack() {
@@ -212,9 +205,6 @@ export class AddWorkoutComponent {
   handlePlanningChanged(change: WorkoutPlanningChangedOutput) {
     if (change.workoutTitle !== undefined) {
       this.workoutTitle.set(change.workoutTitle);
-    }
-    if (change.selectedDate !== undefined) {
-      this.selectDate(change.selectedDate);
     }
     if (change.isWeeklyPlan !== undefined) {
       this.isWeeklyPlan.set(change.isWeeklyPlan);
@@ -273,14 +263,17 @@ export class AddWorkoutComponent {
 
   selectExerciseSection(section: WorkoutExerciseSection) {
     this.selectedExerciseSection.set(section);
-    this.selectedTargetMuscle.set(section === 'main' ? 'chest' : undefined);
+    this.selectedTargetMuscle.set(undefined);
     this.searchExercises('');
   }
 
   getExerciseSectionLabel(section: WorkoutExerciseSection): string {
-    return this.i18n.t(
+    const label = this.i18n.t(
       section === 'warmup' ? 'warmup' : section === 'main' ? 'mainWorkout' : 'cooldown',
     );
+    return section === 'main'
+      ? label
+      : `${label} (${this.i18n.language() === 'fa' ? 'اختیاری' : 'Optional'})`;
   }
 
   getExerciseSectionCount(section: WorkoutExerciseSection): number {
@@ -340,6 +333,12 @@ export class AddWorkoutComponent {
   updateSelectedExerciseSetCount(exerciseId: string, setCount: number) {
     this.selectedExercises.update((selectedExercises) =>
       this.addWorkoutService.updateExerciseSetCount(selectedExercises, exerciseId, setCount),
+    );
+  }
+
+  moveSelectedExercise(exerciseId: string, direction: -1 | 1) {
+    this.selectedExercises.update((exercises) =>
+      this.addWorkoutService.moveExercise(exercises, exerciseId, direction),
     );
   }
 

@@ -152,6 +152,22 @@ export class AddWorkoutService {
     );
   }
 
+  moveExercise(
+    selectedExercises: WorkoutExerciseSummary[],
+    exerciseId: string,
+    direction: -1 | 1,
+  ): WorkoutExerciseSummary[] {
+    const index = selectedExercises.findIndex((exercise) => exercise.id === exerciseId);
+    const targetIndex = index + direction;
+    if (index < 0 || targetIndex < 0 || targetIndex >= selectedExercises.length) {
+      return selectedExercises;
+    }
+
+    const reordered = [...selectedExercises];
+    [reordered[index], reordered[targetIndex]] = [reordered[targetIndex], reordered[index]];
+    return this.reorderExercises(reordered);
+  }
+
   createWorkout(workouts: Workout[], config: AddWorkoutSaveConfig): Workout[] {
     const nextWorkoutId = Math.max(...workouts.map((workout) => workout.id), 0) + 1;
     const firstExercise = config.selectedExercises[0];

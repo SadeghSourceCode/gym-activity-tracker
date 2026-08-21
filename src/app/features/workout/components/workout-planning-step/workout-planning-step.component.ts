@@ -15,10 +15,6 @@ export class WorkoutPlanningStepComponent {
     this.planningChanged.emit({ workoutTitle: (event.target as HTMLInputElement).value });
   }
 
-  onSelectedDateChanged(event: Event) {
-    this.planningChanged.emit({ selectedDate: (event.target as HTMLInputElement).value });
-  }
-
   onWeeklyPlanChanged(event: Event) {
     this.planningChanged.emit({ isWeeklyPlan: (event.target as HTMLInputElement).checked });
   }

@@ -7,12 +7,10 @@ export interface WorkoutPlanningExerciseConfig {
 export interface WorkoutPlanningStepConfig {
   workoutTitle?: string;
   defaultWorkoutTitle: string;
-  selectedDate: string;
   isWeeklyPlan?: boolean;
   exercises: readonly WorkoutPlanningExerciseConfig[];
   workoutTitleLabel: string;
   leaveEmptyToUseLabel: string;
-  workingDayLabel: string;
   weeklyPlanLabel: string;
   weeklyPlanHelpLabel: string;
   selectedExercisesLabel: string;

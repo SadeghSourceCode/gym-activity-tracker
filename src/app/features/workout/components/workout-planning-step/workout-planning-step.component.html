@@ -12,16 +12,6 @@
   </span>
 </label>
 
-<label class="block text-[#72777A]">
-  {{ config().workingDayLabel }}
-  <input
-    class="mt-1 block w-full rounded-xl border border-[#E3E5E5] bg-[#F7F9FA] px-4 py-3 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
-    type="date"
-    [value]="config().selectedDate"
-    (input)="onSelectedDateChanged($event)"
-  />
-</label>
-
 <label class="flex items-start gap-3 rounded-2xl border border-[#E3E5E5] bg-white p-4">
   <input
     class="mt-1 size-5 accent-[#0070F0]"

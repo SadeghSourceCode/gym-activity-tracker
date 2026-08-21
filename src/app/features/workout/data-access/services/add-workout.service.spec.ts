@@ -84,4 +84,18 @@ describe('AddWorkoutService exercise placement', () => {
       occurrences: 4,
     });
   });
+
+  it('reorders placements and rewrites explicit order values', () => {
+    const service = TestBed.inject(AddWorkoutService);
+    const first = service.toggleExercise([], exercise, 'main');
+    const secondExercise = { ...exercise, id: 'catalog:lunge', name: 'Lunge' };
+    const selected = service.toggleExercise(first, secondExercise, 'main');
+
+    const moved = service.moveExercise(selected, selected[1].id, -1);
+
+    expect(moved.map(({ exerciseId, order }) => ({ exerciseId, order }))).toEqual([
+      { exerciseId: 'catalog:lunge', order: 0 },
+      { exerciseId: 'catalog:squat', order: 1 },
+    ]);
+  });
 });
