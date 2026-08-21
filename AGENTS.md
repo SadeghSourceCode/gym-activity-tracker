@@ -54,9 +54,9 @@ Contains application-level shared data-access concerns.
 
 Examples:
 
-* shared models
-* shared utilities
-* shared services
+- shared models
+- shared utilities
+- shared services
 
 Only place something here when it is genuinely shared across application features.
 
@@ -76,10 +76,10 @@ Contains dummy/presentational components owned by that feature.
 
 These components should primarily:
 
-* render data
-* receive configuration
-* handle local presentation behavior
-* emit user interactions
+- render data
+- receive configuration
+- handle local presentation behavior
+- emit user interactions
 
 They should not own feature orchestration or business logic.
 
@@ -89,12 +89,12 @@ They should not own feature orchestration or business logic.
 
 Contains feature-specific:
 
-* services
-* models
-* API access
-* state/data utilities
-* data transformations
-* related data-access concerns
+- services
+- models
+- API access
+- state/data utilities
+- data transformations
+- related data-access concerns
 
 ---
 
@@ -126,8 +126,8 @@ Do not promote something to a global/shared directory because it might theoretic
 
 Move it to a shared location only when:
 
-* it is actually reused across multiple features, or
-* it clearly represents an application-wide concern.
+- it is actually reused across multiple features, or
+- it clearly represents an application-wide concern.
 
 ---
 
@@ -160,6 +160,23 @@ Legacy workout records may still contain the original un-namespaced `sourceId`,
 so catalog lookup must preserve that read compatibility while persisted records
 migrate naturally.
 
+## Workout Plan Domain
+
+`WorkoutPlan` is the persisted planning aggregate (`Workout` is its compatibility
+alias). New records use `schemaVersion: 2`. A `WorkoutExerciseSummary` represents
+an exercise placement: `id` identifies that placement, while `exerciseId`
+references the canonical Exercise Library entity. Keep `order` and `section`
+explicit and required; array position is not the domain contract.
+
+Sets use tracking-aware optional values (`reps`, `weightKg`, `durationSeconds`,
+`distanceMeters`, and `assistanceWeightKg`). UI may expose only reps and weight
+for now, but new code must not restore the legacy `repeat`/`weight` fields.
+
+Recurring plans use the explicit `WorkoutRecurrence` contract. Plan V1 weekly
+recurrence is four occurrences, including the original scheduled workout.
+`isWeeklyPlan` exists only for reading legacy localStorage records and must not be
+written by new flows.
+
 ---
 
 # Dummy / Presentational Components
@@ -168,26 +185,26 @@ When implementing or refactoring features, prefer extracting meaningful UI respo
 
 A dummy component should:
 
-* focus on presentation
-* receive the data it needs through inputs
-* expose user interactions through explicit outputs
-* avoid fetching application data directly
-* avoid direct service dependencies unless strongly justified
-* avoid feature orchestration
-* avoid business logic
-* avoid owning application state
-* remain easy to understand and test independently
+- focus on presentation
+- receive the data it needs through inputs
+- expose user interactions through explicit outputs
+- avoid fetching application data directly
+- avoid direct service dependencies unless strongly justified
+- avoid feature orchestration
+- avoid business logic
+- avoid owning application state
+- remain easy to understand and test independently
 
 The parent/container/feature layer should be responsible for:
 
-* obtaining data
-* calling services
-* state management
-* business rules
-* orchestration
-* navigation when appropriate
-* transforming domain/application data into component configs
-* handling outputs emitted by dummy components
+- obtaining data
+- calling services
+- state management
+- business rules
+- orchestration
+- navigation when appropriate
+- transforming domain/application data into component configs
+- handling outputs emitted by dummy components
 
 ---
 
@@ -199,18 +216,18 @@ A component must represent a meaningful UI responsibility or concept.
 
 Good candidates include:
 
-* cards
-* list items
-* headers
-* summaries
-* filters
-* action sections
-* status sections
-* empty states
-* repeated UI blocks
-* complex template sections
-* independently understandable UI areas
-* UI sections with their own interaction behavior
+- cards
+- list items
+- headers
+- summaries
+- filters
+- action sections
+- status sections
+- empty states
+- repeated UI blocks
+- complex template sections
+- independently understandable UI areas
+- UI sections with their own interaction behavior
 
 Before extracting a component, ask:
 
@@ -257,8 +274,8 @@ export interface WorkoutCardConfig {
 
 Config properties should be optional whenever the component can reasonably:
 
-* operate without the value, or
-* provide a safe default.
+- operate without the value, or
+- provide a safe default.
 
 Example:
 
@@ -295,10 +312,10 @@ Avoid `any` for config properties.
 
 Every component output must be:
 
-* explicit
-* semantically named
-* strongly typed
-* easy for the consuming component to understand
+- explicit
+- semantically named
+- strongly typed
+- easy for the consuming component to understand
 
 For simple values, use the concrete type directly.
 
@@ -340,20 +357,20 @@ Output names should describe the action that occurred.
 Prefer:
 
 ```ts
-exerciseSelected
-workoutDeleted
-dateChanged
-filterChanged
+exerciseSelected;
+workoutDeleted;
+dateChanged;
+filterChanged;
 ```
 
 over generic names such as:
 
 ```ts
-change
-action
-event
-data
-result
+change;
+action;
+event;
+data;
+result;
 ```
 
 ---
@@ -391,10 +408,10 @@ Its responsibility should be limited primarily to API communication.
 
 Examples:
 
-* HTTP requests
-* API endpoint interaction
-* API request/response handling
-* mapping low-level API transport concerns when necessary
+- HTTP requests
+- API endpoint interaction
+- API request/response handling
+- mapping low-level API transport concerns when necessary
 
 Example:
 
@@ -419,16 +436,16 @@ Use this service for feature-level logic and orchestration that should not live 
 
 Typical responsibilities include:
 
-* business logic
-* feature orchestration
-* data transformation
-* state-related operations
-* preparing or processing component data
-* combining multiple data sources
-* manipulating feature models
-* coordinating API service calls
-* reusable feature logic
-* non-trivial decision logic
+- business logic
+- feature orchestration
+- data transformation
+- state-related operations
+- preparing or processing component data
+- combining multiple data sources
+- manipulating feature models
+- coordinating API service calls
+- reusable feature logic
+- non-trivial decision logic
 
 Example:
 
@@ -440,9 +457,7 @@ export class WorkoutService {
   getActiveWorkouts() {
     return this.workoutApiService
       .getWorkouts()
-      .pipe(
-        map(workouts => workouts.filter(workout => workout.active))
-      );
+      .pipe(map((workouts) => workouts.filter((workout) => workout.active)));
   }
 }
 ```
@@ -471,17 +486,17 @@ Move appropriate logic into:
 
 This applies especially to logic such as:
 
-* data transformation
-* filtering
-* mapping
-* sorting
-* business decisions
-* calculations
-* orchestration
-* reusable feature operations
-* complex state manipulation
-* API workflow coordination
-* logic that does not directly belong to rendering or UI interaction
+- data transformation
+- filtering
+- mapping
+- sorting
+- business decisions
+- calculations
+- orchestration
+- reusable feature operations
+- complex state manipulation
+- API workflow coordination
+- logic that does not directly belong to rendering or UI interaction
 
 For example, avoid leaving code like this inside a component:
 
@@ -504,9 +519,9 @@ When this represents feature logic rather than presentation behavior, prefer mov
 export class WorkoutService {
   prepareVisibleWorkouts(workouts: Workout[]): Workout[] {
     return workouts
-      .filter(workout => workout.active)
+      .filter((workout) => workout.active)
       .sort((a, b) => a.order - b.order)
-      .map(workout => ({
+      .map((workout) => ({
         ...workout,
         title: workout.title.trim(),
       }));
@@ -532,13 +547,13 @@ Component functions may remain inside the component when they are directly relat
 
 Examples:
 
-* opening or closing a local UI section
-* toggling a UI-only state
-* handling a DOM-related interaction
-* formatting purely presentational state
-* emitting a component output
-* handling local component interaction
-* simple event forwarding
+- opening or closing a local UI section
+- toggling a UI-only state
+- handling a DOM-related interaction
+- formatting purely presentational state
+- emitting a component output
+- handling local component interaction
+- simple event forwarding
 
 Example:
 
@@ -605,11 +620,11 @@ do not over-engineer the initial implementation by automatically extracting ever
 
 A new feature may start with logic inside its container when that logic is:
 
-* small
-* straightforward
-* feature-local
-* not reusable
-* unlikely to make the component difficult to understand
+- small
+- straightforward
+- feature-local
+- not reusable
+- unlikely to make the component difficult to understand
 
 However, API communication should still remain outside UI components when practical.
 
@@ -660,10 +675,10 @@ Component-related interfaces belong to:
 
 This includes:
 
-* component config interfaces
-* component output interfaces
-* feature models
-* feature data contracts
+- component config interfaces
+- component output interfaces
+- feature models
+- feature data contracts
 
 Example:
 
@@ -738,9 +753,10 @@ is used, perform all existing refactoring rules plus the following steps:
 5. Inspect component methods and logic.
 6. Classify logic into:
 
-   * UI logic
-   * feature/business logic
-   * API communication
+   - UI logic
+   - feature/business logic
+   - API communication
+
 7. Keep UI logic inside components.
 8. Move feature/business logic into `<feature>.service.ts`.
 9. Move API communication into `<feature>.api.service.ts` when the feature uses an API.
@@ -891,10 +907,10 @@ When refactoring an existing feature:
 
 Refactoring should improve:
 
-* separation of concerns
-* readability
-* maintainability
-* testability
+- separation of concerns
+- readability
+- maintainability
+- testability
 
 It should not introduce abstraction merely for abstraction's sake.
 
@@ -906,16 +922,16 @@ Architectural refactoring must not intentionally change existing application beh
 
 Preserve:
 
-* user flows
-* API interactions
-* state behavior
-* validations
-* routing behavior
-* loading behavior
-* error handling
-* analytics/tracking
-* permissions
-* existing UI behavior
+- user flows
+- API interactions
+- state behavior
+- validations
+- routing behavior
+- loading behavior
+- error handling
+- analytics/tracking
+- permissions
+- existing UI behavior
 
 If an unrelated bug or architectural problem is discovered, do not silently change it.
 
@@ -1067,12 +1083,12 @@ Interpret this command as:
 
 Before making architectural changes:
 
-* inspect existing code first
-* prefer existing project conventions when they do not conflict with this file
-* do not guess existing APIs
-* do not invent unnecessary abstractions
-* avoid unrelated refactoring
-* keep changes scoped to the requested feature
-* preserve behavior unless explicitly asked to change it
+- inspect existing code first
+- prefer existing project conventions when they do not conflict with this file
+- do not guess existing APIs
+- do not invent unnecessary abstractions
+- avoid unrelated refactoring
+- keep changes scoped to the requested feature
+- preserve behavior unless explicitly asked to change it
 
 When there are multiple valid architectural solutions, prefer the simplest solution that satisfies this file and the existing project architecture.

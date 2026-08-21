@@ -24,24 +24,32 @@ describe('workout clipboard utilities', () => {
       exercises: [
         {
           id: 'bench-press',
+          exerciseId: 'bench-press',
+          order: 0,
+          section: 'main',
+          trackingType: 'weight-and-repetitions',
           name: 'Bench Press',
           nameEn: 'Bench Press',
           nameFa: 'پرس سینه',
           targetMuscle: 'chest',
           thumbnailUrl: '/gifs/bench-press.gif',
           sets: [
-            { id: 1, repeat: 10, weight: 60 },
-            { id: 2, repeat: 8, weight: 65 },
+            { id: 1, reps: 10, weightKg: 60 },
+            { id: 2, reps: 8, weightKg: 65 },
           ],
         },
         {
           id: 'squat',
+          exerciseId: 'squat',
+          order: 1,
+          section: 'main',
+          trackingType: 'weight-and-repetitions',
           name: 'Squat',
           nameEn: 'Squat',
           nameFa: 'اسکات',
           targetMuscle: 'legs',
           thumbnailUrl: '/gifs/squat.gif',
-          sets: [{ id: 1, repeat: 5, weight: 80 }],
+          sets: [{ id: 1, reps: 5, weightKg: 80 }],
         },
       ],
     };
@@ -57,12 +65,16 @@ describe('workout clipboard utilities', () => {
       exercises: [
         {
           id: 'bench-press',
+          exerciseId: 'bench-press',
+          order: 0,
+          section: 'main',
+          trackingType: 'weight-and-repetitions',
           name: 'Bench Press',
           nameEn: 'Bench Press',
           nameFa: 'پرس سینه',
           targetMuscle: 'chest',
           thumbnailUrl: '/gifs/bench-press.gif',
-          sets: [{ id: 1, repeat: 10, weight: 60 }],
+          sets: [{ id: 1, reps: 10, weightKg: 60 }],
         },
       ],
     };
@@ -80,10 +92,14 @@ describe('workout clipboard utilities', () => {
       exercises: [
         {
           id: 'bench-press',
+          exerciseId: 'bench-press',
+          order: 0,
+          section: 'main',
+          trackingType: 'weight-and-repetitions',
           name: 'Bench Press',
           nameEn: 'Bench Press',
           nameFa: 'پرس سینه',
-          sets: [{ id: 1, repeat: 10, weight: 60 }],
+          sets: [{ id: 1, reps: 10, weightKg: 60 }],
         },
       ],
     });
@@ -129,12 +145,16 @@ describe('workout clipboard utilities', () => {
       exercises: [
         {
           id: 'squat',
+          exerciseId: 'squat',
+          order: 0,
+          section: 'main',
+          trackingType: 'weight-and-repetitions',
           name: 'Squat',
           nameEn: 'Squat',
           nameFa: 'اسکات',
           targetMuscle: 'legs',
           thumbnailUrl: '/gifs/squat.gif',
-          sets: [{ id: 1, repeat: 5, weight: 80 }],
+          sets: [{ id: 1, reps: 5, weightKg: 80 }],
         },
       ],
     };

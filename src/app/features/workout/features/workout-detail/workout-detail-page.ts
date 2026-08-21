@@ -112,7 +112,7 @@ export class WorkoutDetailPage {
     this.replacementExercisesLoading.set(true);
 
     this.exerciseLibrary
-      .getById(exercise.id)
+      .getById(exercise.exerciseId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (sourceExercise) => {
@@ -170,7 +170,7 @@ export class WorkoutDetailPage {
         return {
           ...workout,
           exercises,
-          exerciseId: firstExercise.id,
+          exerciseId: firstExercise.exerciseId,
           thumbnailUrl: firstExercise.thumbnailUrl,
           targetMuscle: firstExercise.targetMuscle,
         };
@@ -197,7 +197,7 @@ export class WorkoutDetailPage {
           exercise.id === exerciseId
             ? {
                 ...exercise,
-                id: replacement.id,
+                exerciseId: replacement.id,
                 name: replacement.name,
                 nameEn: replacement.nameEn,
                 nameFa: replacement.nameFa,
@@ -211,7 +211,7 @@ export class WorkoutDetailPage {
         return {
           ...workout,
           exercises,
-          exerciseId: firstExercise.id,
+          exerciseId: firstExercise.exerciseId,
           thumbnailUrl: firstExercise.thumbnailUrl,
           targetMuscle: firstExercise.targetMuscle,
         };
@@ -249,8 +249,8 @@ export class WorkoutDetailPage {
                 ...exercise.sets,
                 {
                   id: nextSetId,
-                  repeat: 0,
-                  weight: 0,
+                  reps: 0,
+                  weightKg: 0,
                 },
               ],
             };
@@ -265,7 +265,7 @@ export class WorkoutDetailPage {
     workoutId: number,
     exerciseId: string,
     setId: number,
-    changes: Partial<Pick<WorkoutSet, 'repeat' | 'weight'>>,
+    changes: Partial<Pick<WorkoutSet, 'reps' | 'weightKg'>>,
   ) {
     const targetWorkout = this.workouts().find((workout) => workout.id === workoutId);
 
@@ -341,6 +341,12 @@ export class WorkoutDetailPage {
 
       return workouts.map((workout) => ({
         ...workout,
+        schemaVersion: 2 as const,
+        recurrence:
+          workout.recurrence ??
+          (workout.isWeeklyPlan
+            ? { frequency: 'weekly' as const, interval: 1, occurrences: 4 }
+            : undefined),
         date: new Date(workout.date),
         exercises: this.normalizeWorkoutExercises(workout),
         sets: Array.isArray(workout.sets) ? workout.sets : [],
@@ -378,8 +384,11 @@ export class WorkoutDetailPage {
           (exercise): exercise is WorkoutExerciseSummary =>
             typeof exercise?.id === 'string' && typeof exercise.name === 'string',
         )
-        .map((exercise) => ({
+        .map((exercise, order) => ({
           ...exercise,
+          exerciseId: exercise.exerciseId ?? exercise.id,
+          order,
+          trackingType: exercise.trackingType ?? 'weight-and-repetitions',
           nameEn: exercise.nameEn ?? exercise.name,
           nameFa: exercise.nameFa ?? exercise.name,
           targetMuscle: exercise.targetMuscle ?? workout.targetMuscle,
@@ -398,7 +407,10 @@ export class WorkoutDetailPage {
     if (workout.exerciseId) {
       return [
         {
-          id: workout.exerciseId,
+          id: `workout-exercise:${workout.id}:0`,
+          exerciseId: workout.exerciseId,
+          order: 0,
+          trackingType: 'weight-and-repetitions',
           name: workout.name,
           nameEn: workout.name,
           nameFa: workout.name,
@@ -415,17 +427,21 @@ export class WorkoutDetailPage {
 
   private normalizeWorkoutSets(sets: WorkoutSet[] | undefined): WorkoutSet[] {
     if (!Array.isArray(sets)) {
-      return [{ id: 1, repeat: 0, weight: 0 }];
+      return [{ id: 1, reps: 0, weightKg: 0 }];
     }
 
-    const normalizedSets = sets.filter(
-      (set): set is WorkoutSet =>
-        typeof set?.id === 'number' &&
-        typeof set.repeat === 'number' &&
-        typeof set.weight === 'number',
-    );
+    const normalizedSets = sets
+      .filter((set): set is WorkoutSet => typeof set?.id === 'number')
+      .map((set) => {
+        const legacy = set as WorkoutSet & { repeat?: number; weight?: number };
+        return {
+          ...set,
+          reps: set.reps ?? legacy.repeat ?? 0,
+          weightKg: set.weightKg ?? legacy.weight ?? 0,
+        };
+      });
 
-    return normalizedSets.length ? normalizedSets : [{ id: 1, repeat: 0, weight: 0 }];
+    return normalizedSets.length ? normalizedSets : [{ id: 1, reps: 0, weightKg: 0 }];
   }
 
   private getExerciseMediaUrl(exercise: Exercise): string | null {

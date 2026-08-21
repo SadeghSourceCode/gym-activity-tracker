@@ -27,7 +27,7 @@ const exercise: Exercise = {
 };
 
 describe('AddWorkoutService exercise placement', () => {
-  it('assigns section to the workout exercise instead of the library entity', () => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         AddWorkoutService,
@@ -41,11 +41,47 @@ describe('AddWorkoutService exercise placement', () => {
         },
       ],
     });
+  });
+
+  it('assigns section to the workout exercise instead of the library entity', () => {
     const service = TestBed.inject(AddWorkoutService);
 
     const selected = service.toggleExercise([], exercise, 'warmup');
 
     expect(selected[0].section).toBe('warmup');
     expect('section' in exercise).toBe(false);
+  });
+
+  it('creates an ordered reference with tracking-aware sets', () => {
+    const service = TestBed.inject(AddWorkoutService);
+    const selected = service.toggleExercise([], exercise, 'main');
+
+    expect(selected[0]).toMatchObject({
+      exerciseId: exercise.id,
+      order: 0,
+      section: 'main',
+      trackingType: 'repetitions',
+      sets: [{ id: 1, reps: 0, weightKg: 0 }],
+    });
+  });
+
+  it('stores weekly recurrence as four explicit occurrences', () => {
+    const service = TestBed.inject(AddWorkoutService);
+    const selected = service.toggleExercise([], exercise, 'main');
+    const workouts = service.createWorkout([], {
+      workoutTitle: '',
+      defaultWorkoutTitle: 'Leg Day',
+      selectedDate: '2026-08-21',
+      selectedExercises: selected,
+      targetMuscle: 'legs',
+      isWeeklyPlan: true,
+    });
+
+    expect(workouts[0].schemaVersion).toBe(2);
+    expect(workouts[0].recurrence).toEqual({
+      frequency: 'weekly',
+      interval: 1,
+      occurrences: 4,
+    });
   });
 });

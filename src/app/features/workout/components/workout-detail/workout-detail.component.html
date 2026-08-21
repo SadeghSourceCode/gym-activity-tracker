@@ -176,13 +176,13 @@
                             type="number"
                             min="0"
                             [disabled]="!canManage()"
-                            [value]="set.repeat"
+                            [value]="set.reps ?? 0"
                             (input)="
                               updateSet.emit({
                                 workoutId: workout().id,
                                 exerciseId: exercise.id,
                                 setId: set.id,
-                                changes: { repeat: +$any($event.target).value },
+                                changes: { reps: +$any($event.target).value },
                               })
                             "
                           />
@@ -195,13 +195,13 @@
                             type="number"
                             min="0"
                             [disabled]="!canManage()"
-                            [value]="set.weight"
+                            [value]="set.weightKg ?? 0"
                             (input)="
                               updateSet.emit({
                                 workoutId: workout().id,
                                 exerciseId: exercise.id,
                                 setId: set.id,
-                                changes: { weight: +$any($event.target).value },
+                                changes: { weightKg: +$any($event.target).value },
                               })
                             "
                           />
