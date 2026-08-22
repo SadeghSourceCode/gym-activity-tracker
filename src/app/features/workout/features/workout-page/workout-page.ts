@@ -16,7 +16,7 @@ import { Exercise } from '../../../exercise-library/data-access/models/exercise.
 import { ExerciseLibraryService } from '../../../exercise-library/data-access/services/exercise-library.service';
 import { getDateKey, getTodayDateKey, parseDateKey } from '../../utils/calendar-date.util';
 import { saveCopiedWorkout } from '../../utils/workout-clipboard.util';
-import { isWorkoutOnDate } from '../../utils/weekly-recurrence.util';
+import { canStartWorkoutOnDate, isWorkoutOnDate } from '../../utils/weekly-recurrence.util';
 import { mapDailyPlanToViewModel } from '../../utils/workout-plan-view-model.mapper';
 import { WorkoutCalendarComponent } from '../../components/workout-calendar/workout-calendar.component';
 import { I18nService } from '../../../../core/i18n/i18n.service';
@@ -361,19 +361,26 @@ export class WorkoutPage {
     if (
       !targetWorkout ||
       targetWorkout.completionStatus === 'completed' ||
-      !this.canManageWorkout(targetWorkout)
+      !canStartWorkoutOnDate(targetWorkout, this.selectedDate(), getTodayDateKey())
     )
       return;
 
     if (targetWorkout.session?.status !== 'active') {
+      const previousWorkouts = this.workouts();
       this.workouts.update((workouts) =>
         workouts.map((workout) =>
           workout.id === targetWorkout.id ? startWorkoutSession(workout) : workout,
         ),
       );
-      this.saveWorkouts();
+
+      if (!this.saveWorkouts()) {
+        this.workouts.set(previousWorkouts);
+        this.selectedDayError.set(this.i18n.t('workoutStorageError'));
+        return;
+      }
     }
 
+    this.selectedDayError.set(null);
     void this.router.navigate(['/workouts/workout-detail', targetWorkout.id]);
   }
 
@@ -631,9 +638,16 @@ export class WorkoutPage {
     return normalizedSets.length ? normalizedSets : [{ id: 1, reps: 0, weightKg: 0 }];
   }
 
-  private saveWorkouts() {
-    if (this.isBrowser) {
+  private saveWorkouts(): boolean {
+    if (!this.isBrowser) {
+      return false;
+    }
+
+    try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.workouts()));
+      return true;
+    } catch {
+      return false;
     }
   }
 

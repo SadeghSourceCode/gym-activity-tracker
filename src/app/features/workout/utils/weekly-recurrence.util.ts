@@ -24,6 +24,14 @@ export function isWorkoutOnDate(workout: Workout, dateKey: string): boolean {
   return dayDifference / (7 * recurrence.interval) < recurrence.occurrences;
 }
 
+export function canStartWorkoutOnDate(
+  workout: Workout,
+  dateKey: string,
+  todayDateKey: string,
+): boolean {
+  return dateKey >= todayDateKey && isWorkoutOnDate(workout, dateKey);
+}
+
 export function getWeeklyRecurrenceEnd(workout: Workout): Date | null {
   const recurrence = getWorkoutRecurrence(workout);
   if (!recurrence) {
