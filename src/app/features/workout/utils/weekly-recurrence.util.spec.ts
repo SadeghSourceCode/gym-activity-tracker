@@ -1,5 +1,6 @@
 import { Workout } from '../data-access/models/workout-storage.models';
 import {
+  canStartWorkoutOnDate,
   getWeeklyRecurrenceEnd,
   isWorkoutOnDate,
   weeklyRecurrenceOccurrences,
@@ -74,5 +75,24 @@ describe('weekly recurrence utilities', () => {
 
     expect(getWeeklyRecurrenceEnd(weeklyWorkout)).toEqual(new Date(2026, 7, 24));
     expect(getWeeklyRecurrenceEnd(regularWorkout)).toBeNull();
+  });
+
+  it('allows starting the current occurrence when the recurring plan began in the past', () => {
+    const workout = createWorkout({
+      date: new Date(2026, 7, 8),
+      recurrence: { frequency: 'weekly', interval: 1, occurrences: 4 },
+    });
+
+    expect(canStartWorkoutOnDate(workout, '2026-08-22', '2026-08-22')).toBe(true);
+  });
+
+  it('does not allow starting a past or unrelated occurrence', () => {
+    const workout = createWorkout({
+      date: new Date(2026, 7, 8),
+      recurrence: { frequency: 'weekly', interval: 1, occurrences: 4 },
+    });
+
+    expect(canStartWorkoutOnDate(workout, '2026-08-15', '2026-08-22')).toBe(false);
+    expect(canStartWorkoutOnDate(workout, '2026-08-23', '2026-08-22')).toBe(false);
   });
 });
