@@ -1,13 +1,21 @@
-export interface WeeklyActivityDayConfig {
+export type ActivityPeriod = 'week' | 'month' | 'year';
+
+export interface ActivityPointConfig {
   dateKey: string;
-  dayLabel: string;
+  label: string;
   minutes: number;
   selected?: boolean;
 }
 
+export interface ActivityPeriodOptionConfig {
+  id: ActivityPeriod;
+  label: string;
+}
+
 export interface WeeklyActivityConfig {
   title: string;
-  periodLabel: string;
+  selectedPeriod: ActivityPeriod;
+  periodOptions: readonly ActivityPeriodOptionConfig[];
   durationLabel: string;
-  days: readonly WeeklyActivityDayConfig[];
+  points: readonly ActivityPointConfig[];
 }

@@ -58,6 +58,13 @@ describe('AppButton', () => {
     expect(button.classList.contains('rounded-2xl')).toBe(true);
   });
 
+  it('should bind the configured button id to the native button', () => {
+    fixture.componentRef.setInput('config', { buttonId: 'save-workout' });
+    fixture.detectChanges();
+
+    expect(getButton().id).toBe('save-workout');
+  });
+
   it('should change font size from the size input', () => {
     fixture.componentRef.setInput('config', { size: 'small' });
     fixture.detectChanges();

@@ -1,11 +1,31 @@
 <section [attr.aria-label]="config().title">
   <header class="flex items-center justify-between gap-4">
     <h2 class="text-xl font-bold text-[#404446]">{{ config().title }}</h2>
-    <span class="rounded-full bg-[#EBF4FF] px-5 py-2 text-sm font-semibold text-[#0070F0]">{{
-      config().periodLabel
-    }}</span>
+    <div class="flex rounded-full bg-[#F2F4F5] p-1" role="group">
+      @for (period of config().periodOptions; track period.id) {
+        <app-button
+          [config]="{
+            size: 'small',
+            variant: 'link',
+            mode: 'section',
+            type: 'button',
+            ariaLabel: period.label,
+            ariaCurrent: config().selectedPeriod === period.id ? 'page' : null,
+          }"
+          (buttonClicked)="periodSelected.emit(period.id)"
+        >
+          <span
+            class="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors"
+            [class.bg-white]="config().selectedPeriod === period.id"
+            [class.text-[#0070F0]]="config().selectedPeriod === period.id"
+            [class.text-[#72777A]]="config().selectedPeriod !== period.id"
+            >{{ period.label }}</span
+          >
+        </app-button>
+      }
+    </div>
   </header>
-  <div class="mt-5 rounded-3xl bg-white p-4 shadow-sm">
+  <div class="mt-5 rounded-3xl bg-white p-4">
     <svg
       class="h-40 w-full overflow-visible"
       viewBox="0 0 320 150"
@@ -33,13 +53,14 @@
         stroke-linejoin="round"
       />
     </svg>
-    <div class="grid grid-cols-7 gap-1 text-center text-xs">
-      @for (day of config().days; track day.dateKey) {
+    <div class="flex justify-between gap-1 overflow-hidden text-center text-xs">
+      @for (point of config().points; track point.dateKey) {
         <span
-          [class.font-bold]="day.selected"
-          [class.text-[#0070F0]]="day.selected"
-          [class.text-[#72777A]]="!day.selected"
-          >{{ day.dayLabel }}</span
+          class="min-w-0 flex-1 truncate"
+          [class.font-bold]="point.selected"
+          [class.text-[#0070F0]]="point.selected"
+          [class.text-[#72777A]]="!point.selected"
+          >{{ point.label }}</span
         >
       }
     </div>

@@ -1,36 +1,56 @@
-<div class="mx-auto flex w-full max-w-xl flex-col gap-10 pb-4">
-  <header class="flex items-center justify-between">
-    <app-button
-      [config]="{
-        variant: 'outline',
-        mode: 'iconOnly',
-        type: 'button',
-        ariaLabel: i18n.language() === 'fa' ? 'برنامه تمرین' : 'Workout planner',
-      }"
-      (buttonClicked)="openWorkoutPlanner()"
+<div class="mx-auto flex w-full max-w-xl flex-col gap-5 pb-24">
+  @if (!hasWorkoutToday()) {
+    <section
+      class="rounded-2xl border border-dashed border-[#C7CBCC] bg-white p-5 text-center"
+      [attr.aria-label]="i18n.language() === 'fa' ? 'تمرین امروز' : 'Today\'s workout'"
     >
-      <i class="app-icon fa-solid fa-calendar-days" aria-hidden="true"></i>
-    </app-button>
-    <div class="flex gap-3">
-      <span
-        class="flex size-12 items-center justify-center rounded-full border border-[#E3E5E5] bg-white text-xl text-[#72777A]"
-        aria-hidden="true"
-        ><i class="app-icon fa-solid fa-ellipsis"></i
-      ></span>
-      <span
-        class="relative flex size-12 items-center justify-center rounded-full border border-[#E3E5E5] bg-white text-xl text-[#72777A]"
-        aria-hidden="true"
-        ><i class="app-icon fa-regular fa-bell"></i
-        ><span class="absolute right-2 top-2 size-1.5 rounded-full bg-[#FF7777]"></span
-      ></span>
-    </div>
-  </header>
+      <h2 class="text-lg font-bold text-[#202325]">
+        {{ i18n.language() === 'fa' ? 'برای امروز تمرینی نداری' : 'No workout planned for today' }}
+      </h2>
+      <p class="mt-1 text-sm text-[#72777A]">
+        {{
+          i18n.language() === 'fa'
+            ? 'یک تمرین اضافه کن و برنامه امروزت را بساز.'
+            : 'Add a workout and build your plan for today.'
+        }}
+      </p>
+      <app-button
+        [config]="{
+          variant: 'fill',
+          mode: 'section',
+          type: 'button',
+          ariaLabel: i18n.t('addWorkout'),
+        }"
+        class="mt-4 inline-block"
+        (buttonClicked)="addWorkout()"
+      >
+        <i class="app-icon fa-solid fa-plus" aria-hidden="true"></i>
+        {{ i18n.t('addWorkout') }}
+      </app-button>
+    </section>
+  }
 
-  <h1 class="text-3xl font-bold text-[#303437]">{{ i18n.t('home') }}</h1>
   <app-upcoming-workouts
     [config]="upcomingConfig()"
     (workoutSelected)="openWorkout($event.workoutId)"
-    (addWorkoutRequested)="addWorkout()"
   />
-  <app-weekly-activity [config]="activityConfig()" />
+  <app-weekly-activity
+    [config]="activityConfig()"
+    (periodSelected)="selectActivityPeriod($event)"
+  />
+
+  <app-button
+    class="fixed bottom-24 end-5 z-40"
+    [config]="{
+      variant: 'fill',
+      mode: 'iconOnly',
+      type: 'button',
+      ariaLabel: i18n.t('addWorkout'),
+    }"
+    (buttonClicked)="addWorkout()"
+  >
+    <span class="flex size-14 items-center justify-center rounded-full">
+      <i class="app-icon fa-solid fa-plus text-xl" aria-hidden="true"></i>
+    </span>
+  </app-button>
 </div>
