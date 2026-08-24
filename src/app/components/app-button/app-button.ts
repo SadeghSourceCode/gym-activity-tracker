@@ -8,23 +8,23 @@ import { AppButtonConfig } from '../../data-access/models/app-button-config.inte
   styleUrl: './app-button.scss',
 })
 export class AppButton {
-  readonly config = input<AppButtonConfig>({});
+  readonly config = input<AppButtonConfig | undefined>();
   readonly hostClasses = input('', { alias: 'class' });
 
   readonly buttonClicked = output<MouseEvent>();
 
   readonly isInteractionDisabled = computed(
-    () => (this.config().disabled ?? false) || (this.config().loading ?? false),
+    () => (this.config()?.disabled ?? false) || (this.config()?.loading ?? false),
   );
 
   readonly classes = computed(() =>
     [
       'app-button',
-      `app-button--${this.config().size ?? 'medium'}`,
-      `app-button--${this.config().variant ?? 'fill'}`,
-      `app-button--${this.config().mode ?? 'section'}`,
-      this.config().active ? 'app-button--active' : '',
-      this.config().loading ? 'app-button--loading' : '',
+      `app-button--${this.config()?.size ?? 'medium'}`,
+      `app-button--${this.config()?.variant ?? 'fill'}`,
+      `app-button--${this.config()?.mode ?? 'section'}`,
+      this.config()?.active ? 'app-button--active' : '',
+      this.config()?.loading ? 'app-button--loading' : '',
       this.hostClasses(),
     ]
       .filter(Boolean)

@@ -1,19 +1,31 @@
-<header class="grid min-h-12 grid-cols-[3rem_minmax(0,1fr)_3rem] items-center gap-3">
-  <app-button
-    [config]="config().leftButton"
-    (buttonClicked)="leftButtonClicked.emit($event)"
-  >
-    <ng-content select="[appHeaderLeftButton]" />
-  </app-button>
+<header class="relative flex min-h-12 items-center justify-between gap-3">
+  <div class="relative z-10 flex min-w-12 justify-start">
+    @if (leftButton(); as button) {
+      <app-button [config]="button" (buttonClicked)="leftButtonClicked.emit($event)">
+        @if (button.mode === 'iconOnly') {
+          <i [class]="'app-icon ' + button.icon" aria-hidden="true"></i>
+        } @else {
+          {{ button.title }}
+        }
+      </app-button>
+    }
+  </div>
 
-  <h1 class="truncate text-center text-xl font-bold text-[#202325]">
+  <h1
+    class="pointer-events-none absolute inset-x-14 truncate text-center text-xl font-bold text-[#202325]"
+  >
     {{ config().title }}
   </h1>
 
-  <app-button
-    [config]="config().rightButton"
-    (buttonClicked)="rightButtonClicked.emit($event)"
-  >
-    <ng-content select="[appHeaderRightButton]" />
-  </app-button>
+  <div class="relative z-10 flex min-w-12 justify-end">
+    @if (rightButton(); as button) {
+      <app-button [config]="button" (buttonClicked)="rightButtonClicked.emit($event)">
+        @if (button.mode === 'iconOnly') {
+          <i [class]="'app-icon ' + button.icon" aria-hidden="true"></i>
+        } @else {
+          {{ button.title }}
+        }
+      </app-button>
+    }
+  </div>
 </header>

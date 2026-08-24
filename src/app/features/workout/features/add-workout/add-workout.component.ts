@@ -1,4 +1,4 @@
-import { isPlatformBrowser, Location } from '@angular/common';
+import { isPlatformBrowser, Location, NgClass } from '@angular/common';
 import { Component, DestroyRef, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -38,11 +38,13 @@ import {
   readCopiedWorkoutFromSystemClipboard,
 } from '../../utils/workout-clipboard.util';
 import { getSuggestedWorkoutName } from '../../utils/workout-plan-name.util';
+import { AppHeader } from '../../../../components/app-header/app-header';
+import { AppHeaderConfig } from '../../../../data-access/models/app-header-config.interface';
 
 @Component({
   selector: 'app-add-workout',
   standalone: true,
-  imports: [AppButton, AddWorkoutHeaderComponent, WorkoutPlanningStepComponent],
+  imports: [AppButton, AddWorkoutHeaderComponent, WorkoutPlanningStepComponent, AppHeader, NgClass],
   templateUrl: './add-workout.component.html',
   styles: `
     .selected {
@@ -102,7 +104,7 @@ export class AddWorkoutComponent {
   readonly saveButtonLabel = computed(() =>
     this.editingWorkoutId() === undefined ? this.i18n.t('addWorkout') : this.i18n.t('saveWorkout'),
   );
-  readonly headerConfig = computed<AddWorkoutHeaderConfig>(() => ({
+  readonly workoutHeaderConfig = computed<AddWorkoutHeaderConfig>(() => ({
     title: this.title(),
     selectedDateLabel: this.selectedDateLabel(),
     step: this.step(),
@@ -165,6 +167,10 @@ export class AddWorkoutComponent {
     weeklyPlanHelpLabel: this.text().weeklyPlanHelpLabel,
     selectedExercisesLabel: this.text().selectedExercisesLabel,
   }));
+
+  headerConfig = signal<AppHeaderConfig>({
+    title: 'افزودن تمرین',
+  });
 
   constructor() {
     this.loadTargetMuscles();

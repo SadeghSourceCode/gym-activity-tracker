@@ -1,14 +1,15 @@
 <button
   [class]="classes()"
-  [type]="config().type ?? 'button'"
+  [attr.id]="config()?.buttonId ?? null"
+  [type]="config()?.type ?? 'button'"
   [disabled]="isInteractionDisabled()"
-  [attr.aria-label]="config().ariaLabel ?? null"
-  [attr.aria-busy]="config().loading ? 'true' : null"
-  [attr.aria-pressed]="config().active ? 'true' : null"
-  [attr.aria-current]="config().ariaCurrent ?? null"
+  [attr.aria-label]="config()?.ariaLabel ?? null"
+  [attr.aria-busy]="config()?.loading ? 'true' : null"
+  [attr.aria-pressed]="config()?.active ? 'true' : null"
+  [attr.aria-current]="config()?.ariaCurrent ?? null"
   (click)="onClick($event)"
 >
-  @if (config().loading) {
+  @if (config()?.loading) {
     <span class="app-button__spinner" aria-hidden="true"></span>
   } @else {
     <ng-content />
