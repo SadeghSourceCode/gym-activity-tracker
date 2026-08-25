@@ -1,4 +1,4 @@
-import { WorkoutExerciseSummary } from './workout-storage.models';
+import { WorkoutExerciseSummary, WorkoutRecurrence } from './workout-storage.models';
 
 export interface AddWorkoutSaveConfig {
   workoutTitle: string;
@@ -6,5 +6,5 @@ export interface AddWorkoutSaveConfig {
   selectedDate: string;
   selectedExercises: WorkoutExerciseSummary[];
   targetMuscle: string;
-  isWeeklyPlan: boolean;
+  recurrenceFrequency?: WorkoutRecurrence['frequency'];
 }

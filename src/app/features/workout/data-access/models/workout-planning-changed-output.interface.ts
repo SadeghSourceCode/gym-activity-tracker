@@ -1,4 +1,6 @@
+import { WorkoutRecurrence } from './workout-storage.models';
+
 export interface WorkoutPlanningChangedOutput {
   workoutTitle?: string;
-  isWeeklyPlan?: boolean;
+  recurrenceFrequency?: WorkoutRecurrence['frequency'] | null;
 }

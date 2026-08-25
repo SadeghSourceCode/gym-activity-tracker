@@ -41,6 +41,29 @@ export class AddWorkoutService {
     return this.exerciseLibrary.getTargetMuscles();
   }
 
+  canContinueToPlanning(selectedExercises: readonly WorkoutExerciseSummary[]): boolean {
+    return selectedExercises.length > 0;
+  }
+
+  saveWorkoutFlow(
+    isBrowser: boolean,
+    workouts: Workout[],
+    restDayKeys: string[],
+    editingWorkoutId: number | undefined,
+    config: AddWorkoutSaveConfig,
+  ): { workouts: Workout[]; restDayKeys: string[] } {
+    const nextWorkouts =
+      editingWorkoutId === undefined
+        ? this.createWorkout(workouts, config)
+        : this.updateWorkout(workouts, editingWorkoutId, config);
+    const nextRestDayKeys = restDayKeys.filter((dateKey) => dateKey !== config.selectedDate);
+
+    this.saveWorkouts(isBrowser, nextWorkouts);
+    this.saveRestDayKeys(isBrowser, nextRestDayKeys);
+
+    return { workouts: nextWorkouts, restDayKeys: nextRestDayKeys };
+  }
+
   loadWorkouts(isBrowser: boolean, isPersian: boolean): Workout[] {
     if (!isBrowser) {
       return [];
@@ -168,6 +191,21 @@ export class AddWorkoutService {
     return this.reorderExercises(reordered);
   }
 
+  reorderExercise(
+    selectedExercises: WorkoutExerciseSummary[],
+    exerciseId: string,
+    targetExerciseId: string,
+  ): WorkoutExerciseSummary[] {
+    const sourceIndex = selectedExercises.findIndex((exercise) => exercise.id === exerciseId);
+    const targetIndex = selectedExercises.findIndex((exercise) => exercise.id === targetExerciseId);
+    if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex) return selectedExercises;
+
+    const reordered = [...selectedExercises];
+    const [movedExercise] = reordered.splice(sourceIndex, 1);
+    reordered.splice(targetIndex, 0, movedExercise);
+    return this.reorderExercises(reordered);
+  }
+
   createWorkout(workouts: Workout[], config: AddWorkoutSaveConfig): Workout[] {
     const nextWorkoutId = Math.max(...workouts.map((workout) => workout.id), 0) + 1;
     const firstExercise = config.selectedExercises[0];
@@ -183,8 +221,8 @@ export class AddWorkoutService {
         exercises: config.selectedExercises,
         date: parseDateKey(config.selectedDate),
         targetMuscle: config.targetMuscle,
-        recurrence: config.isWeeklyPlan
-          ? { frequency: 'weekly', interval: 1, occurrences: 4 }
+        recurrence: config.recurrenceFrequency
+          ? { frequency: config.recurrenceFrequency, interval: 1, occurrences: 4 }
           : undefined,
         completionStatus: 'pending',
         sets: [{ id: 1, reps: 0, weightKg: 0 }],
@@ -210,8 +248,8 @@ export class AddWorkoutService {
             exercises: config.selectedExercises,
             date: parseDateKey(config.selectedDate),
             targetMuscle: config.targetMuscle,
-            recurrence: config.isWeeklyPlan
-              ? { frequency: 'weekly', interval: 1, occurrences: 4 }
+            recurrence: config.recurrenceFrequency
+              ? { frequency: config.recurrenceFrequency, interval: 1, occurrences: 4 }
               : undefined,
             isWeeklyPlan: undefined,
           }
@@ -346,7 +384,7 @@ export class AddWorkoutService {
   }
 
   private normalizeRecurrence(workout: Workout) {
-    if (workout.recurrence?.frequency === 'weekly') {
+    if (workout.recurrence?.frequency === 'weekly' || workout.recurrence?.frequency === 'monthly') {
       return {
         frequency: 'weekly' as const,
         interval: Math.max(workout.recurrence.interval, 1),
