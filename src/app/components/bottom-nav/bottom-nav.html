@@ -1,0 +1,55 @@
+<nav class="w-full min-w-0 max-w-full shrink-0 overflow-hidden px-6 py-3">
+  <div
+    class="mx-auto flex w-full max-w-90 items-center justify-center rounded-3xl bg-white py-2.5 shadow-[10px_14px_28px_rgba(0,0,0,0.12)]"
+    aria-label="Bottom navigation"
+  >
+    <div class="grid w-85 grid-cols-5 items-center justify-items-center">
+      @for (item of config().items; track item.id) {
+        <app-button
+          [config]="{
+            variant: 'link',
+            mode: 'section',
+            type: 'button',
+            ariaLabel: item.label,
+            ariaCurrent: isSelected(item.id) ? 'page' : null,
+          }"
+          [class.col-span-2]="isSelected(item.id)"
+          [class.col-auto]="!isSelected(item.id)"
+          (buttonClicked)="itemSelected.emit({ id: item.id, route: item.route })"
+        >
+          <span
+            class="flex h-11 items-center justify-center rounded-[48px] transition-all duration-300 ease-out"
+            [class.w-[124px]]="isSelected(item.id)"
+            [class.w-9]="!isSelected(item.id)"
+            [class.gap-2]="isSelected(item.id)"
+            [class.bg-[#303437]]="isSelected(item.id)"
+            [class.text-[#F2F4F5]]="isSelected(item.id)"
+            [class.text-[#72777A]]="!isSelected(item.id)"
+          >
+            <i
+              [class]="
+                'app-icon fa-solid size-6 shrink-0 text-xl transition-transform duration-300 ease-out ' +
+                item.iconClass
+              "
+              [class.scale-100]="isSelected(item.id)"
+              [class.scale-95]="!isSelected(item.id)"
+              aria-hidden="true"
+            ></i>
+
+            <span
+              class="overflow-hidden whitespace-nowrap text-sm font-medium leading-5 transition-all duration-300 ease-out"
+              [class.max-w-16]="isSelected(item.id)"
+              [class.opacity-100]="isSelected(item.id)"
+              [class.translate-x-0]="isSelected(item.id)"
+              [class.max-w-0]="!isSelected(item.id)"
+              [class.opacity-0]="!isSelected(item.id)"
+              [class.-translate-x-1]="!isSelected(item.id)"
+            >
+              {{ item.label }}
+            </span>
+          </span>
+        </app-button>
+      }
+    </div>
+  </div>
+</nav>

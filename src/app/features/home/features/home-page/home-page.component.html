@@ -1,33 +1,9 @@
-<div class="mx-auto flex w-full max-w-xl flex-col gap-5 pb-24">
+<div class="mx-auto flex w-full max-w-xl flex-col gap-5 pt-5 pb-24 px-5">
   @if (!hasWorkoutToday()) {
-    <section
-      class="rounded-2xl border border-dashed border-[#C7CBCC] bg-white p-5 text-center"
-      [attr.aria-label]="i18n.language() === 'fa' ? 'تمرین امروز' : 'Today\'s workout'"
-    >
-      <h2 class="text-lg font-bold text-[#202325]">
-        {{ i18n.language() === 'fa' ? 'برای امروز تمرینی نداری' : 'No workout planned for today' }}
-      </h2>
-      <p class="mt-1 text-sm text-[#72777A]">
-        {{
-          i18n.language() === 'fa'
-            ? 'یک تمرین اضافه کن و برنامه امروزت را بساز.'
-            : 'Add a workout and build your plan for today.'
-        }}
-      </p>
-      <app-button
-        [config]="{
-          variant: 'fill',
-          mode: 'section',
-          type: 'button',
-          ariaLabel: i18n.t('addWorkout'),
-        }"
-        class="mt-4 inline-block"
-        (buttonClicked)="addWorkout()"
-      >
-        <i class="app-icon fa-solid fa-plus" aria-hidden="true"></i>
-        {{ i18n.t('addWorkout') }}
-      </app-button>
-    </section>
+    <app-today-workout-empty-state
+      [config]="todayWorkoutEmptyStateConfig()"
+      (workoutAddRequested)="addWorkout()"
+    />
   }
 
   <app-upcoming-workouts

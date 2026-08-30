@@ -1,0 +1,24 @@
+<section
+  class="rounded-2xl border border-dashed border-[#C7CBCC] bg-white p-5 text-center"
+  [attr.aria-label]="config().ariaLabel"
+>
+  <h2 class="text-lg font-bold text-[#202325]">
+    {{ config().title }}
+  </h2>
+  <p class="mt-1 text-sm text-[#72777A]">
+    {{ config().description }}
+  </p>
+  <app-button
+    [config]="{
+      variant: 'fill',
+      mode: 'section',
+      type: 'button',
+      ariaLabel: config().actionLabel,
+    }"
+    class="mt-4 inline-block"
+    (buttonClicked)="workoutAddRequested.emit()"
+  >
+    <i class="app-icon fa-solid fa-plus" aria-hidden="true"></i>
+    {{ config().actionLabel }}
+  </app-button>
+</section>

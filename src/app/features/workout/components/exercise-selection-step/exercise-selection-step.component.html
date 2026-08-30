@@ -1,0 +1,92 @@
+<div class="flex min-h-0 flex-1 overflow-y-auto flex-col gap-4" (scroll)="onScroll($event)">
+  <app-workout-calendar
+    class="px-5"
+    [config]="{ selectedDate: config().selectedDate, showStatuses: false }"
+    (dateSelected)="dateSelected.emit($event)"
+  />
+
+  <div class="flex flex-col justify-between gap-3 px-5">
+    <input
+      class="block w-full rounded-xl border border-[#E3E5E5] bg-[#F7F9FA] px-4 py-3 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+      type="search"
+      [placeholder]="config().searchPlaceholder"
+      [value]="config().searchQuery"
+      (input)="queryChanged.emit($any($event.target).value)"
+    />
+  </div>
+
+  <div class="flex gap-3 overflow-x-auto p-1 px-5">
+    @for (muscle of config().muscles; track muscle.id) {
+      <div
+        class="w-32 shrink-0 overflow-hidden rounded-3xl bg-white text-start transition"
+        type="button"
+        [ngClass]="{
+          'border-[#0070F0] ring-2 ring-[#0070F0]/20': muscle.selected,
+          'border-[#E3E5E5]': !muscle.selected,
+        }"
+        (click)="muscleToggled.emit(muscle.id)"
+      >
+        <img
+          class="h-24 w-full bg-[#F7F9FA] object-cover"
+          [src]="muscle.imageUrl"
+          [alt]="muscle.label"
+          loading="lazy"
+        />
+        <span class="block p-3">
+          <span class="block truncate text-sm font-bold text-[#202325]">{{ muscle.label }}</span>
+          <span class="mt-1 line-clamp-2 text-[11px] leading-tight text-[#72777A]">{{
+            muscle.description
+          }}</span>
+        </span>
+      </div>
+    }
+  </div>
+
+  <div class="min-h-0 flex-1 px-5" >
+    @if (config().error; as error) {
+      <p class="rounded-xl bg-[#FFD6D6] p-3 text-[#C93636]">{{ error }}</p>
+    }
+
+    <div class="grid gap-3">
+      @for (exercise of config().exercises; track exercise.id) {
+        <div
+          class="grid items-center w-full grid-cols-[72px_1fr] gap-3 rounded-2xl border bg-white p-3 text-start border-[#E3E5E5]"
+          (click)="exerciseToggled.emit(exercise.id)"
+        >
+          @if (exercise.mediaUrl) {
+            <img
+              class="size-18 rounded-xl bg-[#F7F9FA] object-cover"
+              [src]="exercise.mediaUrl"
+              [alt]="exercise.name"
+              loading="lazy"
+            />
+          } @else {
+            <span class="size-18 rounded-xl bg-[#F7F9FA]"></span>
+          }
+          <div class="min-w-0 relative">
+            <span class="block font-semibold text-[#202325]">{{ exercise.name }}</span>
+            <span class="block text-sm capitalize text-[#72777A]">
+              {{ exercise.targetMuscleLabel }}
+              @if (exercise.equipmentLabel) {
+                · {{ exercise.equipmentLabel }}
+              }
+            </span>
+            @if (exercise.selected) {
+              <span class="flex items-center justify-center text-xs font-bold text-[#0070F0] absolute top-0 left-2 bg-[#F7F9FA] border-[#E3E5E5] rounded-full p-2">
+                <i class="app-icon fa-solid fa-check" aria-hidden="true"></i>
+              </span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (config().loading) {
+      <p class="py-4 text-center text-[#72777A]">{{ config().loadingLabel }}</p>
+    } @else if (!config().exercises.length && !config().error) {
+      <p class="py-8 text-center text-[#72777A]">{{ config().emptyLabel }}</p>
+    } @else if (config().hasMore) {
+      <div class="h-10" aria-hidden="true"></div>
+    }
+  </div>
+</div>

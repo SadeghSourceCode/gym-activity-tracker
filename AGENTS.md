@@ -669,29 +669,14 @@ Do not create services solely to satisfy a directory structure.
 
 # Service Rules During Feature Creation
 
-The strict service-extraction rule applies primarily to refactoring existing features.
+Every new feature must include a feature-owned `<feature>.service.ts` in its `data-access/services`
+directory. This service owns the feature's application flow, business decisions, state
+transitions, and persistence orchestration. Containers coordinate routing and presentation;
+presentational components render configs and emit user intent.
 
-When using:
-
-```text
-Create feature: <path>
-```
-
-do not over-engineer the initial implementation by automatically extracting every small piece of logic into a service.
-
-A new feature may start with logic inside its container when that logic is:
-
-- small
-- straightforward
-- feature-local
-- not reusable
-- unlikely to make the component difficult to understand
-
-However, API communication should still remain outside UI components when practical.
-
-As the feature grows or is later refactored, move meaningful feature logic into `<feature>.service.ts`.
-
-Prefer architectural simplicity during initial feature creation and stronger separation during dedicated refactoring.
+Do not move trivial DOM interaction or purely local presentation behavior into the service.
+API communication still belongs in `<feature>.api.service.ts` when the feature uses an external
+API, with the feature service coordinating that API workflow.
 
 ---
 

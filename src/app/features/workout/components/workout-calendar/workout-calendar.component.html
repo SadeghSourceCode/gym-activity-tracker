@@ -40,31 +40,37 @@
             <span class="leading-5 text-[#0070F0]">{{ day.label }}</span>
             <span
               class="flex size-8 items-center justify-center rounded-lg leading-5 transition-colors"
-              [class.bg-[#22A06B]]="getDayStatus(day.dateKey) === 'completed'"
-              [class.bg-[#0070F0]]="getDayStatus(day.dateKey) === 'rest'"
-              [class.bg-[#E5484D]]="getDayStatus(day.dateKey) === 'missed'"
+              [class.bg-[#22A06B]]="
+                (config().showStatuses ?? true) && getDayStatus(day.dateKey) === 'completed'
+              "
+              [class.bg-[#0070F0]]="
+                (config().showStatuses ?? true) && getDayStatus(day.dateKey) === 'rest'
+              "
+              [class.bg-[#E5484D]]="
+                (config().showStatuses ?? true) && getDayStatus(day.dateKey) === 'missed'
+              "
               [class.bg-[#303437]]="
                 isSelected(day.dateKey) &&
-                getDayStatus(day.dateKey) !== 'completed' &&
-                getDayStatus(day.dateKey) !== 'rest' &&
-                getDayStatus(day.dateKey) !== 'missed'
+                (!(config().showStatuses ?? true) || getDayStatus(day.dateKey) !== 'completed') &&
+                (!(config().showStatuses ?? true) || getDayStatus(day.dateKey) !== 'rest') &&
+                (!(config().showStatuses ?? true) || getDayStatus(day.dateKey) !== 'missed')
               "
               [class.text-[#F2F4F5]]="
                 isSelected(day.dateKey) ||
-                getDayStatus(day.dateKey) === 'completed' ||
-                getDayStatus(day.dateKey) === 'rest' ||
-                getDayStatus(day.dateKey) === 'missed'
+                ((config().showStatuses ?? true) && getDayStatus(day.dateKey) === 'completed') ||
+                ((config().showStatuses ?? true) && getDayStatus(day.dateKey) === 'rest') ||
+                ((config().showStatuses ?? true) && getDayStatus(day.dateKey) === 'missed')
               "
               [class.ring-2]="isToday(day.dateKey) && !isSelected(day.dateKey)"
               [class.ring-[#BFDDFF]]="isToday(day.dateKey) && !isSelected(day.dateKey)"
               [class.text-[#979C9E]]="
                 !isSelected(day.dateKey) &&
-                getDayStatus(day.dateKey) !== 'completed' &&
-                getDayStatus(day.dateKey) !== 'rest' &&
-                getDayStatus(day.dateKey) !== 'missed'
+                (!(config().showStatuses ?? true) || getDayStatus(day.dateKey) !== 'completed') &&
+                (!(config().showStatuses ?? true) || getDayStatus(day.dateKey) !== 'rest') &&
+                (!(config().showStatuses ?? true) || getDayStatus(day.dateKey) !== 'missed')
               "
             >
-              @switch (getDayStatus(day.dateKey)) {
+              @switch ((config().showStatuses ?? true) ? getDayStatus(day.dateKey) : 'empty') {
                 @case ('completed') {
                   <i class="app-icon fa-solid fa-check" aria-hidden="true"></i>
                 }
@@ -76,10 +82,12 @@
                 }
               }
             </span>
-            <span
-              class="size-1.5 shrink-0 rounded-full"
-              [class.bg-[#0070F0]]="getDayStatus(day.dateKey) === 'planned'"
-            ></span>
+            @if (config().showStatuses ?? true) {
+              <span
+                class="size-1.5 shrink-0 rounded-full"
+                [class.bg-[#0070F0]]="getDayStatus(day.dateKey) === 'planned'"
+              ></span>
+            }
           </app-button>
         }
       </div>
