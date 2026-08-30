@@ -30,11 +30,13 @@ import {
   startWorkoutSession,
   syncWorkoutSessionProgress,
 } from '../../utils/workout-session.util';
+import { AppHeaderConfig } from '../../../../data-access/models/app-header-config.interface';
+import { AppHeader } from '../../../../components/app-header/app-header';
 
 @Component({
   selector: 'app-workout-detail-page',
   standalone: true,
-  imports: [WorkoutDetailComponent, AppButton],
+  imports: [WorkoutDetailComponent, AppButton, AppHeader],
   templateUrl: './workout-detail-page.html',
 })
 export class WorkoutDetailPage {
@@ -127,6 +129,18 @@ export class WorkoutDetailPage {
         isPersian: this.i18n.language() === 'fa',
       },
     };
+  });
+
+  readonly headerConfig = signal<AppHeaderConfig>({
+    title: '',
+    leftButton: {
+      icon: 'fa-solid fa-chevron-right',
+      type: 'button',
+      variant: 'outline',
+      size: 'small',
+      mode: 'iconOnly',
+      ariaLabel: this.i18n.t('back'),
+    },
   });
 
   constructor() {

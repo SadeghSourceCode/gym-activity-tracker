@@ -3,6 +3,7 @@ import { WorkoutRecurrence } from './workout-storage.models';
 export interface WorkoutPlanningExerciseConfig {
   id: string;
   name: string;
+  mediaUrl?: string;
   setCount: number;
 }
 

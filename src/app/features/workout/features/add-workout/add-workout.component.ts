@@ -73,15 +73,14 @@ export class AddWorkoutComponent {
   );
   readonly headerConfig = computed<AppHeaderConfig>(() => ({
     title: this.title(),
-    leftButton:
-      this.step() === 'planning'
-        ? {
-            title: this.text().backLabel,
-            type: 'button',
-            variant: 'link',
-            mode: 'section',
-          }
-        : undefined,
+    leftButton: {
+      icon: 'fa-solid fa-chevron-right',
+      type: 'button',
+      variant: 'outline',
+      size: 'small',
+      mode: 'iconOnly',
+      ariaLabel: this.i18n.t('back'),
+    },
     rightButton:
       this.step() === 'exercises'
         ? {
@@ -170,6 +169,7 @@ export class AddWorkoutComponent {
     exercises: this.selectedExercises().map((exercise) => ({
       id: exercise.id,
       name: this.getWorkoutExerciseName(exercise),
+      mediaUrl: exercise.thumbnailUrl,
       setCount: Math.max(exercise.sets.length, 1),
     })),
     workoutTitleLabel: this.text().workoutTitleLabel,

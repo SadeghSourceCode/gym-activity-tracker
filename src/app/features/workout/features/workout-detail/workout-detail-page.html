@@ -1,30 +1,37 @@
+<app-header
+  class="sticky top-0 z-40 block w-full bg-[#F7F9FA]"
+  [config]="headerConfig()"
+  (leftButtonClicked)="goBack()"
+/>
+
 @if (workoutError()) {
-  <div class="flex min-h-dvh flex-col items-center justify-center gap-4 p-4 text-center">
-    <p class="text-lg font-semibold text-[#202325]">{{ workoutError() }}</p>
-    <app-button
-      [config]="{
+<div class="flex min-h-dvh flex-col items-center justify-center gap-4 p-4 text-center">
+  <p class="text-lg font-semibold text-[#202325]">{{ workoutError() }}</p>
+  <app-button
+    [config]="{
         variant: 'fill',
         mode: 'section',
         type: 'button',
       }"
-      (buttonClicked)="goBack()"
-    >
-      {{ i18n.t('back') }}
-    </app-button>
-  </div>
+    (buttonClicked)="goBack()"
+  >
+    {{ i18n.t('back') }}
+  </app-button>
+</div>
 } @else if (workoutDetailConfig(); as workoutDetailConfig) {
-  <app-workout-detail
-    [config]="workoutDetailConfig"
-    (close)="goBack()"
-    (addSet)="addSet($event.workoutId, $event.exerciseId)"
-    (removeExercise)="removeExercise($event.workoutId, $event.exerciseId)"
-    (requestExerciseReplacement)="requestExerciseReplacement($event)"
-    (cancelExerciseReplacement)="cancelExerciseReplacement()"
-    (replaceExercise)="replaceExercise($event.workoutId, $event.exerciseId, $event.replacement)"
-    (updateSet)="updateSet($event.workoutId, $event.exerciseId, $event.setId, $event.changes)"
-    (startSession)="startSession($event)"
-    (requestAddExercise)="requestAddExercise($event)"
-    (cancelAddExercise)="cancelAddExercise()"
-    (addExercise)="addExercise($event.workoutId, $event.section, $event.exercise)"
-  />
+<app-workout-detail
+  class="flex flex-col px-5"
+  [config]="workoutDetailConfig"
+  (close)="goBack()"
+  (addSet)="addSet($event.workoutId, $event.exerciseId)"
+  (removeExercise)="removeExercise($event.workoutId, $event.exerciseId)"
+  (requestExerciseReplacement)="requestExerciseReplacement($event)"
+  (cancelExerciseReplacement)="cancelExerciseReplacement()"
+  (replaceExercise)="replaceExercise($event.workoutId, $event.exerciseId, $event.replacement)"
+  (updateSet)="updateSet($event.workoutId, $event.exerciseId, $event.setId, $event.changes)"
+  (startSession)="startSession($event)"
+  (requestAddExercise)="requestAddExercise($event)"
+  (cancelAddExercise)="cancelAddExercise()"
+  (addExercise)="addExercise($event.workoutId, $event.section, $event.exercise)"
+/>
 }
