@@ -1,9 +1,12 @@
-<section class="flex min-h-full w-full min-w-0 flex-col gap-4" [attr.aria-label]="title()">
+<section
+  class="flex h-full w-full min-w-0 flex-col gap-4 overflow-hidden"
+  [attr.aria-label]="title()"
+>
   <app-header
-    class="sticky top-0 z-40 block w-full bg-[#F7F9FA] py-2"
+    class="sticky top-0 z-40 block w-full bg-[#F7F9FA] py-2 px-5"
     [config]="headerConfig()"
-    (leftButtonClicked)="goNext()"
-    (rightButtonClicked)="goBack()"
+    (leftButtonClicked)="goBack()"
+    (rightButtonClicked)="goNext()"
   />
 
   <div class="flex min-h-0 flex-1 flex-col gap-4">
@@ -26,7 +29,7 @@
         (setCountChanged)="updateSelectedExerciseSetCount($event)"
       />
 
-      <div class="stiky-button">
+      <div class="stiky-button px-5">
         <app-button
           class="w-full"
           [config]="{ variant: 'fill', mode: 'form', type: 'button' }"

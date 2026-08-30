@@ -30,6 +30,7 @@ type AddWorkoutStep = 'exercises' | 'planning';
 
 @Component({
   selector: 'app-add-workout',
+  host: { class: 'block h-full' },
   standalone: true,
   imports: [AppButton, AppHeader, ExerciseSelectionStepComponent, WorkoutPlanningStepComponent],
   templateUrl: './add-workout.component.html',
@@ -73,6 +74,15 @@ export class AddWorkoutComponent {
   readonly headerConfig = computed<AppHeaderConfig>(() => ({
     title: this.title(),
     leftButton:
+      this.step() === 'planning'
+        ? {
+            title: this.text().backLabel,
+            type: 'button',
+            variant: 'link',
+            mode: 'section',
+          }
+        : undefined,
+    rightButton:
       this.step() === 'exercises'
         ? {
             title: this.text().continueLabel,
@@ -80,15 +90,6 @@ export class AddWorkoutComponent {
             variant: 'link',
             mode: 'section',
             disabled: !this.selectedExercises().length,
-          }
-        : undefined,
-    rightButton:
-      this.step() === 'planning'
-        ? {
-            title: this.text().backLabel,
-            type: 'button',
-            variant: 'link',
-            mode: 'section',
           }
         : undefined,
   }));
