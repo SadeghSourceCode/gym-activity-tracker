@@ -1,9 +1,10 @@
-name: Deploy Angular to GitHub Pages
+name: Deploy Gym Tracker PWA to GitHub Pages
 
 on:
   push:
     branches:
-      - main
+      - staging
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -11,7 +12,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -38,10 +39,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build Angular
+      - name: Build Angular PWA
         run: pnpm run build:github-pages
 
-      - name: Upload Pages Artifact
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist/gym-activity-tracker/browser
@@ -52,7 +56,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     needs: build
-
     runs-on: ubuntu-latest
 
     steps:
