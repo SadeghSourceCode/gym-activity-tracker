@@ -39,6 +39,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Run unit tests
+        run: pnpm run test:ci
+
       - name: Build Angular PWA
         run: pnpm run build:github-pages
 
