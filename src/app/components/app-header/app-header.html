@@ -1,13 +1,11 @@
-<header class="relative flex min-h-12 items-center justify-between gap-3">
+<header class="h-14 relative flex min-h-12 items-center justify-between gap-3 px-5">
   <div class="relative z-10 flex min-w-12 justify-start">
     @if (leftButton(); as button) {
-      <app-button [config]="button" (buttonClicked)="leftButtonClicked.emit($event)">
-        @if (button.mode === 'iconOnly') {
-          <i [class]="'app-icon ' + button.icon" aria-hidden="true"></i>
-        } @else {
-          {{ button.title }}
-        }
-      </app-button>
+    <app-button [config]="button" (buttonClicked)="leftButtonClicked.emit($event)">
+      @if (button.mode === 'iconOnly') {
+      <i [class]="'app-icon ' + button.icon" aria-hidden="true"></i>
+      } @else { {{ button.title }} }
+    </app-button>
     }
   </div>
 
@@ -19,13 +17,11 @@
 
   <div class="relative z-10 flex min-w-12 justify-end">
     @if (rightButton(); as button) {
-      <app-button [config]="button" (buttonClicked)="rightButtonClicked.emit($event)">
-        @if (button.mode === 'iconOnly') {
-          <i [class]="'app-icon ' + button.icon" aria-hidden="true"></i>
-        } @else {
-          {{ button.title }}
-        }
-      </app-button>
+    <app-button [config]="button" (buttonClicked)="rightButtonClicked.emit($event)">
+      @if (button.mode === 'iconOnly') {
+      <i [class]="'app-icon ' + button.icon" aria-hidden="true"></i>
+      } @else { {{ button.title }} }
+    </app-button>
     }
   </div>
 </header>

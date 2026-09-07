@@ -4,4 +4,5 @@ export interface WorkoutCalendarConfig {
   selectedDate?: string;
   workouts?: readonly Workout[];
   restDayKeys?: readonly string[];
+  showStatuses?: boolean;
 }

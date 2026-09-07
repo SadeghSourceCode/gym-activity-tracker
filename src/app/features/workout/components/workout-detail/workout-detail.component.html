@@ -3,27 +3,6 @@
   [attr.aria-label]="workout().name + ' ' + text().workoutDetailsLabel"
 >
   <div class="flex min-h-full flex-col gap-4">
-    <div class="flex items-center justify-between gap-3">
-      <div class="min-w-0">
-        <h2 class="truncate text-xl font-bold text-[#202325]">{{ workout().name }}</h2>
-        <p class="text-sm font-medium text-[#72777A]">
-          {{ getExerciseCountLabel(workout().exercises.length) }}
-        </p>
-      </div>
-
-      <app-button
-        [config]="{
-          variant: 'link',
-          mode: 'iconOnly',
-          type: 'button',
-          ariaLabel: text().closeWorkoutDetailsLabel,
-        }"
-        (buttonClicked)="close.emit()"
-      >
-        <i class="app-icon fa-solid fa-xmark" aria-hidden="true"></i>
-      </app-button>
-    </div>
-
     @if (config().persistenceError) {
       <p
         class="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700"

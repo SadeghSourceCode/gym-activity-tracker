@@ -44,7 +44,7 @@ export interface WorkoutExerciseSummary {
 }
 
 export interface WorkoutRecurrence {
-  frequency: 'weekly';
+  frequency: 'weekly' | 'monthly';
   interval: number;
   occurrences: number;
 }

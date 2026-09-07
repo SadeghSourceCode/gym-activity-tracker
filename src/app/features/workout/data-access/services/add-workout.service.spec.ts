@@ -74,12 +74,31 @@ describe('AddWorkoutService exercise placement', () => {
       selectedDate: '2026-08-21',
       selectedExercises: selected,
       targetMuscle: 'legs',
-      isWeeklyPlan: true,
+      recurrenceFrequency: 'weekly',
     });
 
     expect(workouts[0].schemaVersion).toBe(2);
     expect(workouts[0].recurrence).toEqual({
       frequency: 'weekly',
+      interval: 1,
+      occurrences: 4,
+    });
+  });
+
+  it('stores monthly recurrence explicitly', () => {
+    const service = TestBed.inject(AddWorkoutService);
+    const selected = service.toggleExercise([], exercise, 'main');
+    const workouts = service.createWorkout([], {
+      workoutTitle: '',
+      defaultWorkoutTitle: 'Leg Day',
+      selectedDate: '2026-08-21',
+      selectedExercises: selected,
+      targetMuscle: 'legs',
+      recurrenceFrequency: 'monthly',
+    });
+
+    expect(workouts[0].recurrence).toEqual({
+      frequency: 'monthly',
       interval: 1,
       occurrences: 4,
     });
@@ -96,6 +115,21 @@ describe('AddWorkoutService exercise placement', () => {
     expect(moved.map(({ exerciseId, order }) => ({ exerciseId, order }))).toEqual([
       { exerciseId: 'catalog:lunge', order: 0 },
       { exerciseId: 'catalog:squat', order: 1 },
+    ]);
+  });
+
+  it('reorders a dragged placement relative to its drop target', () => {
+    const service = TestBed.inject(AddWorkoutService);
+    const first = service.toggleExercise([], exercise, 'main');
+    const second = service.toggleExercise(first, { ...exercise, id: 'catalog:lunge' }, 'main');
+    const selected = service.toggleExercise(second, { ...exercise, id: 'catalog:press' }, 'main');
+
+    const reordered = service.reorderExercise(selected, selected[2].id, selected[0].id);
+
+    expect(reordered.map(({ exerciseId, order }) => ({ exerciseId, order }))).toEqual([
+      { exerciseId: 'catalog:press', order: 0 },
+      { exerciseId: 'catalog:squat', order: 1 },
+      { exerciseId: 'catalog:lunge', order: 2 },
     ]);
   });
 });

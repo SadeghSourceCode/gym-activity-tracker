@@ -1,0 +1,23 @@
+{
+  "name": "Gym Activity Tracker",
+  "short_name": "Gym Tracker",
+  "description": "Plan workouts, log sets, and track training progress from any device.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#0b1020",
+  "orientation": "portrait-primary",
+  "lang": "fa",
+  "dir": "auto",
+  "categories": ["fitness", "health", "productivity"],
+  "icons": [
+    {
+      "src": "icons/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

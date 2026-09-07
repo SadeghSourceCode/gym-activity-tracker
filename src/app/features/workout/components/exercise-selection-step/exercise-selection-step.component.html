@@ -1,0 +1,133 @@
+<div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto" (scroll)="onScroll($event)">
+  <div class="flex items-center justify-between gap-3 px-5">
+    <button
+      class="flex min-w-0 items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-[#202325] shadow-sm"
+      type="button"
+      [attr.aria-expanded]="showCalendar()"
+      (click)="toggleCalendar()"
+    >
+      <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+      <span class="truncate">{{ config().selectedDate }}</span>
+      <span class="text-xs text-[#0070F0]">{{ showCalendar() ? config().hideCalendarLabel : config().changeDateLabel }}</span>
+    </button>
+
+    <button
+      class="flex shrink-0 items-center gap-2 rounded-xl border border-[#E3E5E5] bg-white px-3 py-2 text-sm font-semibold text-[#0070F0]"
+      type="button"
+      [attr.aria-expanded]="showSearch()"
+      (click)="toggleSearch()"
+    >
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      {{ showSearch() ? config().hideSearchLabel : config().searchActionLabel }}
+    </button>
+  </div>
+
+  @if (showCalendar()) {
+    <app-workout-calendar
+      class="px-5"
+      [config]="{ selectedDate: config().selectedDate, showStatuses: false }"
+      (dateSelected)="dateSelected.emit($event); showCalendar.set(false)"
+    />
+  }
+
+  @if (showSearch()) {
+    <div class="px-5">
+      <input
+        class="block w-full rounded-xl border border-[#E3E5E5] bg-white px-4 py-3 text-[#202325] focus:outline-none focus:ring-2 focus:ring-[#0070F0]"
+        type="search"
+        autofocus
+        [attr.aria-label]="config().searchPlaceholder"
+        [placeholder]="config().searchPlaceholder"
+        [value]="config().searchQuery"
+        (input)="queryChanged.emit($any($event.target).value)"
+      />
+    </div>
+  }
+
+  <div class="px-5">
+    <div class="mb-2 flex items-center justify-between gap-3">
+      <strong class="text-sm text-[#202325]">{{ config().quickPickLabel }}</strong>
+      <button class="text-xs font-bold text-[#0070F0]" type="button" (click)="showAllExercises()">
+        {{ config().allExercisesLabel }}
+      </button>
+    </div>
+
+    <div class="flex gap-2 overflow-x-auto pb-1">
+      @for (muscle of config().muscles; track muscle.id) {
+        <button
+          class="flex shrink-0 items-center gap-2 rounded-full border bg-white py-2 ps-2 pe-3 text-sm font-semibold transition"
+          type="button"
+          [attr.aria-pressed]="muscle.selected"
+          [ngClass]="{
+            'border-[#0070F0] bg-[#EAF4FF] text-[#0068D9] ring-2 ring-[#0070F0]/10': muscle.selected,
+            'border-[#E3E5E5] text-[#202325]': !muscle.selected,
+          }"
+          (click)="muscleToggled.emit(muscle.id)"
+        >
+          <img class="size-8 rounded-full bg-[#F7F9FA] object-cover" [src]="muscle.imageUrl" [alt]="muscle.label" loading="lazy" />
+          <span>{{ muscle.label }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (config().selectedCount > 0) {
+    <div
+      class="sticky top-0 z-20 mx-5 flex items-center justify-between rounded-xl bg-[#EAF4FF] px-4 py-3 text-sm font-bold text-[#0068D9] shadow-sm"
+      role="status"
+      aria-live="polite"
+    >
+      <span>{{ config().selectedCount }} {{ config().selectedCountLabel }}</span>
+      <i class="fa-solid fa-check" aria-hidden="true"></i>
+    </div>
+  }
+
+  <div class="min-h-0 flex-1 px-5">
+    @if (config().error; as error) {
+      <p class="rounded-xl bg-[#FFD6D6] p-3 text-[#C93636]" role="alert">{{ error }}</p>
+    }
+
+    <div class="grid gap-2">
+      @for (exercise of config().exercises; track exercise.id) {
+        <button
+          class="grid w-full grid-cols-[64px_1fr_auto] items-center gap-3 rounded-2xl border bg-white p-2 text-start transition active:scale-[0.99]"
+          type="button"
+          [attr.aria-pressed]="exercise.selected"
+          [ngClass]="{
+            'border-[#0070F0] bg-[#F7FBFF]': exercise.selected,
+            'border-[#E3E5E5]': !exercise.selected,
+          }"
+          (click)="exerciseToggled.emit(exercise.id)"
+        >
+          @if (exercise.mediaUrl) {
+            <img class="size-16 rounded-xl bg-[#F7F9FA] object-cover" [src]="exercise.mediaUrl" [alt]="exercise.name" loading="lazy" />
+          } @else {
+            <span class="size-16 rounded-xl bg-[#F7F9FA]" aria-hidden="true"></span>
+          }
+          <span class="min-w-0">
+            <span class="block font-semibold text-[#202325]">{{ exercise.name }}</span>
+            <span class="block truncate text-xs capitalize text-[#72777A]">
+              {{ exercise.targetMuscleLabel }}
+              @if (exercise.equipmentLabel) { · {{ exercise.equipmentLabel }} }
+            </span>
+          </span>
+          <span
+            class="flex size-8 items-center justify-center rounded-full border"
+            [ngClass]="exercise.selected ? 'border-[#0070F0] bg-[#0070F0] text-white' : 'border-[#D6D8D9] text-[#72777A]'"
+            aria-hidden="true"
+          >
+            <i class="fa-solid" [ngClass]="exercise.selected ? 'fa-check' : 'fa-plus'" aria-hidden="true"></i>
+          </span>
+        </button>
+      }
+    </div>
+
+    @if (config().loading) {
+      <p class="py-4 text-center text-[#72777A]" role="status">{{ config().loadingLabel }}</p>
+    } @else if (!config().exercises.length && !config().error) {
+      <p class="py-8 text-center text-[#72777A]">{{ config().emptyLabel }}</p>
+    } @else if (config().hasMore) {
+      <div class="h-10" aria-hidden="true"></div>
+    }
+  </div>
+</div>

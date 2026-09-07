@@ -1,14 +1,14 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { I18nService } from './core/i18n/i18n.service';
-import { AppButton } from './components/app-button/app-button';
-
-type BottomNavItem = 'home' | 'search' | 'statistics' | 'profile';
+import { BottomNav } from './components/bottom-nav/bottom-nav';
+import { BottomNavItemId } from './data-access/models/bottom-nav-item-id.type';
+import { BottomNavItemSelectedOutput } from './data-access/models/bottom-nav-item-selected-output.interface';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, AppButton],
+  imports: [RouterOutlet, BottomNav],
   templateUrl: './app.html',
 })
 export class App {
@@ -16,18 +16,34 @@ export class App {
   readonly i18n = inject(I18nService);
 
   protected readonly title = signal('gym-activity-tracker');
-  protected readonly selectedBottomNavItem = signal<BottomNavItem | null>(null);
+  protected readonly selectedBottomNavItem = signal<BottomNavItemId | null>(null);
 
   protected readonly bottomNavItems: {
-    id: BottomNavItem;
+    id: BottomNavItemId;
     labelKey: 'home' | 'search' | 'statistics' | 'profile';
     route: string;
+    iconClass: string;
   }[] = [
-    { id: 'home', labelKey: 'home', route: '/' },
-    { id: 'search', labelKey: 'search', route: '/search' },
-    { id: 'statistics', labelKey: 'statistics', route: '/statistics' },
-    { id: 'profile', labelKey: 'profile', route: '/profile' },
+    { id: 'home', labelKey: 'home', route: '/', iconClass: 'fa-house' },
+    { id: 'search', labelKey: 'search', route: '/search', iconClass: 'fa-magnifying-glass' },
+    {
+      id: 'statistics',
+      labelKey: 'statistics',
+      route: '/statistics',
+      iconClass: 'fa-chart-column',
+    },
+    { id: 'profile', labelKey: 'profile', route: '/profile', iconClass: 'fa-user' },
   ];
+
+  protected readonly bottomNavConfig = computed(() => ({
+    items: this.bottomNavItems.map((item) => ({
+      id: item.id,
+      route: item.route,
+      iconClass: item.iconClass,
+      label: this.i18n.t(item.labelKey),
+    })),
+    selectedItemId: this.selectedBottomNavItem()!,
+  }));
 
   constructor() {
     this.syncSelectedBottomNavItemWithRoute(this.router.url);
@@ -37,16 +53,8 @@ export class App {
       .subscribe((event) => this.syncSelectedBottomNavItemWithRoute(event.urlAfterRedirects));
   }
 
-  protected selectBottomNavItem(item: BottomNavItem, route: string) {
-    void this.router.navigateByUrl(route);
-  }
-
-  protected isBottomNavItemSelected(item: BottomNavItem): boolean {
-    return this.selectedBottomNavItem() === item;
-  }
-
-  protected getBottomNavLabel(labelKey: 'home' | 'search' | 'statistics' | 'profile'): string {
-    return this.i18n.t(labelKey);
+  protected selectBottomNavItem(selection: BottomNavItemSelectedOutput): void {
+    void this.router.navigateByUrl(selection.route);
   }
 
   private syncSelectedBottomNavItemWithRoute(url: string) {

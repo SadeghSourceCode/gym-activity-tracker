@@ -16,10 +16,17 @@ import {
 } from '../../data-access/models/weekly-activity-config.interface';
 import { UpcomingWorkoutsComponent } from '../../components/upcoming-workouts/upcoming-workouts.component';
 import { WeeklyActivityComponent } from '../../components/weekly-activity/weekly-activity.component';
+import { TodayWorkoutEmptyStateComponent } from '../../components/today-workout-empty-state/today-workout-empty-state.component';
+import { TodayWorkoutEmptyStateConfig } from '../../data-access/models/today-workout-empty-state-config.interface';
 
 @Component({
   selector: 'app-home-page',
-  imports: [AppButton, UpcomingWorkoutsComponent, WeeklyActivityComponent],
+  imports: [
+    AppButton,
+    TodayWorkoutEmptyStateComponent,
+    UpcomingWorkoutsComponent,
+    WeeklyActivityComponent,
+  ],
   templateUrl: './home-page.component.html',
 })
 export class HomePageComponent {
@@ -31,6 +38,19 @@ export class HomePageComponent {
   readonly hasWorkoutToday = computed(() =>
     this.workouts().some((workout) => isWorkoutOnDate(workout, getTodayDateKey())),
   );
+
+  readonly todayWorkoutEmptyStateConfig = computed<TodayWorkoutEmptyStateConfig>(() => {
+    const isPersian = this.i18n.language() === 'fa';
+
+    return {
+      ariaLabel: isPersian ? 'تمرین امروز' : "Today's workout",
+      title: isPersian ? 'برای امروز تمرینی نداری' : 'No workout planned for today',
+      description: isPersian
+        ? 'یک تمرین اضافه کن و برنامه امروزت را بساز.'
+        : 'Add a workout and build your plan for today.',
+      actionLabel: this.i18n.t('addWorkout'),
+    };
+  });
 
   readonly upcomingConfig = computed<UpcomingWorkoutConfig>(() => {
     const isPersian = this.i18n.language() === 'fa';

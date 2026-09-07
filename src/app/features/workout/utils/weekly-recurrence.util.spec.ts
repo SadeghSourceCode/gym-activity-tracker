@@ -50,6 +50,15 @@ describe('weekly recurrence utilities', () => {
     expect(isWorkoutOnDate(workout, '2026-08-11')).toBe(false);
   });
 
+  it('matches monthly workouts on the same day of month', () => {
+    const workout = createWorkout({
+      recurrence: { frequency: 'monthly', interval: 1, occurrences: 4 },
+    });
+
+    expect(isWorkoutOnDate(workout, '2026-09-03')).toBe(true);
+    expect(isWorkoutOnDate(workout, '2026-09-04')).toBe(false);
+  });
+
   it('does not match weekly workouts before their start date', () => {
     const workout = createWorkout({
       recurrence: { frequency: 'weekly', interval: 1, occurrences: 4 },
