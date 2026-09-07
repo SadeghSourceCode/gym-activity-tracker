@@ -7,9 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:ci": "ng test --watch=false",
-    "build:github-pages": "ng build --base-href /gym-activity-tracker/",
-    "check:pwa": "node scripts/verify-pwa.mjs"
+    "build:github-pages": "ng build --base-href /gym-activity-tracker/"
   },
   "private": true,
   "packageManager": "pnpm@11.9.0",

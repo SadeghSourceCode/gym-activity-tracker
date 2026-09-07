@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
-  <title id="title">Gym Activity Tracker</title>
-  <desc id="desc">A rounded fitness tracker app icon with a dumbbell and progress mark.</desc>
-  <rect width="512" height="512" rx="112" fill="#0b1020"/>
-  <circle cx="256" cy="256" r="168" fill="#121a31"/>
-  <path d="M145 222h32v68h-32v34h-34V188h34v34Zm190 0h32v-34h34v136h-34v-34h-32v-68ZM177 239h158v34H177v-34Z" fill="#f8fafc"/>
-  <path d="m206 334 32 31 68-78" fill="none" stroke="#22c55e" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
