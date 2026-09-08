@@ -28,11 +28,4 @@ export interface ExerciseSelectionStepConfig {
   selectedLabel: string;
   loadingLabel: string;
   emptyLabel: string;
-  quickPickLabel: string;
-  allExercisesLabel: string;
-  searchActionLabel: string;
-  hideSearchLabel: string;
-  changeDateLabel: string;
-  hideCalendarLabel: string;
-  selectedCountLabel: string;
 }

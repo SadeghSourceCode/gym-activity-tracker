@@ -25,6 +25,7 @@
     <div class="grid gap-3">
       @for (workout of workouts(); track workout.id) {
         <app-button
+          class="w-full"
           [config]="{
             variant: 'outline',
             mode: 'form',
