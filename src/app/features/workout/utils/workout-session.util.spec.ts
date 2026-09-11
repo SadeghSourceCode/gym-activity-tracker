@@ -39,7 +39,20 @@ describe('workout session', () => {
 
     expect(touched.session?.lastUpdatedAt).toBe('2026-08-21T10:05:00.000Z');
     expect(completed.completionStatus).toBe('completed');
-    expect(completed.session).toMatchObject({ status: 'completed', durationSeconds: 1800 });
+    expect(completed.session).toMatchObject({
+      status: 'completed',
+      completedAt: '2026-08-21T10:30:00.000Z',
+      durationSeconds: 1800,
+      progressPercent: 100,
+    });
+  });
+
+  it('does not restart an already active session', () => {
+    const started = startWorkoutSession(workout(), new Date('2026-08-21T10:00:00Z'));
+    const startedAgain = startWorkoutSession(started, new Date('2026-08-21T10:10:00Z'));
+
+    expect(startedAgain).toBe(started);
+    expect(startedAgain.session?.startedAt).toBe('2026-08-21T10:00:00.000Z');
   });
 
   it('reports completed set progress', () => {
@@ -48,5 +61,18 @@ describe('workout session', () => {
     expect(
       syncWorkoutSessionProgress(startWorkoutSession(workout())).session?.progressPercent,
     ).toBe(50);
+  });
+
+  it('keeps actual progress when a workout is abandoned', () => {
+    const started = startWorkoutSession(workout(), new Date('2026-08-21T10:00:00Z'));
+    const abandoned = finishWorkoutSession(started, 'abandoned', new Date('2026-08-21T10:12:00Z'));
+
+    expect(abandoned.completionStatus).toBe('rejected');
+    expect(abandoned.session).toMatchObject({
+      status: 'abandoned',
+      completedAt: '2026-08-21T10:12:00.000Z',
+      durationSeconds: 720,
+      progressPercent: 50,
+    });
   });
 });
