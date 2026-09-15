@@ -1,59 +1,98 @@
-# GymActivityTracker
+# Gym Activity Tracker
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.8.
+A mobile-first Angular application for planning workouts, logging sets, and tracking training progress.
 
-## Development server
+## Product status
 
-To start a local development server, run:
+The project is an active pre-production product. The core workout flow is usable, but the repository should not yet be treated as commercially production-ready.
 
-```bash
-ng serve
-```
+Current capabilities include:
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Browse and search an exercise library.
+- Create workouts and organize exercises into workout sections.
+- Start/resume workout sessions.
+- Log reps and weight per set and mark sets complete.
+- Track workout progress and use a rest timer.
+- Install the application as a PWA on supported browsers.
+- Cache the application shell for offline navigation.
 
-## Code scaffolding
+## Technology
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Angular 22
+- TypeScript 6
+- RxJS
+- Tailwind CSS 4
+- Vitest
+- pnpm
+- GitHub Actions / GitHub Pages
 
-```bash
-ng generate component component-name
-```
+## Requirements
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- Node.js 22.x
+- pnpm 11.9.0
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Local development
 
 ```bash
-ng test
+pnpm install
+pnpm start
 ```
 
-## Running end-to-end tests
+The development server is available at `http://localhost:4200/` by default.
 
-For end-to-end (e2e) testing, run:
+## Quality checks
+
+Run the unit tests:
 
 ```bash
-ng e2e
+pnpm test
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Run a production build:
 
-## Additional Resources
+```bash
+pnpm build
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+The `staging` branch runs both checks through `.github/workflows/quality.yml` on every push. Pull requests targeting `main` or `staging` run the same quality workflow.
+
+> There is currently no configured end-to-end test runner. Do not use `ng e2e` as a release check until an E2E framework and critical user journeys are added.
+
+## PWA
+
+The application includes a web app manifest, 192x192 and 512x512 PNG icons, an SVG fallback icon, and a service worker for application-shell/offline caching.
+
+GitHub Pages deployment is performed from `main` by `.github/workflows/deploy-pages.yml`. The deployment workflow runs unit tests before building and publishing the application and creates a `404.html` SPA fallback for direct route navigation.
+
+Live application:
+
+https://sadeghsourcecode.github.io/gym-activity-tracker/
+
+## Persistence
+
+Workout and rest-day records are currently persisted in browser `localStorage`. This is suitable for the current MVP but is **not** sufficient as the only source of truth for a commercial product: clearing browser data, changing devices, or losing local storage can remove user history.
+
+Before commercial launch, introduce authenticated server-side persistence and cross-device synchronization. Offline-first local storage can remain as a cache/queue, with explicit conflict handling and recovery behavior.
+
+## Commercial-readiness checklist
+
+The highest-priority work before treating the product as production-ready is:
+
+- Authentication and server-side workout persistence.
+- Cross-device synchronization, backup, and recovery.
+- Data export and account/data deletion controls.
+- End-to-end coverage for the critical `Plan -> Start -> Log -> Finish` journey.
+- Automated accessibility checks plus keyboard/screen-reader validation.
+- Error reporting, performance monitoring, and privacy-aware product analytics.
+- Reduce the exercise-library cold-start payload; the current catalog is large for mobile first load.
+- Verify redistribution/commercial-use licenses for exercise data, images, and animations.
+- Separate staging and production release environments as the deployment model grows.
+- Protect release branches and require passing quality checks before merge.
+
+## Repository conventions
+
+Follow [`AGENTS.md`](./AGENTS.md) for project architecture and implementation conventions. Keep feature business logic in feature data-access/services and keep reusable/presentational components focused on inputs and outputs.
+
+## Release flow
+
+Use `staging` for integration and validation. Merge reviewed, green changes to `main` to trigger the GitHub Pages production deployment.
